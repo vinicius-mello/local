@@ -38,8 +38,8 @@ MA57_LIB= ~/local/Numeric/ma57-3.7.0/src/libma57.a \
 GL2_LIB = -lGLU -lGLEW -lGL
 GL2_INC = -I .
 
-LPT_LIB = ~/local/lpt-code/lpt/lpt.o
-LPT_INC = -I ~/local/lpt-code/
+LPT_LIB = ~/local/lpt/lpt.o
+LPT_INC = -I ~/local/
 
 GSL_LIB = -lgsl $(BLAS_LIB)
 GSL_INC= 
