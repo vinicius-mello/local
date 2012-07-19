@@ -1,0 +1,37 @@
+/*! \mainpage 
+ 
+  \section intro_sec Introduction
+
+  The lpt library is an implementation of the 
+  algorithms and ideas described in the paper 
+	<a href="http://www.imr.sandia.gov/papers/abstracts/At309.html">
+	"Pointerless Implementation
+	of Hierarchical Simplicial Meshes and Efficient 
+	Neighbor Finding in Arbitrary Dimensions"</a> authored by F. Betul Atalay
+	and David M. Mount. In short, a code (the lpt code) 
+	is associated to each simplex in a hierachical
+	mesh originated from sucessive compatible bisections of a 
+	canonicaly triangulated hypercube. The lpt code of a simplex encodes 
+	its (L)evel (the class of equivalence according 
+	similarity relation), a (P)ermutation (the orthogonal transformation
+	that relates the simplex with the standard simplex at same level) and
+	a (T)ranslation (the path of the simplex in a tree of nested boxes, like
+	a quadtree). From the lpt code one can compute efficiently the code of 
+  the parent and children simplexes, the code of the neighbors simplexes at same
+	level, and the coordinates of the vertices.
+
+  Our implementation is very literal so for 
+	understand the details  read the original paper. Tables for dimension 2,
+	3 and 4 dimensions are supplied, but its easy to generate tables for 
+	higher dimensions. The interface is very simple, read the
+	\link example.cpp example code \endlink in to see how to use the library.
+	
+
+  \section using_sec Using the Library
+
+	The library is implemented as a template library (in file lpt.hpp),
+	plus some static tables (in the file lpt.cpp). Typing make in the
+	top directory will generate the tables and compile the file lpt.cpp.
+	To use the library, just include lpt.hpp and link against lpt.o.
+ 
+*/

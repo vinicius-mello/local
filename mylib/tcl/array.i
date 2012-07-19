@@ -1,0 +1,3 @@
+%include "../swig/array.i"
+
+
