@@ -2,7 +2,7 @@ include ../make.inc
 
 TARGETS=array$(EXT) blas$(EXT) sparse$(EXT) triplets$(EXT) umfpack$(EXT) \
   arpack$(EXT) ma57$(EXT)\
-	gl2$(EXT) lpt$(EXT) gsl$(EXT) 
+	gl2$(EXT) lpt$(EXT) gsl$(EXT) pack$(EXT)
 #	ma47$(EXT) lpt$(EXT)
 
 
@@ -92,6 +92,9 @@ lpt$(EXT): lpt_wrap.cxx
 
 lpt_wrap.cxx: $(MYLIB)/swig/lpt.i 
 	swig -o $@ -c++ -lua $<
+
+pack$(EXT): lpack.c 
+	gcc -o $@ $(SHARED) $< $(LUA_INC) $(LUA_LIB) -I $(MYLIB)
 
 clean:
 	rm -rf *_wrap.cxx 

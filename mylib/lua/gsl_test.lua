@@ -24,7 +24,7 @@ function df(a,g)
 end
 
 local x=vec {5,7}
-gsl.multimin_fminimize(f,
+gsl.fminimize(f,
   { eps=0.00001,
     maxiter=500,
     starting_point=x ,
@@ -35,7 +35,7 @@ gsl.multimin_fminimize(f,
 print(x:get(0),x:get(1))
 
 local x=vec {5,7}
-gsl.multimin_fdfminimize(f,df,
+gsl.fdfminimize(f,df,
   { eps=0.00001,
     maxiter=500,
     starting_point=x ,
@@ -43,3 +43,36 @@ gsl.multimin_fdfminimize(f,df,
     show_iterations=true })
 
 print(x:get(0),x:get(1))
+
+function rosenbrock(v,w)
+	local x=v:get(0)
+	local y=v:get(1)
+	w:set(0,1-x)
+	w:set(1,10*(y-x*x))
+end
+
+local x=vec {-10,-5}
+gsl.fsolve(rosenbrock, 
+	{ algorithm="dnewton",
+    starting_point=x ,
+    show_iterations=true })
+
+print(x:get(0),x:get(1))
+
+function rosenbrock_df(v,j)
+	local x=v:get(0)
+	local y=v:get(1)
+	j:set(0,0,-1)
+	j:set(0,1,0)
+	j:set(1,0,-20*x)
+	j:set(1,1,10)
+end
+
+local x=vec {-10,-5}
+gsl.fdfsolve(rosenbrock, rosenbrock_df,
+	{ algorithm="hybridsj",
+    starting_point=x ,
+    show_iterations=true })
+
+print(x:get(0),x:get(1))
+
