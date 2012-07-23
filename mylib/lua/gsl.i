@@ -15,6 +15,7 @@ struct multi_param {
   lua_State * L;
   int f_index;
   int df_index;
+  int fdf_index;
 };
 
 double multimin_f_cb(const gsl_vector *v, void *params) {
@@ -43,8 +44,21 @@ void multimin_df_cb(const gsl_vector *v, void *params, gsl_vector * g) {
 }
 
 void multimin_fdf_cb(const gsl_vector *v, void *params, double * f, gsl_vector * g) {
-  *f=multimin_f_cb(v,params);
-  multimin_df_cb(v,params,g);
+  int fdf_index=((multi_param*)params)->fdf_index;
+  if(fdf_index<0) {
+    *f=multimin_f_cb(v,params);
+    multimin_df_cb(v,params,g);
+  } else {
+    lua_rawgeti(L,LUA_REGISTRYINDEX,fdf_index);
+    //push the parameters and call it
+    array<double> V(v->size,v->data);
+    SWIG_NewPointerObj(L,(void *) &V,SWIGTYPE_p_arrayT_double_t,0);
+    array<double> G(g->size,g->data);
+    SWIG_NewPointerObj(L,(void *) &G,SWIGTYPE_p_arrayT_double_t,0);
+    lua_pcall(L, 2, 1, 0); 
+    *f=lua_tonumber(L,-1);
+    lua_pop(L,1);
+  }
 }
 
 int lua_multimin_fminimize(lua_State * L) {
