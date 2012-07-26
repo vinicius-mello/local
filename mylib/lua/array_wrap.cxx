@@ -2098,6 +2098,32 @@ fail:
 }
 
 
+static int _wrap_array_double_set_all(lua_State* L) {
+  int SWIG_arg = 0;
+  array< double > *arg1 = (array< double > *) 0 ;
+  double arg2 ;
+  
+  SWIG_check_num_args("set_all",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("set_all",1,"array< double > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("set_all",2,"double");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_double_t,0))){
+    SWIG_fail_ptr("array_double_set_all",1,SWIGTYPE_p_arrayT_double_t);
+  }
+  
+  arg2 = (double)lua_tonumber(L, 2);
+  (arg1)->set_all(arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_double_times_to(lua_State* L) {
   int SWIG_arg = 0;
   array< double > *arg1 = (array< double > *) 0 ;
@@ -2362,6 +2388,7 @@ static swig_lua_method swig_array_Sl_double_Sg__methods[] = {
     {"data", _wrap_array_double_data}, 
     {"copy", _wrap_array_double_copy}, 
     {"zero", _wrap_array_double_zero}, 
+    {"set_all", _wrap_array_double_set_all}, 
     {"times_to", _wrap_array_double_times_to}, 
     {"times", _wrap_array_double_times}, 
     {"sum_to", _wrap_array_double_sum_to}, 
@@ -2932,6 +2959,32 @@ fail:
 }
 
 
+static int _wrap_array_float_set_all(lua_State* L) {
+  int SWIG_arg = 0;
+  array< float > *arg1 = (array< float > *) 0 ;
+  float arg2 ;
+  
+  SWIG_check_num_args("set_all",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("set_all",1,"array< float > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("set_all",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_float_t,0))){
+    SWIG_fail_ptr("array_float_set_all",1,SWIGTYPE_p_arrayT_float_t);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  (arg1)->set_all(arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_float_times_to(lua_State* L) {
   int SWIG_arg = 0;
   array< float > *arg1 = (array< float > *) 0 ;
@@ -3196,6 +3249,7 @@ static swig_lua_method swig_array_Sl_float_Sg__methods[] = {
     {"data", _wrap_array_float_data}, 
     {"copy", _wrap_array_float_copy}, 
     {"zero", _wrap_array_float_zero}, 
+    {"set_all", _wrap_array_float_set_all}, 
     {"times_to", _wrap_array_float_times_to}, 
     {"times", _wrap_array_float_times}, 
     {"sum_to", _wrap_array_float_sum_to}, 
@@ -3766,6 +3820,32 @@ fail:
 }
 
 
+static int _wrap_array_int_set_all(lua_State* L) {
+  int SWIG_arg = 0;
+  array< int > *arg1 = (array< int > *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("set_all",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("set_all",1,"array< int > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("set_all",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_int_t,0))){
+    SWIG_fail_ptr("array_int_set_all",1,SWIGTYPE_p_arrayT_int_t);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  (arg1)->set_all(arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_int_times_to(lua_State* L) {
   int SWIG_arg = 0;
   array< int > *arg1 = (array< int > *) 0 ;
@@ -4030,6 +4110,7 @@ static swig_lua_method swig_array_Sl_int_Sg__methods[] = {
     {"data", _wrap_array_int_data}, 
     {"copy", _wrap_array_int_copy}, 
     {"zero", _wrap_array_int_zero}, 
+    {"set_all", _wrap_array_int_set_all}, 
     {"times_to", _wrap_array_int_times_to}, 
     {"times", _wrap_array_int_times}, 
     {"sum_to", _wrap_array_int_sum_to}, 
@@ -4602,6 +4683,33 @@ fail:
 }
 
 
+static int _wrap_array_uint_set_all(lua_State* L) {
+  int SWIG_arg = 0;
+  array< uint > *arg1 = (array< uint > *) 0 ;
+  unsigned int arg2 ;
+  
+  SWIG_check_num_args("set_all",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("set_all",1,"array< uint > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("set_all",2,"unsigned int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_int_t,0))){
+    SWIG_fail_ptr("array_uint_set_all",1,SWIGTYPE_p_arrayT_unsigned_int_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (unsigned int)lua_tonumber(L, 2);
+  (arg1)->set_all(arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_uint_times_to(lua_State* L) {
   int SWIG_arg = 0;
   array< uint > *arg1 = (array< uint > *) 0 ;
@@ -4866,6 +4974,7 @@ static swig_lua_method swig_array_Sl_uint_Sg__methods[] = {
     {"data", _wrap_array_uint_data}, 
     {"copy", _wrap_array_uint_copy}, 
     {"zero", _wrap_array_uint_zero}, 
+    {"set_all", _wrap_array_uint_set_all}, 
     {"times_to", _wrap_array_uint_times_to}, 
     {"times", _wrap_array_uint_times}, 
     {"sum_to", _wrap_array_uint_sum_to}, 
@@ -5438,6 +5547,33 @@ fail:
 }
 
 
+static int _wrap_array_size_t_set_all(lua_State* L) {
+  int SWIG_arg = 0;
+  array< size_t > *arg1 = (array< size_t > *) 0 ;
+  size_t arg2 ;
+  
+  SWIG_check_num_args("set_all",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("set_all",1,"array< size_t > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("set_all",2,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_size_t_t,0))){
+    SWIG_fail_ptr("array_size_t_set_all",1,SWIGTYPE_p_arrayT_size_t_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  (arg1)->set_all(arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_size_t_times_to(lua_State* L) {
   int SWIG_arg = 0;
   array< size_t > *arg1 = (array< size_t > *) 0 ;
@@ -5702,6 +5838,7 @@ static swig_lua_method swig_array_Sl_size_t_Sg__methods[] = {
     {"data", _wrap_array_size_t_data}, 
     {"copy", _wrap_array_size_t_copy}, 
     {"zero", _wrap_array_size_t_zero}, 
+    {"set_all", _wrap_array_size_t_set_all}, 
     {"times_to", _wrap_array_size_t_times_to}, 
     {"times", _wrap_array_size_t_times}, 
     {"sum_to", _wrap_array_size_t_sum_to}, 
@@ -6272,6 +6409,32 @@ fail:
 }
 
 
+static int _wrap_array_char_set_all(lua_State* L) {
+  int SWIG_arg = 0;
+  array< char > *arg1 = (array< char > *) 0 ;
+  char arg2 ;
+  
+  SWIG_check_num_args("set_all",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("set_all",1,"array< char > *");
+  if(!lua_isstring(L,2)) SWIG_fail_arg("set_all",2,"char");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_char_t,0))){
+    SWIG_fail_ptr("array_char_set_all",1,SWIGTYPE_p_arrayT_char_t);
+  }
+  
+  arg2 = (lua_tostring(L, 2))[0];
+  (arg1)->set_all(arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_char_times_to(lua_State* L) {
   int SWIG_arg = 0;
   array< char > *arg1 = (array< char > *) 0 ;
@@ -6536,6 +6699,7 @@ static swig_lua_method swig_array_Sl_char_Sg__methods[] = {
     {"data", _wrap_array_char_data}, 
     {"copy", _wrap_array_char_copy}, 
     {"zero", _wrap_array_char_zero}, 
+    {"set_all", _wrap_array_char_set_all}, 
     {"times_to", _wrap_array_char_times_to}, 
     {"times", _wrap_array_char_times}, 
     {"sum_to", _wrap_array_char_sum_to}, 
@@ -7108,6 +7272,33 @@ fail:
 }
 
 
+static int _wrap_array_byte_set_all(lua_State* L) {
+  int SWIG_arg = 0;
+  array< byte > *arg1 = (array< byte > *) 0 ;
+  unsigned char arg2 ;
+  
+  SWIG_check_num_args("set_all",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("set_all",1,"array< byte > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("set_all",2,"unsigned char");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_char_t,0))){
+    SWIG_fail_ptr("array_byte_set_all",1,SWIGTYPE_p_arrayT_unsigned_char_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (unsigned char)lua_tonumber(L, 2);
+  (arg1)->set_all(arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_byte_times_to(lua_State* L) {
   int SWIG_arg = 0;
   array< byte > *arg1 = (array< byte > *) 0 ;
@@ -7372,6 +7563,7 @@ static swig_lua_method swig_array_Sl_byte_Sg__methods[] = {
     {"data", _wrap_array_byte_data}, 
     {"copy", _wrap_array_byte_copy}, 
     {"zero", _wrap_array_byte_zero}, 
+    {"set_all", _wrap_array_byte_set_all}, 
     {"times_to", _wrap_array_byte_times_to}, 
     {"times", _wrap_array_byte_times}, 
     {"sum_to", _wrap_array_byte_sum_to}, 

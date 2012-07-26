@@ -24,25 +24,33 @@ function df(a,g)
 end
 
 local x=vec {5,7}
-gsl.fminimize(f,
-  { eps=0.00001,
+
+gsl.minimize {
+		f=f,
+		eps=0.00001,
     maxiter=500,
     starting_point=x ,
-		algorithm="nmsimplex2rand",
-    step_sizes=vec {0.5,0.5},
-    show_iterations=true })
+		algorithm="nmsimplex2",
+--    step_sizes=1,
+    show_iterations=true
+ }
 
 print(x:get(0),x:get(1))
 
 local x=vec {5,7}
-gsl.fdfminimize(f,df,
-  { eps=0.00001,
+
+gsl.minimize {
+		f=f,
+		df=df,
+		eps=0.00001,
     maxiter=500,
     starting_point=x ,
-		algorithm="steepest_descent",
-    show_iterations=true })
+		algorithm="vector_bfgs",
+    show_iterations=true
+ }
 
 print(x:get(0),x:get(1))
+
 
 function rosenbrock(v,w)
 	local x=v:get(0)
@@ -52,10 +60,13 @@ function rosenbrock(v,w)
 end
 
 local x=vec {-10,-5}
-gsl.fsolve(rosenbrock, 
-	{ algorithm="dnewton",
+
+gsl.solve {
+		f=rosenbrock,
+		algorithm="dnewton",
     starting_point=x ,
-    show_iterations=true })
+    show_iterations=true
+  }
 
 print(x:get(0),x:get(1))
 
@@ -69,10 +80,13 @@ function rosenbrock_df(v,j)
 end
 
 local x=vec {-10,-5}
-gsl.fdfsolve(rosenbrock, rosenbrock_df,
-	{ algorithm="hybridsj",
+gsl.solve {
+		f=rosenbrock,
+		df=rosenbrock_df,
+		algorithm="gnewton",
     starting_point=x ,
-    show_iterations=true })
+    show_iterations=true
+  }
 
 print(x:get(0),x:get(1))
 

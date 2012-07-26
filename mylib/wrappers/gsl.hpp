@@ -216,6 +216,14 @@ inline bool matrix_transpose(array<double>& a) {
 	return gsl_matrix_transpose(&A)==GSL_SUCCESS;
 }
 
+inline bool matrix_transpose(array<double>& a, array<double>& b) {
+  gsl_matrix A;
+	convert(a,A);
+  gsl_matrix B;
+	convert(b,B);
+	return gsl_matrix_transpose_memcpy(&A,&B)==GSL_SUCCESS;
+}
+
 inline bool matrix_add(array<double>& a, array<double>& b) {
   gsl_matrix A;
 	convert(a,A);
@@ -295,6 +303,16 @@ inline bool LU_solve(array<double>& a, array<size_t>& p, array<double>& bx) {
   gsl_vector BX;
 	convert(bx,BX);
   return gsl_linalg_LU_svx(&A,&perm,&BX)==GSL_SUCCESS;
+}
+
+inline bool LU_invert(array<double>& a, array<size_t>& p, array<double>& inv) {
+  gsl_matrix A;
+	convert(a,A);
+  gsl_permutation perm;
+	convert(p,perm);
+  gsl_matrix INV;
+	convert(inv,INV);
+  return gsl_linalg_LU_invert(&A,&perm,&INV)==GSL_SUCCESS;
 }
 
 inline bool LU_refine(array<double>& a, array<double>& lu, array<size_t>& p, array<double>& b, array<double>& x, array<double>& r) {

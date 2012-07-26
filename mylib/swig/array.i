@@ -21,6 +21,7 @@ class array {
   T * data() const;
 	void copy(array& b);
 	void zero();
+	void set_all(T v);
 	void times_to(const array& x, array& y) const;
 	void times(const array& x);
 	void sum_to(const array& x, array& y) const;

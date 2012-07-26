@@ -84,7 +84,7 @@ gsl$(EXT): gsl_wrap.cxx
 	g++ -o $@ $(SHARED) $< $(LUA_INC) $(GSL_INC) $(LUA_LIB) $(GSL_LIB)  -I $(MYLIB)
 
 #gsl_wrap.cxx: $(MYLIB)/swig/gsl.i $(MYLIB)/wrappers/gsl.hpp
-gsl_wrap.cxx: gsl.i $(MYLIB)/wrappers/gsl.hpp
+gsl_wrap.cxx: gsl.i $(MYLIB)/swig/gsl.i $(MYLIB)/wrappers/gsl.hpp
 	swig -o $@ -c++ -lua $<
 
 lpt$(EXT): lpt_wrap.cxx 

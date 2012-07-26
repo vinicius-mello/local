@@ -1,5 +1,5 @@
 EXT=.so
-SHARED= -shared -fPIC
+SHARED= -shared -fPIC 
 FORTRAN_LIB= -lgfortran
 BLAS_LIB= /opt/intel/mkl/lib/intel64/libmkl_rt.so $(FORTRAN_LIB)
 #BLAS_LIB= /opt/acml5.0.0/gfortran64/lib/libacml.a $(FORTRAN_LIB)

@@ -67,6 +67,9 @@ class array {
 	void zero() {
 		for(size_t i=0;i<size();++i) data_[i]=0;
 	}
+	void set_all(T v) {
+		for(size_t i=0;i<size();++i) data_[i]=v;
+	}
 	void times_to(const array& x, array& y) const {
 	  for(size_t j=0;j<width_;++j)
 		for(size_t i=0;i<dim_;++i) y.data_[i*width_+j]=data_[i*width_+j]*x.data_[i];
