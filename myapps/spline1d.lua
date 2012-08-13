@@ -115,6 +115,14 @@ function cnv:action(x, y)
   gl.MatrixMode('MODELVIEW')       -- seleciona matriz de modelagem
 	gl.LoadIdentity()         
 
+	gl.Color(1,1,1)
+	gl.Begin('LINES')
+	gl.Vertex(-1,0)
+	gl.Vertex(1,0)
+	gl.Vertex(0,-1)
+	gl.Vertex(0,1)
+	gl.End()
+
 	gl.PointSize(4.0)
 	gl.Color(1,0,0)
 	gl.Begin('POINTS')
@@ -134,6 +142,14 @@ function cnv:action(x, y)
 			gl.Vertex(i,interp(alpha,g,i))
 		end
 		gl.End()
+		for j=1,#points.y do
+			gl.Color(0,1,0)
+			gl.Begin('LINE_STRIP')
+			for i=-1,1,0.01 do
+				gl.Vertex(i,alpha.array:get(j-1)*g(i,points.x[j]))
+			end
+			gl.End()
+		end
 	end
   -- troca buffers
   iup.GLSwapBuffers(self)

@@ -6,14 +6,26 @@ require("luaglu")
 require("matrix")
 
 points={}
-points.src={}
-points.dst={}
-points.src.x={}
-points.src.y={}
-points.dst.x={}
-points.dst.y={}
+points.x={-0.75,-0.25,0.25,0.75,-0.75,-0.25,0.25,0.75}
+points.y={0.5,0.5,0.5,0.5,-0.5,-0.5,-0.5,-0.5}
 
 lg={}
+
+function bezier3(t,i0,i1,i2,i3)
+	local px,py=0,0
+	local tt=1-t
+	px=points.x[i0]*tt^3+3*points.x[i1]*tt^2*t+3*points.x[i2]*tt*t^2+points.x[i3]*t^3
+	py=points.y[i0]*tt^3+3*points.y[i1]*tt^2*t+3*points.y[i2]*tt*t^2+points.y[i3]*t^3
+	return px,py
+end
+
+function bezier3t(t,i0,i1,i2,i3)
+	local tx,ty=0,0
+	local tt=1-t
+	tx=3*((points.x[i1]-points.x[i0])*tt^2+(points.x[i2]-points.x[i1])*2*tt*t+(points.x[i3]-points.x[i2])*t^2)
+	ty=3*((points.y[i1]-points.y[i0])*tt^2+(points.y[i2]-points.y[i1])*2*tt*t+(points.y[i3]-points.y[i2])*t^2)
+	return tx,ty
+end
 
 function dist(x,y,u,v)
 	return math.sqrt((x-u)*(x-u)+(y-v)*(y-v))
@@ -60,36 +72,22 @@ function click(pts,x,y,err)
 	return 0
 end
 
-function S(g) 
+function S(g,x0,y0,x1,y1) 
   local mat={}
-	for i=1,#points.src.x do
-		mat[i]={}
-		for j=1,#points.src.x do
-			mat[i][j]=g(points.src.x[i],points.src.y[i],points.src.x[j],points.src.y[j])
-			if i==j then 
-				mat[i][j]=mat[i][j]+(sigma.value)^4
-			end
-		end
-	end
+	mat[1]={}
+	mat[2]={}
+	mat[1][1]=g(x0,y0,x0,y0)+(sigma.value)^4
+	mat[1][2]=g(x0,y0,x1,y1)
+	mat[2][2]=g(x1,y1,x1,y1)+(sigma.value)^4
+	mat[2][1]=mat[1][2]
 	return mat
 end
 
-function interp(alpha,g,x,y)
-	local tx=0
-	local ty=0
-	for i=1,#points.src.x do
-		local w=g(points.src.x[i],points.src.y[i],x,y)
-		tx=tx+alpha.x.array:get(i-1)*w
-		ty=ty+alpha.y.array:get(i-1)*w
-	end
-	return tx,ty
-end
-
 cnv = iup.glcanvas { buffer="DOUBLE", rastersize = "480x480" }
-sigma = iup.val {orientation="HORIZONTAL", value=0.5, max=1}
+sigma = iup.val {orientation="HORIZONTAL", value=0.0, max=1}
 listg = iup.list { "K0", "K1", "K2", "K3", "Gaussian" ; dropdown="YES", value=2 }
 vbox= iup.vbox { cnv,iup.hbox {sigma,listg} }
-dlg = iup.dialog {vbox; title="spline2d"}
+dlg = iup.dialog {vbox; title="spline vector"}
 
 function sigma:valuechanged_cb() 
 	cnv:action(0,0)
@@ -131,67 +129,57 @@ function cnv:action(x, y)
 	gl.PointSize(6.0)
 	gl.Color(1,0,0)
 	gl.Begin('POINTS')
-	for i=1,#points.src.x do
-		gl.Vertex(points.src.x[i],points.src.y[i])
+	for i=1,4 do
+		gl.Vertex(points.x[i],points.y[i])
 	end
 	gl.End()
 	gl.Color(0,0,1)
 	gl.Begin('POINTS')
-	for i=1,#points.dst.x do
-		gl.Vertex(points.dst.x[i],points.dst.y[i])
+	for i=5,8 do
+		gl.Vertex(points.x[i],points.y[i])
+	end
+	gl.End()
+	gl.LineWidth(1.0)
+	gl.Color(1,0,0)
+	gl.Begin('LINE_STRIP')
+	for t=0,1,0.01 do
+		local px,py=bezier3(t,1,2,3,4)
+		gl.Vertex(px,py)
+	end
+	gl.End()
+	gl.Color(0,0,1)
+	gl.Begin('LINE_STRIP')
+	for t=0,1,0.01 do
+		local px,py=bezier3(t,5,6,7,8)
+		gl.Vertex(px,py)
 	end
 	gl.End()
 	gl.Color(1,1,0)
-	gl.LineWidth(1.0)
 	gl.Begin('LINES')
-	for i=1,#points.src.x do
-		gl.Vertex(points.src.x[i],points.src.y[i])
-		gl.Vertex(points.dst.x[i],points.dst.y[i])
-	end
-	gl.End()
-	gl.Color(0.4,0.4,0.4)
-	for i=-1,1,0.1 do
-		gl.Begin('LINE_STRIP')
-		for j=-1,1,0.1 do
-			gl.Vertex(i,j)
-		end
-		gl.End()
-	end
-	for j=-1,1,0.1 do
-		gl.Begin('LINE_STRIP')
-		for i=-1,1,0.1 do
-			gl.Vertex(i,j)
-		end
-		gl.End()
-	end
-  -- troca buffers
-	if #points.src.x>0 then 
+	for t=0,1,0.1 do
+		local p0x,p0y=bezier3(t,1,2,3,4)
+		local p1x,p1y=bezier3(t,5,6,7,8)
+		local t0x,t0y=bezier3t(t,1,2,3,4)
+		local t1x,t1y=bezier3t(t,5,6,7,8)
 		local g=lg[math.floor(listg.value)]
-		local s=matrix.new(S(g))
-		local dx=matrix.new({points.dst.x})
-		local dy=matrix.new({points.dst.y})
+		local s=matrix.new(S(g,p0x,p0y,p1x,p1y))
+		local dx=matrix.new({{t0x,t1x}})
+		local dy=matrix.new({{t0y,t1y}})
 		local alpha={}
 		alpha.x=s:solve(dx)
 		alpha.y=s:solve(dy)
-		gl.PointSize(1.0)
-		gl.Color(1,1,1)
-		for x=-1,1,0.1 do
-			gl.Begin('LINE_STRIP')
-			for y=-1,1,0.1 do
-				local fx,fy=interp(alpha,g,x,y)
-				gl.Vertex(fx,fy)
-			end
-			gl.End()
-		end
-		for y=-1,1,0.1 do
-			gl.Begin('LINE_STRIP')
-			for x=-1,1,0.1 do
-				local fx,fy=interp(alpha,g,x,y)
-				gl.Vertex(fx,fy)
-			end
-			gl.End()
-		end
+		local a0x=alpha.x.array:get(0)
+		local a1x=alpha.x.array:get(1)
+		local a0y=alpha.y.array:get(0)
+		local a1y=alpha.y.array:get(1)
+		gl.Vertex(p0x,p0y)
+		gl.Vertex(p0x+0.1*a0x,p0y+0.1*a0y)
+		gl.Vertex(p1x,p1y)
+		gl.Vertex(p1x+0.1*a1x,p1y+0.1*a1y)
 	end
+	gl.End()
+
+  -- troca buffers
   iup.GLSwapBuffers(self)
 end
 
@@ -220,20 +208,7 @@ function cnv:button_cb(but,pressed,x,y,status)
   iup.GLMakeCurrent(self)
   if pressed==1 then 
 		x,y=cnv:convert(x,y)
-		seli=click(points.dst,x,y,4*self.pixel_width) 
-		if seli>0 then 
-			selt=2 --src
-    else 
-			seli=click(points.src,x,y,4*self.pixel_width) 
-			if seli>0 then
-				selt=1
-			else 
-		  	points.src.x[#points.src.x+1]=x
-		  	points.src.y[#points.src.y+1]=y
-		  	points.dst.x[#points.dst.x+1]=x
-		  	points.dst.y[#points.dst.y+1]=y
-			end
-    end
+		seli=click(points,x,y,4*self.pixel_width) 
 	else 
 		seli=0
 	end
@@ -243,13 +218,8 @@ end
 function cnv:motion_cb(x,y,status)
 	if seli>0 then
 		x,y=cnv:convert(x,y)
-		if selt==1 then 
-			points.src.x[seli]=x
-			points.src.y[seli]=y
-		else
-			points.dst.x[seli]=x
-			points.dst.y[seli]=y
-		end
+			points.x[seli]=x
+			points.y[seli]=y
   	cnv:action(0,0)
   end
 end
