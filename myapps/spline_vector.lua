@@ -208,7 +208,7 @@ function cnv:button_cb(but,pressed,x,y,status)
   iup.GLMakeCurrent(self)
   if pressed==1 then 
 		x,y=cnv:convert(x,y)
-		seli=click(points,x,y,4*self.pixel_width) 
+		seli=click(points,x,y,5*self.pixel_width) 
 	else 
 		seli=0
 	end
