@@ -10,8 +10,8 @@ LAPACK_LIB= $(BLAS_LIB)
 #LAPACK_LIB= /usr/lib/liblapack.a $(BLAS_LIB)
 ARPACK_LIB= ~/local/Numeric/ARPACK/libarpack.a $(LAPACK_LIB) 
 
-LUA_LIB= -llua-5.1
-#LUA_LIB= -llua5.1
+#LUA_LIB= -llua-5.1
+LUA_LIB= -llua5.1
 LUA_INC= -I/usr/include/lua5.1
 
 TCL_LIB= -ltcl
@@ -23,7 +23,7 @@ UMFPACK_LIB=~/local/Numeric/SuiteSparse/UMFPACK/Lib/libumfpack.a\
        ~/local/Numeric/SuiteSparse/COLAMD/Lib/libcolamd.a\
        ~/local/Numeric/SuiteSparse/CAMD/Lib/libcamd.a\
        ~/local/Numeric/SuiteSparse/AMD/Lib/libamd.a\
-       ~/local/Numeric/SuiteSparse/metis-4.0/libmetis.a\
+       ~/local/Numeric/metis-4.0.3/libmetis.a\
 			 $(BLAS_LIB)
 
 UMFPACK_INC= -I ~/local/Numeric/SuiteSparse/UMFPACK/Include \
@@ -31,7 +31,7 @@ UMFPACK_INC= -I ~/local/Numeric/SuiteSparse/UMFPACK/Include \
  -I ~/local/Numeric/SuiteSparse/AMD/Include/ 
 
 MA57_LIB= ~/local/Numeric/ma57-3.7.0/src/libma57.a \
-  ~/local/Numeric/SuiteSparse/metis-4.0/libmetis.a $(BLAS_LIB)
+  ~/local/Numeric/metis-4.0.3/libmetis.a $(BLAS_LIB)
 
 #MA47_LIB= -L/home/vinicius/Numeric/lib -lma47 $(BLAS_LIB)
 

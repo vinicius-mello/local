@@ -21,7 +21,7 @@ unprojection=gl2.unprojection()
 tree=lpt.lpt3d_tree()
 
 
-cnv = iup.glcanvas { buffer="DOUBLE", rastersize = "480x480" }
+cnv = iup.glcanvas { buffer="DOUBLE", depth_size="16", rastersize = "480x480" }
 dlg = iup.dialog {cnv; title="lpt3d"}
 
 
@@ -96,16 +96,6 @@ function draw_tetra(cur,id)
 	if cur:orientation()<0 then
 	  c,d=d,c
 	end
-	gl.Disable('LIGHTING')
-	gl.Color(1,1,1)
-  gl.PolygonMode('FRONT','LINE')
-	gl.Begin('TRIANGLES')
- 	draw_face(b,c,d)
- 	draw_face(a,d,c)
- 	draw_face(a,b,d)
- 	draw_face(a,c,b)
-	gl.End()
-	gl.Enable('LIGHTING')
   if selected and tree:id(selected)==id then
 	  gl.Material('FRONT','DIFFUSE',{0,0,1})
 	else
@@ -120,6 +110,17 @@ function draw_tetra(cur,id)
  	draw_face(a,b,d)
  	draw_face(a,c,b)
 	gl.End()
+  gl.Disable('POLYGON_OFFSET_FILL')
+	gl.Disable('LIGHTING')
+	gl.Color(1,1,1)
+  gl.PolygonMode('FRONT','LINE')
+	gl.Begin('TRIANGLES')
+ 	draw_face(b,c,d)
+ 	draw_face(a,d,c)
+ 	draw_face(a,b,d)
+ 	draw_face(a,c,b)
+	gl.End()
+	gl.Enable('LIGHTING')
 end
 
 -- chamada quando a janela OpenGL necessita ser desenhada
