@@ -61,8 +61,8 @@ class array {
 	T * data() const {
 	  return data_;
 	}
-	void copy(const array& b) {
-		for(size_t i=0;i<size();++i) data_[i]=b.data_[i];
+	void copy(const array& b, size_t offset=0) {
+		for(size_t i=0;i<b.size();++i) data_[i+offset]=b.data_[i];
 	}
 	void zero() {
 		for(size_t i=0;i<size();++i) data_[i]=0;

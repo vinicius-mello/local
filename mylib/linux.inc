@@ -44,3 +44,5 @@ LPT_INC = -I ~/local/
 GSL_LIB = -lgsl $(BLAS_LIB)
 GSL_INC= 
 
+GINAC_LIB = -lginac 
+GINAC_INC= 

@@ -19,7 +19,7 @@ class array {
 	T set(size_t i, T v);
 	T set(size_t i, size_t j, T v);
   T * data() const;
-	void copy(array& b);
+	void copy(array& b, size_t offset=0);
 	void zero();
 	void set_all(T v);
 	void times_to(const array& x, array& y) const;
