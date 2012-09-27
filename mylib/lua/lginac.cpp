@@ -588,6 +588,7 @@ static const luaL_Reg R[] =
   REG_ENTRY(subs)
   REG_ENTRY(diff)
   REG_ENTRY(print)
+  REG_ENTRY(tostring)
   REG_ENTRY(compile)
 
   REG_ENTRY(abs)

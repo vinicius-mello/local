@@ -15,6 +15,8 @@ class array {
 	array(const array& bl);
   array& operator=(const array& b);
 	~array(); 
+  array(char * filename);
+	void save(char * filename);
 	T get(size_t i, size_t j=0) const;
 	T set(size_t i, T v);
 	T set(size_t i, size_t j, T v);

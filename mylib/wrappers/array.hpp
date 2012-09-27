@@ -1,6 +1,11 @@
 #ifndef WRAP_ARRAY_HPP
 #define WRAP_ARRAY_HPP
 #include "debug.h"
+#include <fstream>
+
+using std::ifstream;
+using std::ofstream;
+using std::endl;
 
 typedef unsigned int uint;
 typedef unsigned char byte;
@@ -40,6 +45,37 @@ class array {
 		if(alloc) copy(b);
 		else { data_=b.data_; dim_=b.dim_; width_=b.width_;}
 		return (*this);
+	}
+	array(char * filename) {
+	 	ifstream in(filename);
+		int n,m;
+		in>>n;
+		in>>m;
+	  data_=new T[n*m];
+		alloc=true;
+		dim_=n;
+		width_=m;
+		for(int i=0;i<n;++i) {
+			T d;
+			for(int j=0;j<m;++j) { 
+				in>>d;
+				set(i,j,d);
+			}
+		} 
+	}
+	void save(char * filename) {
+	 	ofstream out(filename);
+		int n,m;
+		n=dim_; out<<n<<" ";
+		m=width_; out<<m<<endl;
+		for(int i=0;i<n;++i) {
+			for(int j=0;j<m;++j) {
+				T d=get(i,j);
+				out<<d;
+				if(j!=(m-1)) out<<" ";
+			}
+			out<<endl;
+		} 
 	}
 	T get(size_t i, size_t j=0) const {
 		return data_[i*width_+j];
