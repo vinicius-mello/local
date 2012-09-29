@@ -7,10 +7,14 @@
 #include "debug.h"
 
 using namespace std;
-
+#define CL_USE_DEPRECATED_OPENCL_1_1_APIS 1
 #include <CL/cl.h>
 #include <CL/cl_gl.h>
+#if defined(_WIN32) 
+
+#else
 #include <GL/glx.h>
+#endif
 
 class host_singleton {
 	static cl_uint nplatforms_;
@@ -107,19 +111,28 @@ class context {
 		if(ctx_) { //error
 		} else {
 			cl_int status;
+#if defined(_WIN32)
+			cl_context_properties properties[] = {
+   			0
+			};
+#else
 			cl_context_properties properties[] = {
    			CL_GL_CONTEXT_KHR, (cl_context_properties) glXGetCurrentContext(),
    			CL_GLX_DISPLAY_KHR, (cl_context_properties) glXGetCurrentDisplay(), 
    			CL_CONTEXT_PLATFORM, (cl_context_properties) host.platform(platform_), 
    			0
 			};
+#endif
 			ctx_=clCreateContext(properties,dev_ids_.size(),
 				&dev_ids_[0],NULL,NULL,&status);
 		}
 	} 
 	~context() {
-		clReleaseContext(ctx_);
-	 	debug_print("~context(%p)\n",this);
+		if(CL_SUCCESS==clReleaseContext(ctx_)) {
+	 		debug_print("~context(%p)\n",this);
+		} else {
+	 		debug_print("error ~context(%p)\n",this);
+		}
 	}
 };
 
@@ -141,11 +154,16 @@ class mem {
 		if(mo_) {
 			clRetainMemObject(mo_);
 	 		debug_print("mem copy_cons(%p)\n",this);
+		} else {
+	 		debug_print("null mem copy_cons(%p)\n",this);
 		}
 	}
-	~mem() {
-		clReleaseMemObject(mo_);
-	 	debug_print("~mem(%p)\n",this);
+	virtual ~mem() {
+		if(CL_SUCCESS==clReleaseMemObject(mo_)) {
+	 		debug_print("~mem(%p)\n",this);
+		} else {
+	 		debug_print("error ~mem(%p)\n",this);
+		}
 	}
 };
 
@@ -174,7 +192,7 @@ class image2d : public mem {
 	 		debug_print("image2d copy_cons(%p)\n",this);
 		}
 	}
-	~image2d() {
+	virtual ~image2d() {
 	 	debug_print("~image2d(%p)",this);
 	}
 };
@@ -201,8 +219,12 @@ class program {
 		}
 	}
 	~program() {
-		clReleaseProgram(prg_);
-	 	debug_print("~program(%p)\n",this);
+	 	debug_print("enter ~program(%p)\n",this);
+		if(CL_SUCCESS==clReleaseProgram(prg_)) {
+	 		debug_print("~program(%p)\n",this);
+		} else {
+	 		debug_print("error ~program(%p)\n",this);
+		}
 	}
 };
 
@@ -226,8 +248,11 @@ class sampler {
 		}
 	}
 	~sampler() {
-		clReleaseSampler(sam_);
-	 	debug_print("~sampler(%p)\n",this);
+		if(CL_SUCCESS==clReleaseSampler(sam_)) {
+	 		debug_print("~sampler(%p)\n",this);
+		} else {
+	 		debug_print("error ~sampler(%p)\n",this);
+		}
 	}
 };
 
@@ -259,8 +284,11 @@ class kernel {
 		clSetKernelArg(ker_,i,sizeof(cl_sampler),&s.sam_);
 	}
 	~kernel() {
-		clReleaseKernel(ker_);
-	 	debug_print("~kernel(%p)\n",this);
+		if(CL_SUCCESS==clReleaseKernel(ker_)) {
+	 		debug_print("~kernel(%p)\n",this);
+		} else {
+	 		debug_print("error ~kernel(%p)\n",this);
+		}
 	}
 };
 
@@ -283,78 +311,86 @@ class event {
 		}
 	}
 	~event() {
-		clReleaseEvent(ev_);
-	 	debug_print("~event(%p)\n",this);
+		if(ev_==0) debug_print("error ~event(%p): ev_==0\n",this);
+		if(CL_SUCCESS==clReleaseEvent(ev_)) {
+	 		debug_print("~event(%p)\n",this);
+		} else {
+	 		debug_print("error ~event(%p)\n",this);
+		}
 	}
 };
 
 class command_queue {
 	cl_command_queue que_;
 	vector<cl_event> wait_;
+	const context * ctx_;
 	public:
-	command_queue() : que_(0) {
+	command_queue() : que_(0), ctx_(0) {
 	 	debug_print("command_queue default(%p)\n",this);
 	}
-	command_queue(const context& ctx, int dev_id, cl_command_queue_properties pr) {
+	command_queue(const context& ctx, int dev_id, cl_command_queue_properties pr) : ctx_(&ctx) {
 		cl_int code;
 		que_=clCreateCommandQueue(ctx.ctx_,ctx.dev_ids_[dev_id],pr,&code);
 	 	debug_print("command_queue new(%p)\n",this);
 	}
-	command_queue(const command_queue& que) : que_(que.que_) {
+	command_queue(const command_queue& que) : que_(que.que_), ctx_(que.ctx_) {
 		if(que_) {
 			clRetainCommandQueue(que_);
 	 		debug_print("command_queue copy_cons(%p)\n",this);
 		}
 	}
 	~command_queue() {
-		clReleaseCommandQueue(que_);
-	 	debug_print("~command_queue(%p)\n",this);
+		if(CL_SUCCESS==clReleaseCommandQueue(que_)) {
+	 		debug_print("~command_queue(%p)\n",this);
+		} else {
+	 		debug_print("error ~command_queue(%p)\n",this);
+		}
 	}
 	void add_wait(const event& ev) {
 		wait_.push_back(ev.ev_);
 	}
 	event write_buffer(const mem& mo, bool block, size_t offset, size_t count, 
 		void * ptr) {
-		event ret;
-		clEnqueueWriteBuffer(que_,mo.mo_,block,offset,count,ptr,wait_.size(),&wait_[0],&ret.ev_);
+		event ret(*ctx_);
+		clEnqueueWriteBuffer(que_,mo.mo_,block,offset,count,ptr,wait_.size(),&wait_[0],0/*&ret.ev_*/);
 		wait_.clear();
 		return ret;
 	} 
 	event read_buffer(const mem& mo, bool block, size_t offset, size_t count, 
 		void * ptr) {
-		event ret;
-		clEnqueueReadBuffer(que_,mo.mo_,block,offset,count,ptr,wait_.size(),&wait_[0],&ret.ev_);
+		event ret(*ctx_);
+		clEnqueueReadBuffer(que_,mo.mo_,block,offset,count,ptr,wait_.size(),&wait_[0],0/*&ret.ev_*/);
 		wait_.clear();
 		return ret;
 	} 
 	event range_kernel1d(const kernel& ker,size_t offset, size_t global, size_t local) {
-		event ret;
+		event ret(*ctx_);
 		size_t offset_[1]; offset_[0]=offset;
 		size_t global_[1]; global_[0]=global;
 		size_t local_[1]; local_[0]=local;
-		clEnqueueNDRangeKernel(que_,ker.ker_,1,offset_,global_,local_,wait_.size(),&wait_[0],&ret.ev_);
+		clEnqueueNDRangeKernel(que_,ker.ker_,1,offset_,global_,local_,wait_.size(),&wait_[0],0/*&ret.ev_*/);
 		wait_.clear();
 		return ret;
 	}
 	event range_kernel2d(const kernel& ker,size_t offset_x, size_t offset_y,
 		size_t global_x, size_t global_y, size_t local_x, size_t local_y) {
-		event ret;
+		event ret(*ctx_);
 		size_t offset_[2]; offset_[0]=offset_x; offset_[1]=offset_y;
 		size_t global_[2]; global_[0]=global_x; global_[1]=global_y;
 		size_t local_[2]; local_[0]=local_x; local_[1]=local_y;
 
-		clEnqueueNDRangeKernel(que_,ker.ker_,2,offset_,global_,local_,wait_.size(),&wait_[0],&ret.ev_);
+		clEnqueueNDRangeKernel(que_,ker.ker_,2,offset_,global_,local_,wait_.size(),&wait_[0],0/*&ret.ev_*/);
 		wait_.clear();
 		return ret;
 	}
 	event range_kernel3d(const kernel& ker,size_t offset_x, size_t offset_y,
 		size_t offset_z, size_t global_x, size_t global_y, size_t global_z,
 		size_t local_x, size_t local_y, size_t local_z) {
-		event ret;
+		event ret(*ctx_);
 		size_t offset_[2]; offset_[0]=offset_x; offset_[1]=offset_y; offset_[2]=offset_z;
 		size_t global_[2]; global_[0]=global_x; global_[1]=global_y; global_[2]=global_z;
 		size_t local_[2]; local_[0]=local_x; local_[1]=local_y; local_[2]=local_z;
-		clEnqueueNDRangeKernel(que_,ker.ker_,3,offset_,global_,local_,wait_.size(),&wait_[0],&ret.ev_);
+		clEnqueueNDRangeKernel(que_,ker.ker_,3,offset_,global_,local_,wait_.size(),&wait_[0],0/*&ret.ev_*/);
 		wait_.clear();
 		return ret;
 	}
@@ -371,8 +407,8 @@ class command_queue {
 		return clEnqueueWaitForEvents(que_,wait_.size(),&wait_[0]);
 	}
 	event marker() {
-		event ret;
-		clEnqueueMarker(que_,&ret.ev_);
+		event ret(*ctx_);
+		clEnqueueMarker(que_,0/*&ret.ev_*/);
 		return ret;
 	}
 };

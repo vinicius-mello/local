@@ -26,7 +26,7 @@ for i=1,data_size do results:set(i-1,11-i) end
 cmd=cl.command_queue(ctx,0,0)
 input=cl.mem(ctx,cl.MEM_READ_ONLY, 4*data_size)
 output=cl.mem(ctx,cl.MEM_WRITE_ONLY, 4*data_size)
-testimg=cl.image2d(ctx,cl.MEM_WRITE_ONLY, cl.RGB, cl.SNORM_INT8, 200, 200)
+--testimg=cl.image2d(ctx,cl.MEM_WRITE_ONLY, cl.RGB, cl.SNORM_INT8, 200, 200)
 cmd:write_buffer(input, true, 0, 4*data_size, inputdata:data())
 cmd:write_buffer(output, true, 0, 4*data_size, results:data())
 prg=cl.program(ctx,kernel_source)
