@@ -14,6 +14,11 @@
 #define MAP_FAILURE                              -12
 #define MISALIGNED_SUB_BUFFER_OFFSET             -13
 #define EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST -14
+#define COMPILE_PROGRAM_FAILURE                  -15
+#define LINKER_NOT_AVAILABLE                     -16
+#define LINK_PROGRAM_FAILURE                     -17
+#define DEVICE_PARTITION_FAILED                  -18
+#define KERNEL_ARG_INFO_NOT_AVAILABLE            -19
 
 #define INVALID_VALUE                            -30
 #define INVALID_DEVICE_TYPE                      -31
@@ -50,14 +55,21 @@
 #define INVALID_MIP_LEVEL                        -62
 #define INVALID_GLOBAL_WORK_SIZE                 -63
 #define INVALID_PROPERTY                         -64
+#define INVALID_IMAGE_DESCRIPTOR                 -65
+#define INVALID_COMPILER_OPTIONS                 -66
+#define INVALID_LINKER_OPTIONS                   -67
+#define INVALID_DEVICE_PARTITION_COUNT           -68
 
 /* OpenCL Version */
 #define VERSION_1_0                              1
 #define VERSION_1_1                              1
+#define VERSION_1_2                              1
 
 /* cl_bool */
 #define FALSE                                    0
 #define TRUE                                     1
+#define BLOCKING                                 CL_TRUE
+#define NON_BLOCKING                             CL_FALSE
 
 /* cl_platform_info */
 #define PLATFORM_PROFILE                         0x0900
@@ -71,6 +83,7 @@
 #define DEVICE_TYPE_CPU                          (1 << 1)
 #define DEVICE_TYPE_GPU                          (1 << 2)
 #define DEVICE_TYPE_ACCELERATOR                  (1 << 3)
+#define DEVICE_TYPE_CUSTOM                       (1 << 4)
 #define DEVICE_TYPE_ALL                          0xFFFFFFFF
 
 /* cl_device_info */
@@ -124,7 +137,7 @@
 #define DEVICE_VERSION                           0x102F
 #define DEVICE_EXTENSIONS                        0x1030
 #define DEVICE_PLATFORM                          0x1031
-/* 0x1032 reserved for DEVICE_DOUBLE_FP_CONFIG */
+#define DEVICE_DOUBLE_FP_CONFIG                  0x1032
 /* 0x1033 reserved for DEVICE_HALF_FP_CONFIG */
 #define DEVICE_PREFERRED_VECTOR_WIDTH_HALF       0x1034
 #define DEVICE_HOST_UNIFIED_MEMORY               0x1035
@@ -136,6 +149,18 @@
 #define DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE        0x103B
 #define DEVICE_NATIVE_VECTOR_WIDTH_HALF          0x103C
 #define DEVICE_OPENCL_C_VERSION                  0x103D
+#define DEVICE_LINKER_AVAILABLE                  0x103E
+#define DEVICE_BUILT_IN_KERNELS                  0x103F
+#define DEVICE_IMAGE_MAX_BUFFER_SIZE             0x1040
+#define DEVICE_IMAGE_MAX_ARRAY_SIZE              0x1041
+#define DEVICE_PARENT_DEVICE                     0x1042
+#define DEVICE_PARTITION_MAX_SUB_DEVICES         0x1043
+#define DEVICE_PARTITION_PROPERTIES              0x1044
+#define DEVICE_PARTITION_AFFINITY_DOMAIN         0x1045
+#define DEVICE_PARTITION_TYPE                    0x1046
+#define DEVICE_REFERENCE_COUNT                   0x1047
+#define DEVICE_PREFERRED_INTEROP_USER_SYNC       0x1048
+#define DEVICE_PRINTF_BUFFER_SIZE                0x1049
 
 /* cl_device_fp_config - bitfield */
 #define FP_DENORM                                (1 << 0)
@@ -145,6 +170,7 @@
 #define FP_ROUND_TO_INF                          (1 << 4)
 #define FP_FMA                                   (1 << 5)
 #define FP_SOFT_FLOAT                            (1 << 6)
+#define FP_CORRECTLY_ROUNDED_DIVIDE_SQRT         (1 << 7)
 
 /* cl_device_mem_cache_type */
 #define NONE                                     0x0
@@ -169,8 +195,23 @@
 #define CONTEXT_PROPERTIES                       0x1082
 #define CONTEXT_NUM_DEVICES                      0x1083
 
-/* cl_context_info + cl_context_properties */
+/* cl_context_properties */
 #define CONTEXT_PLATFORM                         0x1084
+#define CONTEXT_INTEROP_USER_SYNC                0x1085
+    
+/* cl_device_partition_property */
+#define DEVICE_PARTITION_EQUALLY                 0x1086
+#define DEVICE_PARTITION_BY_COUNTS               0x1087
+#define DEVICE_PARTITION_BY_COUNTS_LIST_END      0x0
+#define DEVICE_PARTITION_BY_AFFINITY_DOMAIN      0x1088
+    
+/* cl_device_affinity_domain */
+#define DEVICE_AFFINITY_DOMAIN_NUMA                     (1 << 0)
+#define DEVICE_AFFINITY_DOMAIN_L4_CACHE                 (1 << 1)
+#define DEVICE_AFFINITY_DOMAIN_L3_CACHE                 (1 << 2)
+#define DEVICE_AFFINITY_DOMAIN_L2_CACHE                 (1 << 3)
+#define DEVICE_AFFINITY_DOMAIN_L1_CACHE                 (1 << 4)
+#define DEVICE_AFFINITY_DOMAIN_NEXT_PARTITIONABLE       (1 << 5)
 
 /* cl_command_queue_info */
 #define QUEUE_CONTEXT                            0x1090
@@ -185,6 +226,14 @@
 #define MEM_USE_HOST_PTR                         (1 << 3)
 #define MEM_ALLOC_HOST_PTR                       (1 << 4)
 #define MEM_COPY_HOST_PTR                        (1 << 5)
+// reserved                                         (1 << 6)    
+#define MEM_HOST_WRITE_ONLY                      (1 << 7)
+#define MEM_HOST_READ_ONLY                       (1 << 8)
+#define MEM_HOST_NO_ACCESS                       (1 << 9)
+
+/* cl_mem_migration_flags - bitfield */
+#define MIGRATE_MEM_OBJECT_HOST                  (1 << 0)
+#define MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED     (1 << 1)
 
 /* cl_channel_order */
 #define R                                        0x10B0
@@ -222,6 +271,10 @@
 #define MEM_OBJECT_BUFFER                        0x10F0
 #define MEM_OBJECT_IMAGE2D                       0x10F1
 #define MEM_OBJECT_IMAGE3D                       0x10F2
+#define MEM_OBJECT_IMAGE2D_ARRAY                 0x10F3
+#define MEM_OBJECT_IMAGE1D                       0x10F4
+#define MEM_OBJECT_IMAGE1D_ARRAY                 0x10F5
+#define MEM_OBJECT_IMAGE1D_BUFFER                0x10F6
 
 /* cl_mem_info */
 #define MEM_TYPE                                 0x1100
@@ -242,6 +295,10 @@
 #define IMAGE_WIDTH                              0x1114
 #define IMAGE_HEIGHT                             0x1115
 #define IMAGE_DEPTH                              0x1116
+#define IMAGE_ARRAY_SIZE                         0x1117
+#define IMAGE_BUFFER                             0x1118
+#define IMAGE_NUM_MIP_LEVELS                     0x1119
+#define IMAGE_NUM_SAMPLES                        0x111A
 
 /* cl_addressing_mode */
 #define ADDRESS_NONE                             0x1130
@@ -264,6 +321,7 @@
 /* cl_map_flags - bitfield */
 #define MAP_READ                                 (1 << 0)
 #define MAP_WRITE                                (1 << 1)
+#define MAP_WRITE_INVALIDATE_REGION              (1 << 2)
 
 /* cl_program_info */
 #define PROGRAM_REFERENCE_COUNT                  0x1160
@@ -273,11 +331,20 @@
 #define PROGRAM_SOURCE                           0x1164
 #define PROGRAM_BINARY_SIZES                     0x1165
 #define PROGRAM_BINARIES                         0x1166
+#define PROGRAM_NUM_KERNELS                      0x1167
+#define PROGRAM_KERNEL_NAMES                     0x1168
 
 /* cl_program_build_info */
 #define PROGRAM_BUILD_STATUS                     0x1181
 #define PROGRAM_BUILD_OPTIONS                    0x1182
 #define PROGRAM_BUILD_LOG                        0x1183
+#define PROGRAM_BINARY_TYPE                      0x1184
+    
+/* cl_program_binary_type */
+#define PROGRAM_BINARY_TYPE_NONE                 0x0
+#define PROGRAM_BINARY_TYPE_COMPILED_OBJECT      0x1
+#define PROGRAM_BINARY_TYPE_LIBRARY              0x2
+#define PROGRAM_BINARY_TYPE_EXECUTABLE           0x4
 
 /* cl_build_status */
 #define BUILD_SUCCESS                            0
@@ -291,6 +358,32 @@
 #define KERNEL_REFERENCE_COUNT                   0x1192
 #define KERNEL_CONTEXT                           0x1193
 #define KERNEL_PROGRAM                           0x1194
+#define KERNEL_ATTRIBUTES                        0x1195
+
+/* cl_kernel_arg_info */
+#define KERNEL_ARG_ADDRESS_QUALIFIER             0x1196
+#define KERNEL_ARG_ACCESS_QUALIFIER              0x1197
+#define KERNEL_ARG_TYPE_NAME                     0x1198
+#define KERNEL_ARG_TYPE_QUALIFIER                0x1199
+#define KERNEL_ARG_NAME                          0x119A
+
+/* cl_kernel_arg_address_qualifier */
+#define KERNEL_ARG_ADDRESS_GLOBAL                0x119B
+#define KERNEL_ARG_ADDRESS_LOCAL                 0x119C
+#define KERNEL_ARG_ADDRESS_CONSTANT              0x119D
+#define KERNEL_ARG_ADDRESS_PRIVATE               0x119E
+
+/* cl_kernel_arg_access_qualifier */
+#define KERNEL_ARG_ACCESS_READ_ONLY              0x11A0
+#define KERNEL_ARG_ACCESS_WRITE_ONLY             0x11A1
+#define KERNEL_ARG_ACCESS_READ_WRITE             0x11A2
+#define KERNEL_ARG_ACCESS_NONE                   0x11A3
+    
+/* cl_kernel_arg_type_qualifer */
+#define KERNEL_ARG_TYPE_NONE                     0
+#define KERNEL_ARG_TYPE_CONST                    (1 << 0)
+#define KERNEL_ARG_TYPE_RESTRICT                 (1 << 1)
+#define KERNEL_ARG_TYPE_VOLATILE                 (1 << 2)
 
 /* cl_kernel_work_group_info */
 #define KERNEL_WORK_GROUP_SIZE                   0x11B0
@@ -298,6 +391,7 @@
 #define KERNEL_LOCAL_MEM_SIZE                    0x11B2
 #define KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE 0x11B3
 #define KERNEL_PRIVATE_MEM_SIZE                  0x11B4
+#define KERNEL_GLOBAL_WORK_SIZE                  0x11B5
 
 /* cl_event_info  */
 #define EVENT_COMMAND_QUEUE                      0x11D0
@@ -328,13 +422,17 @@
 #define COMMAND_WRITE_BUFFER_RECT                0x1202
 #define COMMAND_COPY_BUFFER_RECT                 0x1203
 #define COMMAND_USER                             0x1204
+#define COMMAND_BARRIER                          0x1205
+#define COMMAND_MIGRATE_MEM_OBJECTS              0x1206
+#define COMMAND_FILL_BUFFER                      0x1207
+#define COMMAND_FILL_IMAGE                       0x1208
 
 /* command execution status */
 #define COMPLETE                                 0x0
 #define RUNNING                                  0x1
 #define SUBMITTED                                0x2
 #define QUEUED                                   0x3
-  
+
 /* cl_buffer_create_type  */
 #define BUFFER_CREATE_TYPE_REGION                0x1220
 

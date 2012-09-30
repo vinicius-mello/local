@@ -4,6 +4,7 @@
 typedef unsigned bitfield;
 %}
 
+%include "std_string.i"
 %include cl.inc
 
 typedef unsigned bitfield;
@@ -14,6 +15,8 @@ class host_singleton {
 	~host_singleton();
 	int nplatforms() const;
 	int ndevices(int i) const;
+	std::string get_platform_info(int i, unsigned param) const;
+	std::string get_device_info(int i, int j, unsigned param) const;
 };
 
 extern host_singleton host;
@@ -101,8 +104,10 @@ class command_queue {
 	void range_kernel3d(const kernel& ker,size_t offset_x, size_t offset_y,
 		size_t offset_z, size_t global_x, size_t global_y, size_t global_z,
 		size_t local_x, size_t local_y, size_t local_z);
-	int flush();
-	int finish();
-	int barrier();
+	void flush();
+	void finish();
+	void barrier();
+	void wait_for_events();
+	void marker();
 };
 

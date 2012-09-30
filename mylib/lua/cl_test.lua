@@ -13,6 +13,10 @@ data_size=10
 
 print(cl.host:nplatforms())
 print(cl.host:ndevices(0))
+print(cl.host:get_platform_info(0,cl.PLATFORM_NAME))
+print(cl.host:get_device_info(0,0,cl.DEVICE_NAME))
+print(cl.host:get_device_info(0,0,cl.DEVICE_VERSION))
+print(cl.host:get_device_info(0,0,cl.DEVICE_MAX_COMPUTE_UNITS))
 ctx=cl.context(0)
 ctx:add_device(0)
 ctx:init()

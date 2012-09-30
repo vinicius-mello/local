@@ -4,14 +4,16 @@
 #include <list>
 #include <vector>
 #include <iostream>
+#include <string>
+#include <sstream>
 #include "debug.h"
 
 using namespace std;
-#define CL_USE_DEPRECATED_OPENCL_1_1_APIS 1
+
 #include <CL/cl.h>
 #include <CL/cl_gl.h>
 #if defined(_WIN32) 
-
+#include <windows.h>
 #else
 #include <GL/glx.h>
 #endif
@@ -21,6 +23,7 @@ class host_singleton {
 	static cl_uint * ndevices_;
 	static cl_device_id** devices_;
 	static cl_platform_id* platforms_;
+	static char buffer[1024];
 	public:
 	host_singleton() {
 		if(platforms_==0) {
@@ -61,6 +64,116 @@ class host_singleton {
 	}
 	int ndevices(int i) const {
 		return ndevices_[i];
+	}
+	string get_platform_info(int i, unsigned param) const {
+		clGetPlatformInfo(platform(i),param,1024,buffer,0);
+		string ret(buffer);
+		return ret;
+	}
+	string get_device_info(int i, int j, unsigned param) const {
+		stringstream ss;
+		switch(param) {
+/*aff			 CL_DEVICE_PARTITION_AFFINITY_DOMAIN         */
+/*bool*/
+case			 CL_DEVICE_AVAILABLE:                         
+case			 CL_DEVICE_COMPILER_AVAILABLE:                
+case			 CL_DEVICE_ENDIAN_LITTLE:                     
+case			 CL_DEVICE_ERROR_CORRECTION_SUPPORT:          
+case			 CL_DEVICE_HOST_UNIFIED_MEMORY:               
+case			 CL_DEVICE_IMAGE_SUPPORT:                     
+case			 CL_DEVICE_LINKER_AVAILABLE:                  
+case			 CL_DEVICE_PREFERRED_INTEROP_USER_SYNC:       
+			cl_bool b;
+			clGetDeviceInfo(device(i,j),param,sizeof(cl_bool),&b,0);
+			ss<<b;
+			break;
+/*char[]*/
+case			 CL_DEVICE_BUILT_IN_KERNELS:                  
+case			 CL_DEVICE_EXTENSIONS:                        
+case			 CL_DEVICE_NAME:                              
+case			 CL_DEVICE_OPENCL_C_VERSION:                  
+case			 CL_DEVICE_PROFILE:                           
+case			 CL_DEVICE_VENDOR:                            
+case			 CL_DEVICE_VERSION:                           
+case			 CL_DRIVER_VERSION:                           
+			clGetDeviceInfo(device(i,j),param,1024,buffer,0);
+			ss<<buffer;
+			break;
+/*
+enum			 CL_DEVICE_TYPE                              
+exec_cap			 CL_DEVICE_EXECUTION_CAPABILITIES            
+fp_config			 CL_DEVICE_SINGLE_FP_CONFIG                  
+fp_config		 CL_DEVICE_DOUBLE_FP_CONFIG                  
+mem_cache			 CL_DEVICE_GLOBAL_MEM_CACHE_TYPE             
+mem_type			 CL_DEVICE_LOCAL_MEM_TYPE                    
+part_pr			 CL_DEVICE_PARTITION_PROPERTIES              
+part_pr			 CL_DEVICE_PARTITION_TYPE                    
+queue_pr			 CL_DEVICE_QUEUE_PROPERTIES  
+*/                
+/*size_t*/
+case			 CL_DEVICE_IMAGE2D_MAX_HEIGHT:                
+case			 CL_DEVICE_IMAGE2D_MAX_WIDTH:                 
+case			 CL_DEVICE_IMAGE3D_MAX_DEPTH:                 
+case			 CL_DEVICE_IMAGE3D_MAX_HEIGHT:                
+case			 CL_DEVICE_IMAGE3D_MAX_WIDTH:                 
+case			 CL_DEVICE_IMAGE_MAX_ARRAY_SIZE:              
+case			 CL_DEVICE_IMAGE_MAX_BUFFER_SIZE:             
+case			 CL_DEVICE_MAX_PARAMETER_SIZE:                
+case			 CL_DEVICE_MAX_WORK_GROUP_SIZE:               
+case			 CL_DEVICE_PRINTF_BUFFER_SIZE:                
+case			 CL_DEVICE_PROFILING_TIMER_RESOLUTION:        
+			size_t st;
+			clGetDeviceInfo(device(i,j),param,sizeof(size_t),&st,0);
+			ss<<st;
+			break;
+/*size_t[]			 CL_DEVICE_MAX_WORK_ITEM_SIZES */              
+/*uint*/
+case			 CL_DEVICE_ADDRESS_BITS:                      
+case			 CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE:         
+case			 CL_DEVICE_MAX_CLOCK_FREQUENCY:               
+case			 CL_DEVICE_MAX_COMPUTE_UNITS:                 
+case			 CL_DEVICE_MAX_CONSTANT_ARGS:                 
+case			 CL_DEVICE_MAX_READ_IMAGE_ARGS:               
+case			 CL_DEVICE_MAX_SAMPLERS:                      
+case			 CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS:          
+case			 CL_DEVICE_MAX_WRITE_IMAGE_ARGS:              
+case			 CL_DEVICE_MEM_BASE_ADDR_ALIGN:               
+case			 CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE:          
+case			 CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR:          
+case			 CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE:        
+case			 CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT:         
+case			 CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF:          
+case			 CL_DEVICE_NATIVE_VECTOR_WIDTH_INT:           
+case			 CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG:          
+case			 CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT:         
+case			 CL_DEVICE_PARTITION_MAX_SUB_DEVICES:         
+case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR:       
+case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE:     
+case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT:      
+case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF:       
+case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT:        
+case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG:       
+case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT:      
+case			 CL_DEVICE_REFERENCE_COUNT:                   
+case			 CL_DEVICE_VENDOR_ID:                         
+			cl_uint u;
+			clGetDeviceInfo(device(i,j),param,sizeof(cl_uint),&u,0);
+			ss<<u;
+			break;
+/*ulong*/
+case			 CL_DEVICE_GLOBAL_MEM_CACHE_SIZE:             
+case			 CL_DEVICE_GLOBAL_MEM_SIZE:                   
+case			 CL_DEVICE_LOCAL_MEM_SIZE:                    
+case			 CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE:          
+case			 CL_DEVICE_MAX_MEM_ALLOC_SIZE:                
+			cl_ulong ul;
+			clGetDeviceInfo(device(i,j),param,sizeof(cl_ulong),&ul,0);
+			ss<<ul;
+			break;
+default:
+			break;
+		}
+		return ss.str();
 	}
 };
 
@@ -113,6 +226,9 @@ class context {
 			cl_int status;
 #if defined(_WIN32)
 			cl_context_properties properties[] = {
+				CL_GL_CONTEXT_KHR, (cl_context_properties) wglGetCurrentContext(), 
+				CL_WGL_HDC_KHR, (cl_context_properties) wglGetCurrentDC(), 
+				CL_CONTEXT_PLATFORM, (cl_context_properties) host.platform(platform_), 
    			0
 			};
 #else
@@ -181,8 +297,23 @@ class image2d : public mem {
 		cl_image_format ifmt;
 		ifmt.image_channel_order=order;
 		ifmt.image_channel_data_type=type;
+#ifdef CL_VERSION_1_2
+		cl_image_desc idesc;
+		idesc.image_type=CL_MEM_OBJECT_IMAGE2D;
+		idesc.image_width=image_width;
+		idesc.image_height=image_height;
+		idesc.image_depth=0;
+		idesc.image_array_size=0;
+		idesc.image_row_pitch=image_row_pitch;
+		idesc.image_slice_pitch=0;
+		idesc.num_mip_levels=0;
+		idesc.num_samples=0;
+		idesc.buffer=0;
+		mo_=clCreateImage(ctx.ctx_,flags,&ifmt,&idesc,host_ptr,&code);
+#else
 		mo_=clCreateImage2D(ctx.ctx_,flags,&ifmt,image_width,image_height,
 			image_row_pitch,host_ptr,&code);
+#endif
 	 	debug_print("image2d new(%p)\n",this);
 	} 
 	image2d(const image2d& im) {
@@ -387,21 +518,35 @@ class command_queue {
 		clEnqueueNDRangeKernel(que_,ker.ker_,3,offset_,global_,local_,wait_.size(),&wait_[0],ev_);
 		wait_.clear();ev_=0;
 	}
-	int flush() {
-		return clFlush(que_);
+	void flush() {
+		clFlush(que_);
 	}
-	int finish() {
-		return clFinish(que_);
+	void finish() {
+		clFinish(que_);
 	}
-	int barrier() {
-		return clEnqueueBarrier(que_);
+	void barrier() {
+#ifdef CL_VERSION_1_2
+		clEnqueueBarrierWithWaitList(que_,wait_.size(),&wait_[0],ev_);
+		wait_.clear();ev_=0;
+#else
+		clEnqueueBarrier(que_);
+#endif
 	}
-	int wait_for_events() {
-		return clEnqueueWaitForEvents(que_,wait_.size(),&wait_[0]);
+	void wait_for_events() {
+#ifdef CL_VERSION_1_2
+		clEnqueueMarkerWithWaitList(que_,wait_.size(),&wait_[0],ev_);
+#else
+		clEnqueueWaitForEvents(que_,wait_.size(),&wait_[0]);
+#endif
+		wait_.clear();ev_=0;
 	}
 	void marker() {
+#ifdef CL_VERSION_1_2
+		clEnqueueMarkerWithWaitList(que_,wait_.size(),&wait_[0],ev_);
+#else
 		clEnqueueMarker(que_,ev_);
-		ev_=0;
+#endif
+		wait_.clear();ev_=0;
 	}
 };
 

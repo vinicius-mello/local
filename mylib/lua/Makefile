@@ -87,7 +87,7 @@ gl2_wrap.cxx: $(MYLIB)/swig/gl2.i $(MYLIB)/wrappers/gl2.hpp
 	swig -o $@ -c++ -lua $<
 
 cl$(EXT): cl_wrap.cxx 
-	g++ -DDEBUG -o $@ $(SHARED) $< $(MYLIB)/wrappers/cl.o $(LUA_INC) $(CL_INC) $(LUA_LIB) $(CL_LIB)  -I $(MYLIB)
+	g++ -o $@ $(SHARED) $< $(MYLIB)/wrappers/cl.o $(LUA_INC) $(CL_INC) $(LUA_LIB) $(CL_LIB)  -I $(MYLIB)
 
 cl_wrap.cxx: $(MYLIB)/swig/cl.i $(MYLIB)/wrappers/cl.hpp 
 	swig -o $@ -c++ -lua $<
