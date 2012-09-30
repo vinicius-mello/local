@@ -90,14 +90,15 @@ class command_queue {
 	command_queue(const command_queue& que);
 	~command_queue();
 	void add_wait(const event& ev);
-	event write_buffer(const mem& mo, bool block, size_t offset, size_t count, 
+	void event(const event& ev);
+	void write_buffer(const mem& mo, bool block, size_t offset, size_t count, 
 		void * ptr) ;
-	event read_buffer(const mem& mo, bool block, size_t offset, size_t count, 
+	void read_buffer(const mem& mo, bool block, size_t offset, size_t count, 
 		void * ptr) ;
-	event range_kernel1d(const kernel& ker,size_t offset, size_t global, size_t local) ;
-	event range_kernel2d(const kernel& ker,size_t offset_x, size_t offset_y,
+	void range_kernel1d(const kernel& ker,size_t offset, size_t global, size_t local) ;
+	void range_kernel2d(const kernel& ker,size_t offset_x, size_t offset_y,
 		size_t global_x, size_t global_y, size_t local_x, size_t local_y);
-	event range_kernel3d(const kernel& ker,size_t offset_x, size_t offset_y,
+	void range_kernel3d(const kernel& ker,size_t offset_x, size_t offset_y,
 		size_t offset_z, size_t global_x, size_t global_y, size_t global_z,
 		size_t local_x, size_t local_y, size_t local_z);
 	int flush();
