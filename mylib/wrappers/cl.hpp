@@ -81,14 +81,18 @@ case			 CL_DEVICE_ENDIAN_LITTLE:
 case			 CL_DEVICE_ERROR_CORRECTION_SUPPORT:          
 case			 CL_DEVICE_HOST_UNIFIED_MEMORY:               
 case			 CL_DEVICE_IMAGE_SUPPORT:                     
+#ifdef CL_VERSION_1_2
 case			 CL_DEVICE_LINKER_AVAILABLE:                  
 case			 CL_DEVICE_PREFERRED_INTEROP_USER_SYNC:       
+#endif
 			cl_bool b;
 			clGetDeviceInfo(device(i,j),param,sizeof(cl_bool),&b,0);
 			ss<<b;
 			break;
 /*char[]*/
+#ifdef CL_VERSION_1_2
 case			 CL_DEVICE_BUILT_IN_KERNELS:                  
+#endif
 case			 CL_DEVICE_EXTENSIONS:                        
 case			 CL_DEVICE_NAME:                              
 case			 CL_DEVICE_OPENCL_C_VERSION:                  
@@ -116,11 +120,13 @@ case			 CL_DEVICE_IMAGE2D_MAX_WIDTH:
 case			 CL_DEVICE_IMAGE3D_MAX_DEPTH:                 
 case			 CL_DEVICE_IMAGE3D_MAX_HEIGHT:                
 case			 CL_DEVICE_IMAGE3D_MAX_WIDTH:                 
+#ifdef CL_VERSION_1_2
 case			 CL_DEVICE_IMAGE_MAX_ARRAY_SIZE:              
 case			 CL_DEVICE_IMAGE_MAX_BUFFER_SIZE:             
+case			 CL_DEVICE_PRINTF_BUFFER_SIZE:                
+#endif
 case			 CL_DEVICE_MAX_PARAMETER_SIZE:                
 case			 CL_DEVICE_MAX_WORK_GROUP_SIZE:               
-case			 CL_DEVICE_PRINTF_BUFFER_SIZE:                
 case			 CL_DEVICE_PROFILING_TIMER_RESOLUTION:        
 			size_t st;
 			clGetDeviceInfo(device(i,j),param,sizeof(size_t),&st,0);
@@ -146,7 +152,10 @@ case			 CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF:
 case			 CL_DEVICE_NATIVE_VECTOR_WIDTH_INT:           
 case			 CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG:          
 case			 CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT:         
+#ifdef CL_VERSION_1_2
 case			 CL_DEVICE_PARTITION_MAX_SUB_DEVICES:         
+case			 CL_DEVICE_REFERENCE_COUNT:                   
+#endif
 case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR:       
 case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE:     
 case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT:      
@@ -154,7 +163,6 @@ case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF:
 case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT:        
 case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG:       
 case			 CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT:      
-case			 CL_DEVICE_REFERENCE_COUNT:                   
 case			 CL_DEVICE_VENDOR_ID:                         
 			cl_uint u;
 			clGetDeviceInfo(device(i,j),param,sizeof(cl_uint),&u,0);
