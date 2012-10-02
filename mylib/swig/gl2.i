@@ -164,4 +164,27 @@ public:
 	void bind_attribute(int index, const char * name);
 };
 
+class color_texture1d 
+{
+public:
+	color_texture1d(void);
+	unsigned object_id(void) const;
+	size_t width(void) const;
+	int dimensions(void) const;
+	size_t size(const unsigned i) const;
+	unsigned target(void) const;
+	bool set(int level, int internalFormat, size_t width, int border, unsigned format, unsigned type, const void * pixels);
+};
 
+class color_texture2d 
+{
+public:
+	color_texture2d(void);
+	unsigned object_id(void) const;
+	size_t width(void) const;
+	size_t height(void) const;
+	int dimensions(void) const;
+	size_t size(const unsigned i) const;
+	unsigned target(void) const;
+	bool set(int level, int internalFormat, size_t width, size_t height, int border, unsigned format, unsigned type, const void * pixels);
+};

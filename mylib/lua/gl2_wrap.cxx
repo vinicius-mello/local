@@ -1522,18 +1522,20 @@ SWIG_Lua_dostring(lua_State *L, const char* str) {
 #define SWIGTYPE_p_arrayT_double_t swig_types[4]
 #define SWIGTYPE_p_arrayT_float_t swig_types[5]
 #define SWIGTYPE_p_arrayT_unsigned_int_t swig_types[6]
-#define SWIGTYPE_p_double swig_types[7]
-#define SWIGTYPE_p_fragment_shader swig_types[8]
-#define SWIGTYPE_p_geometry_shader swig_types[9]
-#define SWIGTYPE_p_program swig_types[10]
-#define SWIGTYPE_p_shader swig_types[11]
-#define SWIGTYPE_p_trackball swig_types[12]
-#define SWIGTYPE_p_unprojection swig_types[13]
-#define SWIGTYPE_p_unsigned_char swig_types[14]
-#define SWIGTYPE_p_unsigned_int swig_types[15]
-#define SWIGTYPE_p_vertex_shader swig_types[16]
-static swig_type_info *swig_types[18];
-static swig_module_info swig_module = {swig_types, 17, 0, 0, 0, 0};
+#define SWIGTYPE_p_color_texture1d swig_types[7]
+#define SWIGTYPE_p_color_texture2d swig_types[8]
+#define SWIGTYPE_p_double swig_types[9]
+#define SWIGTYPE_p_fragment_shader swig_types[10]
+#define SWIGTYPE_p_geometry_shader swig_types[11]
+#define SWIGTYPE_p_program swig_types[12]
+#define SWIGTYPE_p_shader swig_types[13]
+#define SWIGTYPE_p_trackball swig_types[14]
+#define SWIGTYPE_p_unprojection swig_types[15]
+#define SWIGTYPE_p_unsigned_char swig_types[16]
+#define SWIGTYPE_p_unsigned_int swig_types[17]
+#define SWIGTYPE_p_vertex_shader swig_types[18]
+static swig_type_info *swig_types[20];
+static swig_module_info swig_module = {swig_types, 19, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -4809,6 +4811,453 @@ static swig_lua_class *swig_program_bases[] = {0};
 static const char *swig_program_base_names[] = {0};
 static swig_lua_class _wrap_class_program = { "program", &SWIGTYPE_p_program,_wrap_new_program, swig_delete_program, swig_program_methods, swig_program_attributes, swig_program_bases, swig_program_base_names };
 
+static int _wrap_new_color_texture1d(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture1d *result = 0 ;
+  
+  SWIG_check_num_args("color_texture1d::color_texture1d",0,0)
+  result = (color_texture1d *)new color_texture1d();
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_color_texture1d,1); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture1d_object_id(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture1d *arg1 = (color_texture1d *) 0 ;
+  unsigned int result;
+  
+  SWIG_check_num_args("color_texture1d::object_id",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture1d::object_id",1,"color_texture1d const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture1d,0))){
+    SWIG_fail_ptr("color_texture1d_object_id",1,SWIGTYPE_p_color_texture1d);
+  }
+  
+  result = (unsigned int)((color_texture1d const *)arg1)->object_id();
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture1d_width(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture1d *arg1 = (color_texture1d *) 0 ;
+  size_t result;
+  
+  SWIG_check_num_args("color_texture1d::width",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture1d::width",1,"color_texture1d const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture1d,0))){
+    SWIG_fail_ptr("color_texture1d_width",1,SWIGTYPE_p_color_texture1d);
+  }
+  
+  result = ((color_texture1d const *)arg1)->width();
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture1d_dimensions(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture1d *arg1 = (color_texture1d *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("color_texture1d::dimensions",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture1d::dimensions",1,"color_texture1d const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture1d,0))){
+    SWIG_fail_ptr("color_texture1d_dimensions",1,SWIGTYPE_p_color_texture1d);
+  }
+  
+  result = (int)((color_texture1d const *)arg1)->dimensions();
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture1d_size(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture1d *arg1 = (color_texture1d *) 0 ;
+  unsigned int arg2 ;
+  size_t result;
+  
+  SWIG_check_num_args("color_texture1d::size",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture1d::size",1,"color_texture1d const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("color_texture1d::size",2,"unsigned int const");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture1d,0))){
+    SWIG_fail_ptr("color_texture1d_size",1,SWIGTYPE_p_color_texture1d);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (unsigned int const)lua_tonumber(L, 2);
+  result = ((color_texture1d const *)arg1)->size(arg2);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture1d_target(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture1d *arg1 = (color_texture1d *) 0 ;
+  unsigned int result;
+  
+  SWIG_check_num_args("color_texture1d::target",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture1d::target",1,"color_texture1d const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture1d,0))){
+    SWIG_fail_ptr("color_texture1d_target",1,SWIGTYPE_p_color_texture1d);
+  }
+  
+  result = (unsigned int)((color_texture1d const *)arg1)->target();
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture1d_set(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture1d *arg1 = (color_texture1d *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  size_t arg4 ;
+  int arg5 ;
+  unsigned int arg6 ;
+  unsigned int arg7 ;
+  void *arg8 = (void *) 0 ;
+  bool result;
+  
+  SWIG_check_num_args("color_texture1d::set",8,8)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture1d::set",1,"color_texture1d *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("color_texture1d::set",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("color_texture1d::set",3,"int");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("color_texture1d::set",4,"size_t");
+  if(!lua_isnumber(L,5)) SWIG_fail_arg("color_texture1d::set",5,"int");
+  if(!lua_isnumber(L,6)) SWIG_fail_arg("color_texture1d::set",6,"unsigned int");
+  if(!lua_isnumber(L,7)) SWIG_fail_arg("color_texture1d::set",7,"unsigned int");
+  if(!SWIG_isptrtype(L,8)) SWIG_fail_arg("color_texture1d::set",8,"void const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture1d,0))){
+    SWIG_fail_ptr("color_texture1d_set",1,SWIGTYPE_p_color_texture1d);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (int)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (size_t)lua_tonumber(L, 4);
+  arg5 = (int)lua_tonumber(L, 5);
+  SWIG_contract_assert((lua_tonumber(L,6)>=0),"number must not be negative")
+  arg6 = (unsigned int)lua_tonumber(L, 6);
+  SWIG_contract_assert((lua_tonumber(L,7)>=0),"number must not be negative")
+  arg7 = (unsigned int)lua_tonumber(L, 7);
+  arg8=(void *)SWIG_MustGetPtr(L,8,0,0,8,"color_texture1d_set");
+  result = (bool)(arg1)->set(arg2,arg3,arg4,arg5,arg6,arg7,(void const *)arg8);
+  lua_pushboolean(L,(int)(result!=0)); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static void swig_delete_color_texture1d(void *obj) {
+color_texture1d *arg1 = (color_texture1d *) obj;
+delete arg1;
+}
+static swig_lua_method swig_color_texture1d_methods[] = {
+    {"object_id", _wrap_color_texture1d_object_id}, 
+    {"width", _wrap_color_texture1d_width}, 
+    {"dimensions", _wrap_color_texture1d_dimensions}, 
+    {"size", _wrap_color_texture1d_size}, 
+    {"target", _wrap_color_texture1d_target}, 
+    {"set", _wrap_color_texture1d_set}, 
+    {0,0}
+};
+static swig_lua_attribute swig_color_texture1d_attributes[] = {
+    {0,0,0}
+};
+static swig_lua_class *swig_color_texture1d_bases[] = {0};
+static const char *swig_color_texture1d_base_names[] = {0};
+static swig_lua_class _wrap_class_color_texture1d = { "color_texture1d", &SWIGTYPE_p_color_texture1d,_wrap_new_color_texture1d, swig_delete_color_texture1d, swig_color_texture1d_methods, swig_color_texture1d_attributes, swig_color_texture1d_bases, swig_color_texture1d_base_names };
+
+static int _wrap_new_color_texture2d(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture2d *result = 0 ;
+  
+  SWIG_check_num_args("color_texture2d::color_texture2d",0,0)
+  result = (color_texture2d *)new color_texture2d();
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_color_texture2d,1); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture2d_object_id(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture2d *arg1 = (color_texture2d *) 0 ;
+  unsigned int result;
+  
+  SWIG_check_num_args("color_texture2d::object_id",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture2d::object_id",1,"color_texture2d const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture2d,0))){
+    SWIG_fail_ptr("color_texture2d_object_id",1,SWIGTYPE_p_color_texture2d);
+  }
+  
+  result = (unsigned int)((color_texture2d const *)arg1)->object_id();
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture2d_width(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture2d *arg1 = (color_texture2d *) 0 ;
+  size_t result;
+  
+  SWIG_check_num_args("color_texture2d::width",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture2d::width",1,"color_texture2d const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture2d,0))){
+    SWIG_fail_ptr("color_texture2d_width",1,SWIGTYPE_p_color_texture2d);
+  }
+  
+  result = ((color_texture2d const *)arg1)->width();
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture2d_height(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture2d *arg1 = (color_texture2d *) 0 ;
+  size_t result;
+  
+  SWIG_check_num_args("color_texture2d::height",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture2d::height",1,"color_texture2d const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture2d,0))){
+    SWIG_fail_ptr("color_texture2d_height",1,SWIGTYPE_p_color_texture2d);
+  }
+  
+  result = ((color_texture2d const *)arg1)->height();
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture2d_dimensions(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture2d *arg1 = (color_texture2d *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("color_texture2d::dimensions",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture2d::dimensions",1,"color_texture2d const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture2d,0))){
+    SWIG_fail_ptr("color_texture2d_dimensions",1,SWIGTYPE_p_color_texture2d);
+  }
+  
+  result = (int)((color_texture2d const *)arg1)->dimensions();
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture2d_size(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture2d *arg1 = (color_texture2d *) 0 ;
+  unsigned int arg2 ;
+  size_t result;
+  
+  SWIG_check_num_args("color_texture2d::size",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture2d::size",1,"color_texture2d const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("color_texture2d::size",2,"unsigned int const");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture2d,0))){
+    SWIG_fail_ptr("color_texture2d_size",1,SWIGTYPE_p_color_texture2d);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (unsigned int const)lua_tonumber(L, 2);
+  result = ((color_texture2d const *)arg1)->size(arg2);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture2d_target(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture2d *arg1 = (color_texture2d *) 0 ;
+  unsigned int result;
+  
+  SWIG_check_num_args("color_texture2d::target",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture2d::target",1,"color_texture2d const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture2d,0))){
+    SWIG_fail_ptr("color_texture2d_target",1,SWIGTYPE_p_color_texture2d);
+  }
+  
+  result = (unsigned int)((color_texture2d const *)arg1)->target();
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_color_texture2d_set(lua_State* L) {
+  int SWIG_arg = 0;
+  color_texture2d *arg1 = (color_texture2d *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  size_t arg4 ;
+  size_t arg5 ;
+  int arg6 ;
+  unsigned int arg7 ;
+  unsigned int arg8 ;
+  void *arg9 = (void *) 0 ;
+  bool result;
+  
+  SWIG_check_num_args("color_texture2d::set",9,9)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("color_texture2d::set",1,"color_texture2d *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("color_texture2d::set",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("color_texture2d::set",3,"int");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("color_texture2d::set",4,"size_t");
+  if(!lua_isnumber(L,5)) SWIG_fail_arg("color_texture2d::set",5,"size_t");
+  if(!lua_isnumber(L,6)) SWIG_fail_arg("color_texture2d::set",6,"int");
+  if(!lua_isnumber(L,7)) SWIG_fail_arg("color_texture2d::set",7,"unsigned int");
+  if(!lua_isnumber(L,8)) SWIG_fail_arg("color_texture2d::set",8,"unsigned int");
+  if(!SWIG_isptrtype(L,9)) SWIG_fail_arg("color_texture2d::set",9,"void const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_color_texture2d,0))){
+    SWIG_fail_ptr("color_texture2d_set",1,SWIGTYPE_p_color_texture2d);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (int)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (size_t)lua_tonumber(L, 4);
+  SWIG_contract_assert((lua_tonumber(L,5)>=0),"number must not be negative")
+  arg5 = (size_t)lua_tonumber(L, 5);
+  arg6 = (int)lua_tonumber(L, 6);
+  SWIG_contract_assert((lua_tonumber(L,7)>=0),"number must not be negative")
+  arg7 = (unsigned int)lua_tonumber(L, 7);
+  SWIG_contract_assert((lua_tonumber(L,8)>=0),"number must not be negative")
+  arg8 = (unsigned int)lua_tonumber(L, 8);
+  arg9=(void *)SWIG_MustGetPtr(L,9,0,0,9,"color_texture2d_set");
+  result = (bool)(arg1)->set(arg2,arg3,arg4,arg5,arg6,arg7,arg8,(void const *)arg9);
+  lua_pushboolean(L,(int)(result!=0)); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static void swig_delete_color_texture2d(void *obj) {
+color_texture2d *arg1 = (color_texture2d *) obj;
+delete arg1;
+}
+static swig_lua_method swig_color_texture2d_methods[] = {
+    {"object_id", _wrap_color_texture2d_object_id}, 
+    {"width", _wrap_color_texture2d_width}, 
+    {"height", _wrap_color_texture2d_height}, 
+    {"dimensions", _wrap_color_texture2d_dimensions}, 
+    {"size", _wrap_color_texture2d_size}, 
+    {"target", _wrap_color_texture2d_target}, 
+    {"set", _wrap_color_texture2d_set}, 
+    {0,0}
+};
+static swig_lua_attribute swig_color_texture2d_attributes[] = {
+    {0,0,0}
+};
+static swig_lua_class *swig_color_texture2d_bases[] = {0};
+static const char *swig_color_texture2d_base_names[] = {0};
+static swig_lua_class _wrap_class_color_texture2d = { "color_texture2d", &SWIGTYPE_p_color_texture2d,_wrap_new_color_texture2d, swig_delete_color_texture2d, swig_color_texture2d_methods, swig_color_texture2d_attributes, swig_color_texture2d_bases, swig_color_texture2d_base_names };
+
 #ifdef __cplusplus
 }
 #endif
@@ -4856,6 +5305,8 @@ static swig_type_info _swigt__p_ShaderType = {"_p_ShaderType", "ShaderType *", 0
 static swig_type_info _swigt__p_arrayT_double_t = {"_p_arrayT_double_t", "array< double > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_arrayT_float_t = {"_p_arrayT_float_t", "array< float > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_arrayT_unsigned_int_t = {"_p_arrayT_unsigned_int_t", "array< unsigned int > *|array< uint > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_color_texture1d = {"_p_color_texture1d", "color_texture1d *", 0, 0, (void*)&_wrap_class_color_texture1d, 0};
+static swig_type_info _swigt__p_color_texture2d = {"_p_color_texture2d", "color_texture2d *", 0, 0, (void*)&_wrap_class_color_texture2d, 0};
 static swig_type_info _swigt__p_double = {"_p_double", "double *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_fragment_shader = {"_p_fragment_shader", "fragment_shader *", 0, 0, (void*)&_wrap_class_fragment_shader, 0};
 static swig_type_info _swigt__p_geometry_shader = {"_p_geometry_shader", "geometry_shader *", 0, 0, (void*)&_wrap_class_geometry_shader, 0};
@@ -4875,6 +5326,8 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_arrayT_double_t,
   &_swigt__p_arrayT_float_t,
   &_swigt__p_arrayT_unsigned_int_t,
+  &_swigt__p_color_texture1d,
+  &_swigt__p_color_texture2d,
   &_swigt__p_double,
   &_swigt__p_fragment_shader,
   &_swigt__p_geometry_shader,
@@ -4894,6 +5347,8 @@ static swig_cast_info _swigc__p_ShaderType[] = {  {&_swigt__p_ShaderType, 0, 0, 
 static swig_cast_info _swigc__p_arrayT_double_t[] = {  {&_swigt__p_arrayT_double_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_arrayT_float_t[] = {  {&_swigt__p_arrayT_float_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_arrayT_unsigned_int_t[] = {  {&_swigt__p_arrayT_unsigned_int_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_color_texture1d[] = {  {&_swigt__p_color_texture1d, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_color_texture2d[] = {  {&_swigt__p_color_texture2d, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_fragment_shader[] = {  {&_swigt__p_fragment_shader, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_geometry_shader[] = {  {&_swigt__p_geometry_shader, 0, 0, 0},{0, 0, 0, 0}};
@@ -4913,6 +5368,8 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_arrayT_double_t,
   _swigc__p_arrayT_float_t,
   _swigc__p_arrayT_unsigned_int_t,
+  _swigc__p_color_texture1d,
+  _swigc__p_color_texture2d,
   _swigc__p_double,
   _swigc__p_fragment_shader,
   _swigc__p_geometry_shader,

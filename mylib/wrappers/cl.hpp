@@ -193,6 +193,7 @@ class context {
 	friend class command_queue;
 	friend class mem;
 	friend class image2d;
+	friend class gl_texture2d;
 	friend class program;
 	friend class event;
 	friend class sampler;
@@ -336,6 +337,29 @@ class image2d : public mem {
 	}
 };
 
+class gl_texture2d : public mem {
+	friend class kernel;
+	friend class command_queue;
+	public:
+	gl_texture2d() : mem() {
+	 	debug_print("gl_texture2d default(%p)\n",this);
+	}
+	gl_texture2d(const context& ctx, cl_mem_flags flags, GLenum target, int miplevel, unsigned texture) {
+		cl_int code;
+		mo_=clCreateFromGLTexture2D(ctx.ctx_,flags,target,miplevel,texture,&code);
+	}
+	gl_texture2d(const gl_texture2d& im) {
+		mem::mo_=im.mo_;
+		if(mem::mo_) {
+			clRetainMemObject(mem::mo_);
+	 		debug_print("gl_texture2d copy_cons(%p)\n",this);
+		}
+	}
+	virtual ~gl_texture2d() {
+	 	debug_print("~gl_texture2d(%p)",this);
+	}
+};
+
 class program {
 	friend class kernel;
 	cl_program prg_;
@@ -347,7 +371,9 @@ class program {
 		cl_int code;
 		prg_=clCreateProgramWithSource(ctx.ctx_,1,(const char **)&src,0,&code);
 		if(clBuildProgram(prg_,0,0,0,0,0)!=CL_SUCCESS) {
-			cerr<<"error building program"<<endl;
+			char buffer[1024];
+			clGetProgramBuildInfo(prg_, host.device(0,0), CL_PROGRAM_BUILD_LOG, 1024,buffer,0);
+			cerr<<buffer<<endl;
 		}
 	 	debug_print("program new(%p)\n",this);
 	}
@@ -461,6 +487,7 @@ class event {
 class command_queue {
 	cl_command_queue que_;
 	vector<cl_event> wait_;
+	vector<cl_mem> obj_;
 	const context * ctx_;
 	cl_event * ev_;
 	public:
@@ -524,6 +551,21 @@ class command_queue {
 		size_t global_[2]; global_[0]=global_x; global_[1]=global_y; global_[2]=global_z;
 		size_t local_[2]; local_[0]=local_x; local_[1]=local_y; local_[2]=local_z;
 		clEnqueueNDRangeKernel(que_,ker.ker_,3,offset_,global_,local_,wait_.size(),&wait_[0],ev_);
+		wait_.clear();ev_=0;
+	}
+	void add_object(const mem& mo) {
+		obj_.push_back(mo.mo_);
+	}
+	void aquire_globject() {
+		clEnqueueAcquireGLObjects(que_, obj_.size(), &obj_[0], wait_.size(), 
+			&wait_[0],ev_);
+		obj_.clear();
+		wait_.clear();ev_=0;
+	}
+	void release_globject() {
+		clEnqueueAcquireGLObjects(que_, obj_.size(), &obj_[0], wait_.size(), 
+			&wait_[0],ev_);
+		obj_.clear();
 		wait_.clear();ev_=0;
 	}
 	void flush() {

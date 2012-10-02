@@ -34,7 +34,7 @@
 
 #include "gl_object.h"
 
-class FrameBufferSemantic
+class frame_buffer_semantic
 {
 public:
 	typedef enum
@@ -44,178 +44,178 @@ public:
 		STENCIL
 	} FBSType;
 
-	virtual FBSType Semantic(void) const = 0;
-	virtual bool ValidateFormat(GLenum format) const = 0;
+	virtual FBSType semantic(void) const = 0;
+	virtual bool validate_format(GLenum format) const = 0;
 
-	static bool ValidateFormat(FBSType type, GLenum format)
+	static bool validate_format(FBSType type, GLenum format)
 	{
 		switch (type)
 		{
-			case COLOR   : return FrameBufferSemantic::ValidateColor(format);
-			case DEPTH   : return FrameBufferSemantic::ValidateDepth(format);
-			case STENCIL : return FrameBufferSemantic::ValidateStencil(format);
+			case COLOR   : return frame_buffer_semantic::validate_color(format);
+			case DEPTH   : return frame_buffer_semantic::validate_depth(format);
+			case STENCIL : return frame_buffer_semantic::validate_stencil(format);
 			default      : return false;
 		}
 	}
 
-	static bool ValidateColor(GLenum type)
+	static bool validate_color(GLenum type)
 	{
 		return true;
 	}
 
-	static bool ValidateDepth(GLenum type)
+	static bool validate_depth(GLenum type)
 	{
 		return  true;
 	}
 
-	static bool ValidateStencil(GLenum type)
+	static bool validate_stencil(GLenum type)
 	{
 		return true;
 	}
 };
 
-class Texture : public GLObject, public Bindable, public FrameBufferSemantic
+class texture : public gl_object, public bindable, public frame_buffer_semantic
 {
 public:
-	Texture(void) : GLObject(), Bindable(), FrameBufferSemantic()
+	texture(void) : gl_object(), bindable(), frame_buffer_semantic()
 	{
-		this->format = GL_NONE;
+		this->format_ = GL_NONE;
 	}
 
-	void Gen(void)
+	void gen(void)
 	{
-		this->Del();
+		this->del();
 		glGenTextures(1, &(this->objectID));
 	}
 
-	void Del(void)
+	void del(void)
 	{
 		if (this->objectID == 0) return;
 		glDeleteTextures(1, &(this->objectID));
 		this->objectID = 0;
 	}
 
-	GLenum Format(void) const
+	GLenum format(void) const
 	{
-		return this->format;
+		return this->format_;
 	}
 
-	virtual GLint Dimensions(void) const = 0;
+	virtual GLint dimensions(void) const = 0;
 
-	virtual GLsizei Size(const unsigned int i) const = 0;
+	virtual GLsizei size(const unsigned int i) const = 0;
 
-	virtual GLenum Target(void) const = 0;
+	virtual GLenum target(void) const = 0;
 
 protected:
-	GLenum format;
+	GLenum format_;
 
-	void DoBind(void)
+	void do_bind(void)
 	{
-		glBindTexture(this->Target(), this->objectID);
+		glBindTexture(this->target(), this->objectID);
 	}
 
-	void DoUnbind(void)
+	void do_unbind(void)
 	{
-		glBindTexture(this->Target(), 0);
-	}
-};
-
-class ColorTexture : public virtual Texture
-{
-public:
-	ColorTexture(void) : Texture()
-	{
-	}
-
-	FrameBufferSemantic::FBSType Semantic(void) const
-	{
-		return FrameBufferSemantic::COLOR;
-	}
-
-	bool ValidateFormat(GLenum format) const
-	{
-		return FrameBufferSemantic::ValidateColor(format);
+		glBindTexture(this->target(), 0);
 	}
 };
 
-class DepthTexture : public virtual Texture
+class color_texture : public virtual texture
 {
 public:
-	DepthTexture(void) : Texture()
+	color_texture(void) : texture()
 	{
 	}
 
-	FrameBufferSemantic::FBSType Semantic(void) const
+	frame_buffer_semantic::FBSType semantic(void) const
 	{
-		return FrameBufferSemantic::DEPTH;
+		return frame_buffer_semantic::COLOR;
 	}
 
-	bool ValidateFormat(GLenum format) const
+	bool validate_format(GLenum format) const
 	{
-		return FrameBufferSemantic::ValidateDepth(format);
+		return frame_buffer_semantic::validate_color(format);
 	}
 };
 
-class StencilTexture : public virtual Texture
+class depth_texture : public virtual texture
 {
 public:
-	StencilTexture(void) : Texture()
+	depth_texture(void) : texture()
 	{
 	}
 
-	FrameBufferSemantic::FBSType Semantic(void) const
+	frame_buffer_semantic::FBSType semantic(void) const
 	{
-		return FrameBufferSemantic::STENCIL;
+		return frame_buffer_semantic::DEPTH;
 	}
 
-	bool ValidateFormat(GLenum format) const
+	bool validate_format(GLenum format) const
 	{
-		return FrameBufferSemantic::ValidateStencil(format);
+		return frame_buffer_semantic::validate_depth(format);
 	}
 };
 
-class Texture1D : public virtual Texture
+class stencil_texture : public virtual texture
 {
 public:
-	Texture1D(void) : Texture()
+	stencil_texture(void) : texture()
+	{
+	}
+
+	frame_buffer_semantic::FBSType semantic(void) const
+	{
+		return frame_buffer_semantic::STENCIL;
+	}
+
+	bool validate_format(GLenum format) const
+	{
+		return frame_buffer_semantic::validate_stencil(format);
+	}
+};
+
+class texture1d : public virtual texture
+{
+public:
+	texture1d(void) : texture()
 	{
 		this->dims[0] = 0;
 		this->wraps[0] = GL_CLAMP_TO_EDGE;
 	}
 
-	GLsizei Width(void) const
+	GLsizei width(void) const
 	{
 		return this->dims[0];
 	}
 
-	GLint Dimensions(void) const
+	GLint dimensions(void) const
 	{
 		return 1;
 	}
 
-	GLsizei Size(const unsigned int i) const
+	GLsizei size(const unsigned int i) const
 	{
 		if (i > 0) return 0;
 		return this->dims[0];
 	}
 
-	GLenum Target(void) const
+	GLenum target(void) const
 	{
 		return GL_TEXTURE_1D;
 	}
 
-	bool Set(GLint level, GLint internalFormat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid * pixels)
+	bool set(GLint level, GLint internalFormat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid * pixels)
 	{
-		if (!this->ValidateFormat(internalFormat)) return false;
+		if (!this->validate_format(internalFormat)) return false;
 
-		this->Bind();
+		this->bind();
 
 		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexImage1D(GL_TEXTURE_1D, level, internalFormat, width, border, format, type, pixels);
 
-		this->Unbind();
+		this->unbind();
 
-		this->format = internalFormat;
+		this->format_ = internalFormat;
 		this->dims[0] = width;
 
 		return true;
@@ -226,53 +226,53 @@ protected:
 	GLenum wraps[1];
 };
 
-class Texture2D : public virtual Texture
+class texture2d : public virtual texture
 {
 public:
-	Texture2D(void) : Texture()
+	texture2d(void) : texture()
 	{
 		this->dims[0] = 0;
 		this->dims[1] = 0;
 	}
 
-	GLsizei Width(void) const
+	GLsizei width(void) const
 	{
 		return this->dims[0];
 	}
 
-	GLsizei Height(void) const
+	GLsizei height(void) const
 	{
 		return this->dims[1];
 	}
 
-	GLint Dimensions(void) const
+	GLint dimensions(void) const
 	{
 		return 2;
 	}
 
-	GLsizei Size(const unsigned int i) const
+	GLsizei size(const unsigned int i) const
 	{
 		if (i > 1) return 0;
 		return this->dims[i];
 	}
 
-	GLenum Target(void) const
+	GLenum target(void) const
 	{
 		return GL_TEXTURE_2D;
 	}
 
-	bool Set(GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid * pixels)
+	bool set(GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid * pixels)
 	{
-		if (!this->ValidateFormat(internalFormat)) return false;
+		if (!this->validate_format(internalFormat)) return false;
 
-		this->Bind();
+		this->bind();
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, border, format, type, pixels);
 
-		this->Unbind();
+		this->unbind();
 
-		this->format = internalFormat;
+		this->format_ = internalFormat;
 		this->dims[0] = width;
 		this->dims[1] = height;
 
@@ -282,70 +282,70 @@ public:
 protected:
 	GLsizei dims[2];
 
-	void DoBind(void)
+	void do_bind(void)
 	{
 		glBindTexture(GL_TEXTURE_2D, this->objectID);
 	}
 
-	void DoUnbind(void)
+	void do_unbind(void)
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 };
 
-class Texture3D : public virtual Texture
+class texture3d : public virtual texture
 {
 public:
-	Texture3D(void) : Texture()
+	texture3d(void) : texture()
 	{
 		this->dims[0] = 0;
 		this->dims[1] = 0;
 		this->dims[2] = 0;
 	}
 
-	GLsizei Width(void) const
+	GLsizei width(void) const
 	{
 		return this->dims[0];
 	}
 
-	GLsizei Height(void) const
+	GLsizei height(void) const
 	{
 		return this->dims[1];
 	}
 
-	GLsizei Depth(void) const
+	GLsizei depth(void) const
 	{
 		return this->dims[2];
 	}
 
-	GLint Dimensions(void) const
+	GLint dimensions(void) const
 	{
 		return 3;
 	}
 
-	GLsizei Size(const unsigned int i) const
+	GLsizei size(const unsigned int i) const
 	{
 		if (i > 2) return 0;
 		return this->dims[i];
 	}
 
-	GLenum Target(void) const
+	GLenum target(void) const
 	{
 		return GL_TEXTURE_3D;
 	}
 
-	bool Set(GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid * pixels)
+	bool set(GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid * pixels)
 	{
-		if (!this->ValidateFormat(internalFormat)) return false;
+		if (!this->validate_format(internalFormat)) return false;
 
-		this->Bind();
+		this->bind();
 
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexImage3D(GL_TEXTURE_3D, 0, internalFormat, width, height, depth, border, format, type, pixels);
 
-		this->Unbind();
+		this->unbind();
 
-		this->format = internalFormat;
+		this->format_ = internalFormat;
 		this->dims[0] = width;
 		this->dims[1] = height;
 		this->dims[2] = depth;
@@ -356,60 +356,60 @@ public:
 protected:
 	GLsizei dims[3];
 
-	void DoBind(void)
+	void do_bind(void)
 	{
 		glBindTexture(GL_TEXTURE_3D, this->objectID);
 	}
 
-	void DoUnbind(void)
+	void do_unbind(void)
 	{
 		glBindTexture(GL_TEXTURE_3D, 0);
 	}
 };
 
-class ColorTexture1D : public virtual ColorTexture, public virtual Texture1D
+class color_texture1d : public virtual color_texture, public virtual texture1d
 {
 public:
-	ColorTexture1D(void) : ColorTexture(), Texture1D()
+	color_texture1d(void) : color_texture(), texture1d()
 	{
 	}
 };
 
-class ColorTexture2D : public virtual ColorTexture, public virtual Texture2D
+class color_texture2d : public virtual color_texture, public virtual texture2d
 {
 public:
-	ColorTexture2D(void) : ColorTexture(), Texture2D()
+	color_texture2d(void) : color_texture(), texture2d()
 	{
 	}
 };
 
-class ColorTexture3D : public virtual ColorTexture, public virtual Texture3D
+class color_texture3d : public virtual color_texture, public virtual texture3d
 {
 public:
-	ColorTexture3D(void) : ColorTexture(), Texture3D()
+	color_texture3d(void) : color_texture(), texture3d()
 	{
 	}
 };
 
-class DepthTexture2D : public virtual DepthTexture, public virtual Texture2D
+class depth_texture2d : public virtual depth_texture, public virtual texture2d
 {
 public:
-	DepthTexture2D(void) : DepthTexture(), Texture2D()
+	depth_texture2d(void) : depth_texture(), texture2d()
 	{
 	}
 };
 
-class StencilTexture2D : public virtual StencilTexture, public virtual Texture2D
+class stencil_texture2d : public virtual stencil_texture, public virtual texture2d
 {
 public:
-	StencilTexture2D(void) : StencilTexture(), Texture2D()
+	stencil_texture2d(void) : stencil_texture(), texture2d()
 	{
 	}
 };
-
+/*
 class FrameBuffer;
 
-class RenderTarget : public GLObject, public Bindable, public FrameBufferSemantic
+class RenderTarget : public gl_object, public bindable, public frame_buffer_semantic
 {
 friend class FrameBuffer;
 
@@ -420,7 +420,7 @@ public:
 		TEXTURE
 	} RTStorageType;
 
-	RenderTarget(void) : GLObject(), Bindable(), FrameBufferSemantic()
+	RenderTarget(void) : gl_object(), bindable(), frame_buffer_semantic()
 	{
 		this->frameBuffer = 0;
 	}
@@ -500,7 +500,7 @@ public:
 
 	bool Set(GLenum format, GLsizei width, GLsizei height)
 	{
-		if (!this->ValidateFormat(format)) return false;
+		if (!this->validate_format(format)) return false;
 
 		this->Bind();
 
@@ -528,12 +528,12 @@ protected:
 	GLsizei width;
 	GLsizei height;
 
-	void DoBind(void)
+	void do_bind(void)
 	{
 		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, this->objectID);
 	}
 
-	void DoUnbind(void)
+	void do_unbind(void)
 	{
 		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 	}
@@ -590,7 +590,7 @@ public:
 		this->Unset();
 
 		if (tex == 0) return true;
-		if (this->Semantic() != tex->Semantic()) return false;
+		if (this->semantic() != tex->semantic()) return false;
 
 		this->tex = tex;
 
@@ -624,11 +624,11 @@ protected:
 	Texture2D * tex;
 	GLint level;
 
-	void DoBind(void)
+	void do_bind(void)
 	{
 	}
 
-	void DoUnbind(void)
+	void do_unbind(void)
 	{
 	}
 };
@@ -641,14 +641,14 @@ public:
 		this->attachment = GL_COLOR_ATTACHMENT0_EXT;
 	}
 
-	FrameBufferSemantic::FBSType Semantic(void) const
+	frame_buffer_semantic::FBSType semantic(void) const
 	{
-		return FrameBufferSemantic::COLOR;
+		return frame_buffer_semantic::COLOR;
 	}
 
-	bool ValidateFormat(GLenum format) const
+	bool validate_format(GLenum format) const
 	{
-		return FrameBufferSemantic::ValidateColor(format);
+		return frame_buffer_semantic::validate_color(format);
 	}
 
 	bool ValidateAttachment(GLenum attachment) const
@@ -678,14 +678,14 @@ public:
 	{
 	}
 
-	FrameBufferSemantic::FBSType Semantic(void) const
+	frame_buffer_semantic::FBSType semantic(void) const
 	{
-		return FrameBufferSemantic::DEPTH;
+		return frame_buffer_semantic::DEPTH;
 	}
 
-	bool ValidateFormat(GLenum format) const
+	bool validate_format(GLenum format) const
 	{
-		return FrameBufferSemantic::ValidateDepth(format);
+		return frame_buffer_semantic::validate_depth(format);
 	}
 
 	bool ValidateAttachment(GLenum attachment) const
@@ -706,14 +706,14 @@ public:
 	{
 	}
 
-	FrameBufferSemantic::FBSType Semantic(void) const
+	frame_buffer_semantic::FBSType semantic(void) const
 	{
-		return FrameBufferSemantic::STENCIL;
+		return frame_buffer_semantic::STENCIL;
 	}
 
-	bool ValidateFormat(GLenum format) const
+	bool validate_format(GLenum format) const
 	{
-		return FrameBufferSemantic::ValidateStencil(format);
+		return frame_buffer_semantic::validate_stencil(format);
 	}
 
 	bool ValidateAttachment(GLenum attachment) const
@@ -790,12 +790,12 @@ public:
 	}
 };
 
-class FrameBuffer : public GLObject, public Bindable
+class FrameBuffer : public gl_object, public bindable
 {
 friend class RenderTarget;
 
 public:
-	FrameBuffer(void) : GLObject(), Bindable()
+	FrameBuffer(void) : gl_object(), bindable()
 	{
 	}
 
@@ -866,7 +866,7 @@ protected:
 
 	RTMap renderTargets;
 
-	void DoBind(void)
+	void do_bind(void)
 	{
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, this->objectID);
 
@@ -876,7 +876,7 @@ protected:
 		for (RTMap_i rt=this->renderTargets.begin(); rt!=this->renderTargets.end(); ++rt)
 		{
 			RenderTarget * prt = (*rt).second;
-			if (prt->Semantic() == FrameBufferSemantic::COLOR)
+			if (prt->semantic() == frame_buffer_semantic::COLOR)
 			{
 				colorDrawBuffers.push_back(prt->Attachment());
 			}
@@ -890,7 +890,7 @@ protected:
 		}
 	}
 
-	void DoUnbind(void)
+	void do_unbind(void)
 	{
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	}
@@ -943,6 +943,6 @@ bool RenderTarget::Detach(void)
 	this->frameBuffer = 0;
 
 	return true;
-}
+}*/
 
 #endif  // __FBO_H__

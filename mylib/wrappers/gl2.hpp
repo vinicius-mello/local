@@ -2,6 +2,7 @@
 #define WRAP_GL2_HPP
 #include <GL/glew.h>
 #include "shaders.h"
+#include "fbo.h"
 #include "array.hpp"
 #include <mytl/unprojection.hpp>
 #include <mytl/trackball.hpp>

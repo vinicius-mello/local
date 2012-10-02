@@ -50,6 +50,14 @@ class image2d : public mem {
 	~image2d();
 };
 
+class gl_texture2d : public mem {
+	public:
+	gl_texture2d() : mem();
+	gl_texture2d(const context& ctx, bitfield flags, unsigned target, int miplevel, unsigned texture);
+	gl_texture2d(const gl_texture2d& im);
+	virtual ~gl_texture2d();
+};
+
 class program {
 	public:
 	program();
@@ -104,6 +112,9 @@ class command_queue {
 	void range_kernel3d(const kernel& ker,size_t offset_x, size_t offset_y,
 		size_t offset_z, size_t global_x, size_t global_y, size_t global_z,
 		size_t local_x, size_t local_y, size_t local_z);
+	void add_object(const mem& mo);
+	void aquire_globject();
+	void release_globject();
 	void flush();
 	void finish();
 	void barrier();
