@@ -15,27 +15,22 @@ print(cl.host:get_platform_info(0,cl.PLATFORM_NAME))
 print(cl.host:get_device_info(0,0,cl.DEVICE_NAME))
 print(cl.host:get_device_info(0,0,cl.DEVICE_EXTENSIONS))
 
-ctx=cl.context(0)
-ctx:add_device(0)
-ctx:init()
-cmd=cl.command_queue(ctx,0,0)
+
 
 kernel_src= [[
+#pragma OPENCL EXTENSION cl_amd_printf : enable
 __kernel void turn_gray(__write_only image2d_t bmp)
 {
 
    int x = get_global_id(0);
    int y = get_global_id(1); 
-
+	 //printf("%d,%d\n",x,y);
    int2 coords = (int2)(x,y);
    //Attention to RGBA order
-	 float4 val=(float4)(0.5f,0.5f,0.5f,1.0f);
+	 float4 val=(float4)(0.0f,0.0f,0.0f,1.0f);
    write_imagef(bmp, coords, val);
 };
 ]]
-
-prg=cl.program(ctx,kernel_src)
-krn=cl.kernel(prg, "turn_gray")
 
 cnv = iup.glcanvas { buffer="DOUBLE", rastersize = "480x480" }
 dlg = iup.dialog {cnv; title="spline1d"}
@@ -57,15 +52,15 @@ function cnv:action(x, y)
   gl.Clear('COLOR_BUFFER_BIT,DEPTH_BUFFER_BIT')
   gl.MatrixMode('MODELVIEW')       -- seleciona matriz de modelagem
 	gl.LoadIdentity()   
-	cmd:add_object(self.cltex)      
-	cmd:aquire_globject()
-	cmd:finish()
-	krn:arg(0,self.cltex)
-	cmd:range_kernel2d(krn,0,0,480,480,1,1)
-	cmd:finish()
-	cmd:add_object(self.cltex)      
-	cmd:release_globject()
-	cmd:finish()
+	self.cmd:add_object(self.cltex)      
+	self.cmd:aquire_globject()
+	self.cmd:finish()
+	self.krn:arg(0,self.cltex)
+	self.cmd:range_kernel2d(self.krn,0,0,480,480,1,1)
+	self.cmd:finish()
+	self.cmd:add_object(self.cltex)      
+	self.cmd:release_globject()
+	self.cmd:finish()
 	gl.Enable('TEXTURE_2D')
 	gl.Begin('QUADS')
 	gl.TexCoord(0,0)
@@ -97,9 +92,16 @@ function cnv:map_cb()
 			self.buff:set(i-1,j-1,((i+j) % 256)/256);
 		end
 	end
+
+	self.ctx=cl.context(0)
+	self.ctx:add_device(0)
+	self.ctx:initGL()
+	self.cmd=cl.command_queue(self.ctx,0,0)
+	self.prg=cl.program(self.ctx,kernel_src)
+	self.krn=cl.kernel(self.prg, "turn_gray")
 	self.tex=gl2.color_texture2d()
-	self.tex:set(0,1,480,480,0,gl.LUMINANCE,gl.FLOAT,self.buff:data())
-	self.cltex=cl.gl_texture2d(ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0,self.tex:object_id())
+	self.tex:set(0,gl.LUMINANCE,480,480,0,gl.LUMINANCE,gl.FLOAT,self.buff:data())
+	self.cltex=cl.gl_texture2d(self.ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0,self.tex:object_id())
 end
 
 -- chamada quando uma tecla é pressionada

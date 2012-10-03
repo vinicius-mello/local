@@ -230,6 +230,9 @@ class context {
 			};
 			ctx_=clCreateContext(properties,dev_ids_.size(),
 				&dev_ids_[0],NULL,NULL,&status);
+			if(status!=CL_SUCCESS) {
+				cerr<<"error: create context"<<endl;
+			}
 		}
 	} 
 	void initGL() {
@@ -253,6 +256,9 @@ class context {
 #endif
 			ctx_=clCreateContext(properties,dev_ids_.size(),
 				&dev_ids_[0],NULL,NULL,&status);
+			if(status!=CL_SUCCESS) {
+				cerr<<"error: create context"<<endl;
+			}
 		}
 	} 
 	~context() {
@@ -276,6 +282,9 @@ class mem {
 	mem(const context& ctx, cl_mem_flags flags, size_t size=0, void * ptr=0) {
 		cl_int code;
 		mo_=clCreateBuffer(ctx.ctx_,flags,size,ptr,&code);
+		if(code!=CL_SUCCESS) {
+			cerr<<"error: create buffer"<<endl;
+		}
 	 	debug_print("mem new(%p)\n",this);
 	} 
 	mem(const mem& mo) : mo_(mo.mo_) {
@@ -326,6 +335,9 @@ class image2d : public mem {
 		mo_=clCreateImage2D(ctx.ctx_,flags,&ifmt,image_width,image_height,
 			image_row_pitch,host_ptr,&code);
 #endif
+		if(code!=CL_SUCCESS) {
+			cerr<<"error: create image"<<endl;
+		}
 	 	debug_print("image2d new(%p)\n",this);
 	} 
 	image2d(const image2d& im) {
@@ -354,6 +366,9 @@ class gl_texture2d : public mem {
 #else
 		mo_=clCreateFromGLTexture2D(ctx.ctx_,flags,target,miplevel,texture,&code);
 #endif
+		if(code!=CL_SUCCESS) {
+			cerr<<"error: create from texture"<<code<<endl;
+		}
 	}
 	gl_texture2d(const gl_texture2d& im) {
 		mem::mo_=im.mo_;
@@ -410,6 +425,9 @@ class sampler {
 		cl_addressing_mode addr, cl_filter_mode fil) {
 		cl_int code;
 		sam_=clCreateSampler(ctx.ctx_, norm, addr, fil, &code);
+		if(code!=CL_SUCCESS) {
+			cerr<<"error: create sampler"<<endl;
+		}
 	 	debug_print("sampler new(%p)\n",this);
 	}
 	sampler(const sampler& sam) : sam_(sam.sam_) {
@@ -437,6 +455,9 @@ class kernel {
 	kernel(const program& prg, const char * name) {
 		cl_int code;
 		ker_=clCreateKernel(prg.prg_,name,&code);
+		if(code!=CL_SUCCESS) {
+			cerr<<"error: create kernel"<<endl;
+		}
 	 	debug_print("kernel new(%p)\n",this);
 	}
 	kernel(const kernel& ker) : ker_(ker.ker_) {
@@ -473,6 +494,9 @@ class event {
 	event(const context& ctx) {
 		cl_int code;
 		ev_=clCreateUserEvent(ctx.ctx_, &code);
+		if(code!=CL_SUCCESS) {
+			cerr<<"error: create event"<<endl;
+		}
 	 	debug_print("event new(%p)\n",this);
 	}
 	event(const event& ev) : ev_(ev.ev_) {
@@ -504,6 +528,9 @@ class command_queue {
 	command_queue(const context& ctx, int dev_id, cl_command_queue_properties pr) : ctx_(&ctx), ev_(0) {
 		cl_int code;
 		que_=clCreateCommandQueue(ctx.ctx_,ctx.dev_ids_[dev_id],pr,&code);
+		if(code!=CL_SUCCESS) {
+			cerr<<"error: create command queue"<<endl;
+		}
 	 	debug_print("command_queue new(%p)\n",this);
 	}
 	command_queue(const command_queue& que) : que_(que.que_), ctx_(que.ctx_), ev_(0) {
@@ -548,7 +575,9 @@ class command_queue {
 		size_t global_[2]; global_[0]=global_x; global_[1]=global_y;
 		size_t local_[2]; local_[0]=local_x; local_[1]=local_y;
 
-		clEnqueueNDRangeKernel(que_,ker.ker_,2,offset_,global_,local_,wait_.size(),&wait_[0],ev_);
+		if(CL_SUCCESS!=clEnqueueNDRangeKernel(que_,ker.ker_,2,offset_,global_,local_,wait_.size(),&wait_[0],ev_)) {
+			cerr<<"error: nd range kernel"<<endl;
+		}
 		wait_.clear();ev_=0;
 	}
 	void range_kernel3d(const kernel& ker,size_t offset_x, size_t offset_y,

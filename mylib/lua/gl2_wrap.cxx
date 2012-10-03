@@ -9,7 +9,6 @@
  * ----------------------------------------------------------------------------- */
 
 #define SWIGLUA
-#define SWIG_LUA_MODULE_GLOBAL
 
 
 #ifdef __cplusplus
@@ -967,7 +966,7 @@ SWIGINTERN int SWIG_Lua_module_set(lua_State* L)
   return 0;
 }
 
-/* registering a module in lua. Pushes the module table on the stack. */
+/* registering a module in lua */
 SWIGINTERN void  SWIG_Lua_module_begin(lua_State* L,const char* name)
 {
   assert(lua_istable(L,-1));  /* just in case */
@@ -984,16 +983,8 @@ SWIGINTERN void  SWIG_Lua_module_begin(lua_State* L,const char* name)
   lua_newtable(L);    /* the .set table */
   lua_rawset(L,-3);  /* add .set into metatable */
   lua_setmetatable(L,-2);  /* sets meta table in module */
-#ifdef SWIG_LUA_MODULE_GLOBAL
-  /* If requested, install the module directly into the global namespace. */
   lua_rawset(L,-3);        /* add module into parent */
   SWIG_Lua_get_table(L,name);   /* get the table back out */
-#else
-  /* Do not install the module table as global name. The stack top has
-     the module table with the name below. We pop the top and replace
-     the name with it. */
-  lua_replace(L,-2);
-#endif
 }
 
 /* ending the register */
@@ -5672,9 +5663,8 @@ SWIGEXPORT int SWIG_init(lua_State* L)
   /* invoke user-specific initialization */
   SWIG_init_user(L);
   /* end module */
-  /* Note: We do not clean up the stack here (Lua will do this for us). At this
-     point, we have the globals table and out module table on the stack. Returning
-     one value makes the module table the result of the require command. */
+  lua_pop(L,1);  /* tidy stack (remove module table)*/
+  lua_pop(L,1);  /* tidy stack (remove global table)*/
   return 1;
 }
 
