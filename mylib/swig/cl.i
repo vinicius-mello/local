@@ -12,6 +12,7 @@ typedef unsigned bitfield;
 class host_singleton {
 	public:
 	host_singleton();
+  void init();
 	~host_singleton();
 	int nplatforms() const;
 	int ndevices(int i) const;

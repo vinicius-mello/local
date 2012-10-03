@@ -10,6 +10,7 @@
 
 using namespace std;
 
+#include <GL/gl.h>
 #include <CL/cl.h>
 #include <CL/cl_gl.h>
 #if defined(_WIN32) 
@@ -26,6 +27,8 @@ class host_singleton {
 	static char buffer[1024];
 	public:
 	host_singleton() {
+	}
+	void init() {
 		if(platforms_==0) {
 			cl_int status;
 			status=clGetPlatformIDs(0, 0, &nplatforms_);
@@ -346,7 +349,11 @@ class gl_texture2d : public mem {
 	}
 	gl_texture2d(const context& ctx, cl_mem_flags flags, GLenum target, int miplevel, unsigned texture) {
 		cl_int code;
+#ifdef CL_VERSION_1_2
+		mo_=clCreateFromGLTexture(ctx.ctx_,flags,target,miplevel,texture,&code);
+#else
 		mo_=clCreateFromGLTexture2D(ctx.ctx_,flags,target,miplevel,texture,&code);
+#endif
 	}
 	gl_texture2d(const gl_texture2d& im) {
 		mem::mo_=im.mo_;

@@ -8,7 +8,7 @@ require("gl2")
 require("cl")
 
 gl2.init()
-
+cl.host:init()
 print(cl.host:nplatforms())
 print(cl.host:ndevices(0))
 print(cl.host:get_platform_info(0,cl.PLATFORM_NAME))

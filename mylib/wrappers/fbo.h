@@ -267,7 +267,7 @@ public:
 
 		this->bind();
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, border, format, type, pixels);
 
 		this->unbind();

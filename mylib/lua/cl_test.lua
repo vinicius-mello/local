@@ -10,7 +10,7 @@ __kernel void hello(__global float *input, __global float *output)
 ]]
 
 data_size=10
-
+cl.host:init()
 print(cl.host:nplatforms())
 print(cl.host:ndevices(0))
 print(cl.host:get_platform_info(0,cl.PLATFORM_NAME))
