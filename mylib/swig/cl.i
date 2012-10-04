@@ -9,18 +9,16 @@ typedef unsigned bitfield;
 
 typedef unsigned bitfield;
 
-class host_singleton {
-	public:
-	host_singleton();
-  void init();
-	~host_singleton();
-	int nplatforms() const;
-	int ndevices(int i) const;
-	std::string get_platform_info(int i, unsigned param) const;
-	std::string get_device_info(int i, int j, unsigned param) const;
+class host {
+  public:
+  static void init();
+	static void finish();
+	static int nplatforms();
+	static int ndevices(int i);
+	static std::string get_platform_info(int i, unsigned param);
+	static std::string get_device_info(int i, int j, unsigned param);
+	static std::string get_error();
 };
-
-extern host_singleton host;
 
 class context {
 	public:

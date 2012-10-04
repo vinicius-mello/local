@@ -8,12 +8,12 @@ require("gl2")
 require("cl")
 
 gl2.init()
-cl.host:init()
-print(cl.host:nplatforms())
-print(cl.host:ndevices(0))
-print(cl.host:get_platform_info(0,cl.PLATFORM_NAME))
-print(cl.host:get_device_info(0,0,cl.DEVICE_NAME))
-print(cl.host:get_device_info(0,0,cl.DEVICE_EXTENSIONS))
+cl.host_init()
+print(cl.host_nplatforms())
+print(cl.host_ndevices(0))
+print(cl.host_get_platform_info(0,cl.PLATFORM_NAME))
+print(cl.host_get_device_info(0,0,cl.DEVICE_NAME))
+print(cl.host_get_device_info(0,0,cl.DEVICE_EXTENSIONS))
 
 
 
@@ -57,6 +57,7 @@ function cnv:action(x, y)
 	self.cmd:finish()
 	self.krn:arg(0,self.cltex)
 	self.cmd:range_kernel2d(self.krn,0,0,480,480,1,1)
+	print(cl.host_get_error())
 	self.cmd:finish()
 	self.cmd:add_object(self.cltex)      
 	self.cmd:release_globject()
@@ -102,6 +103,7 @@ function cnv:map_cb()
 	self.tex=gl2.color_texture2d()
 	self.tex:set(0,gl.LUMINANCE,480,480,0,gl.LUMINANCE,gl.FLOAT,self.buff:data())
 	self.cltex=cl.gl_texture2d(self.ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0,self.tex:object_id())
+	print(cl.host_get_error())
 end
 
 -- chamada quando uma tecla é pressionada

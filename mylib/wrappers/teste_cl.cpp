@@ -14,10 +14,10 @@ const char *KernelSource =
 const size_t DATA_SIZE=10;
 
 int main() {
-	host.init();
-	cout<<host.nplatforms()<<endl;
-	cout<<host.ndevices(0)<<endl;
-	cout<<host.get_device_info(0,0,CL_DEVICE_NAME)<<endl;
+	host::init();
+	cout<<host::nplatforms()<<endl;
+	cout<<host::ndevices(0)<<endl;
+	cout<<host::get_device_info(0,0,CL_DEVICE_NAME)<<endl;
 	context ctx(0);
 	ctx.add_device(0);
 	ctx.init();
