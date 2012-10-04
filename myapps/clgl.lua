@@ -27,12 +27,12 @@ __kernel void turn_gray(__write_only image2d_t bmp)
 	 //printf("%d,%d\n",x,y);
    int2 coords = (int2)(x,y);
    //Attention to RGBA order
-	 float4 val=(float4)(0.0f,0.0f,0.0f,1.0f);
+	 float4 val=(float4)(1.0f,0.0f,0.0f,1.0f);
    write_imagef(bmp, coords, val);
 };
 ]]
 
-cnv = iup.glcanvas { buffer="DOUBLE", rastersize = "480x480" }
+cnv = iup.glcanvas { buffer="DOUBLE", rastersize = "512x512" }
 dlg = iup.dialog {cnv; title="spline1d"}
 
 function cnv:resize_cb(width, height)
@@ -56,7 +56,7 @@ function cnv:action(x, y)
 	self.cmd:aquire_globject()
 	self.cmd:finish()
 	self.krn:arg(0,self.cltex)
-	self.cmd:range_kernel2d(self.krn,0,0,480,480,1,1)
+	self.cmd:range_kernel2d(self.krn,0,0,512,512,1,1)
 	print(cl.host_get_error())
 	self.cmd:finish()
 	self.cmd:add_object(self.cltex)      
@@ -87,10 +87,13 @@ function cnv:map_cb()
   gl.Disable('DEPTH_TEST')                         -- habilita teste z-buffer
   gl.Enable('CULL_FACE')                         
   gl.ShadeModel('FLAT')
-	self.buff=array.array_float(480,480)
-	for i=1,480 do 
-		for j=1,480 do
-			self.buff:set(i-1,j-1,((i+j) % 256)/256);
+	self.buff=array.array_float(512*4,512)
+	for i=1,512 do 
+		for j=1,512 do
+			self.buff:set((i-1)*4,j-1,((i*4+j+27) % 256)/256);
+			self.buff:set((i-1)*4+1,j-1,((i*4+1+j+11) % 256)/256);
+			self.buff:set((i-1)*4+2,j-1,((i*4+2+j+59) % 256)/256);
+			self.buff:set((i-1)*4+3,j-1,1.0);
 		end
 	end
 
@@ -101,7 +104,8 @@ function cnv:map_cb()
 	self.prg=cl.program(self.ctx,kernel_src)
 	self.krn=cl.kernel(self.prg, "turn_gray")
 	self.tex=gl2.color_texture2d()
-	self.tex:set(0,gl.LUMINANCE,480,480,0,gl.LUMINANCE,gl.FLOAT,self.buff:data())
+	print(self.tex:object_id())
+	self.tex:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.FLOAT,self.buff:data())
 	self.cltex=cl.gl_texture2d(self.ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0,self.tex:object_id())
 	print(cl.host_get_error())
 end

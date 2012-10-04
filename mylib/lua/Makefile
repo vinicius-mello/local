@@ -80,7 +80,7 @@ ma47$(EXT): ma47_wrap.cxx
 ma47_wrap.cxx: $(MYLIB)/swig/ma47.i $(MYLIB)/wrappers/ma47.hpp
 	swig -o $@ -c++ -lua $<
 
-gl2$(EXT): gl2_wrap.cxx 
+gl2$(EXT): gl2_wrap.cxx $(MYLIB)/wrappers/gl2.hpp  $(MYLIB)/wrappers/fbo.h 
 	g++ -o $@ $(SHARED) $< $(LUA_INC) $(GL2_INC) $(LUA_LIB) $(GL2_LIB)  -I $(MYLIB)
 
 gl2_wrap.cxx: $(MYLIB)/swig/gl2.i $(MYLIB)/wrappers/gl2.hpp  $(MYLIB)/wrappers/fbo.h 

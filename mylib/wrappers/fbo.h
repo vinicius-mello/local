@@ -80,6 +80,7 @@ public:
 	texture(void) : gl_object(), bindable(), frame_buffer_semantic()
 	{
 		this->format_ = GL_NONE;
+		gen();
 	}
 
 	void gen(void)
