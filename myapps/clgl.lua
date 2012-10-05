@@ -5,10 +5,16 @@ require("luagl")
 require("luaglu")
 require("array")
 require("gl2")
+require("il")
+require("devilut")
 require("cl")
 
 gl2.init()
 cl.host_init()
+il.Init()
+devilut.Init()
+devilut.Enable(devilut.ILUT_OPENGL_CONV)
+devilut.Renderer(devilut.ILUT_OPENGL)
 print(cl.host_nplatforms())
 print(cl.host_ndevices(0))
 print(cl.host_get_platform_info(0,cl.PLATFORM_NAME))
@@ -55,8 +61,8 @@ function cnv:action(x, y)
 	self.cmd:add_object(self.cltex)      
 	self.cmd:aquire_globject()
 	self.cmd:finish()
-	self.krn:arg(0,self.cltex)
-	self.cmd:range_kernel2d(self.krn,0,0,512,512,1,1)
+--	self.krn:arg(0,self.cltex)
+--	self.cmd:range_kernel2d(self.krn,0,0,512,512,1,1)
 	print(cl.host_get_error())
 	self.cmd:finish()
 	self.cmd:add_object(self.cltex)      
@@ -87,7 +93,7 @@ function cnv:map_cb()
   gl.Disable('DEPTH_TEST')                         -- habilita teste z-buffer
   gl.Enable('CULL_FACE')                         
   gl.ShadeModel('FLAT')
-	self.buff=array.array_float(512*4,512)
+--[[	self.buff=array.array_float(512*4,512)
 	for i=1,512 do 
 		for j=1,512 do
 			self.buff:set((i-1)*4,j-1,((i*4+j+27) % 256)/256);
@@ -95,7 +101,7 @@ function cnv:map_cb()
 			self.buff:set((i-1)*4+2,j-1,((i*4+2+j+59) % 256)/256);
 			self.buff:set((i-1)*4+3,j-1,1.0);
 		end
-	end
+	end]]
 
 	self.ctx=cl.context(0)
 	self.ctx:add_device(0)
@@ -103,10 +109,13 @@ function cnv:map_cb()
 	self.cmd=cl.command_queue(self.ctx,0,0)
 	self.prg=cl.program(self.ctx,kernel_src)
 	self.krn=cl.kernel(self.prg, "turn_gray")
-	self.tex=gl2.color_texture2d()
-	print(self.tex:object_id())
-	self.tex:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.FLOAT,self.buff:data())
-	self.cltex=cl.gl_texture2d(self.ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0,self.tex:object_id())
+--	self.tex=gl2.color_texture2d()
+--	print(self.tex:object_id())
+--	self.tex:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.FLOAT,self.buff:data())
+	local texid=devilut.GLLoadImage("mandril.png")
+	print(texid)
+	self.cltex=cl.gl_texture2d(self.ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0,texid)
+--	self.cltex=cl.gl_texture2d(self.ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0, self.tex:object_id())
 	print(cl.host_get_error())
 end
 

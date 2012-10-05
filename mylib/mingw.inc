@@ -56,5 +56,8 @@ BIAS_INC= -I /c/local/Numeric/include
 GSL_LIB = "/c/local/Numeric/lib/libgsl.a" "/c/local/Numeric/lib/libgoto2.lib"
 GSL_INC= -I /c/local/Numeric/include  
 
+IL_LIB = -lDevIL -lILU -lILUT
+IL_INC = 
+
 LPT_LIB = "/c/local/lpt-code/lpt/lpt.o"
 LPT_INC = -I "/c/local/lpt-code/"

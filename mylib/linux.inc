@@ -44,7 +44,7 @@ CL_INC = -I .
 LPT_LIB = ~/local/lpt/lpt.o
 LPT_INC = -I ~/local/
 
-IL_LIB = -lIL
+IL_LIB = -lIL -lILU -lILUT
 IL_INC = 
 
 GSL_LIB = -lgsl $(BLAS_LIB)
