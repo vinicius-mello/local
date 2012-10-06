@@ -17,6 +17,8 @@
 
 %module devilut
 %{
+#include <GL/gl.h>
+#define ILUT_USE_OPENGL
 #include <IL/ilut.h>
 %}
 
@@ -44,66 +46,66 @@ typedef unsigned int   GLuint;
 // Defines
 //-----------------------------------------------------------------------------
 
-#define ILUT_VERSION_1_7_8 1
-#define ILUT_VERSION       178
+#define VERSION_1_7_8 1
+#define VERSION       178
 
 
 // Attribute Bits
-#define ILUT_OPENGL_BIT      0x00000001
-#define ILUT_D3D_BIT         0x00000002
-#define ILUT_ALL_ATTRIB_BITS 0x000FFFFF
+#define OPENGL_BIT      0x00000001
+#define D3D_BIT         0x00000002
+#define ALL_ATTRIB_BITS 0x000FFFFF
 
 
 // Error Types
-#define ILUT_INVALID_ENUM        0x0501
-#define ILUT_OUT_OF_MEMORY       0x0502
-#define ILUT_INVALID_VALUE       0x0505
-#define ILUT_ILLEGAL_OPERATION   0x0506
-#define ILUT_INVALID_PARAM       0x0509
-#define ILUT_COULD_NOT_OPEN_FILE 0x050A
-#define ILUT_STACK_OVERFLOW      0x050E
-#define ILUT_STACK_UNDERFLOW     0x050F
-#define ILUT_BAD_DIMENSIONS      0x0511
-#define ILUT_NOT_SUPPORTED       0x0550
+#define INVALID_ENUM        0x0501
+#define OUT_OF_MEMORY       0x0502
+#define INVALID_VALUE       0x0505
+#define ILLEGAL_OPERATION   0x0506
+#define INVALID_PARAM       0x0509
+#define COULD_NOT_OPEN_FILE 0x050A
+#define STACK_OVERFLOW      0x050E
+#define STACK_UNDERFLOW     0x050F
+#define BAD_DIMENSIONS      0x0511
+#define NOT_SUPPORTED       0x0550
 
 
 // State Definitions
-#define ILUT_PALETTE_MODE         0x0600
-#define ILUT_OPENGL_CONV          0x0610
-#define ILUT_D3D_MIPLEVELS        0x0620
-#define ILUT_MAXTEX_WIDTH         0x0630
-#define ILUT_MAXTEX_HEIGHT        0x0631
-#define ILUT_MAXTEX_DEPTH         0x0632
-#define ILUT_GL_USE_S3TC          0x0634
-#define ILUT_D3D_USE_DXTC         0x0634
-#define ILUT_GL_GEN_S3TC          0x0635
-#define ILUT_D3D_GEN_DXTC         0x0635
-#define ILUT_S3TC_FORMAT          0x0705
-#define ILUT_DXTC_FORMAT          0x0705
-#define ILUT_D3D_POOL             0x0706
-#define ILUT_D3D_ALPHA_KEY_COLOR  0x0707
-#define ILUT_D3D_ALPHA_KEY_COLOUR 0x0707
-#define ILUT_FORCE_INTEGER_FORMAT 0x0636
+#define PALETTE_MODE         0x0600
+#define OPENGL_CONV          0x0610
+#define D3D_MIPLEVELS        0x0620
+#define MAXTEX_WIDTH         0x0630
+#define MAXTEX_HEIGHT        0x0631
+#define MAXTEX_DEPTH         0x0632
+#define GL_USE_S3TC          0x0634
+#define D3D_USE_DXTC         0x0634
+#define GL_GEN_S3TC          0x0635
+#define D3D_GEN_DXTC         0x0635
+#define S3TC_FORMAT          0x0705
+#define DXTC_FORMAT          0x0705
+#define D3D_POOL             0x0706
+#define D3D_ALPHA_KEY_COLOR  0x0707
+#define D3D_ALPHA_KEY_COLOUR 0x0707
+#define FORCE_INTEGER_FORMAT 0x0636
 
 //This new state does automatic texture target detection
 //if enabled. Currently, only cubemap detection is supported.
 //if the current image is no cubemap, the 2d texture is chosen.
-#define ILUT_GL_AUTODETECT_TEXTURE_TARGET 0x0807
+#define GL_AUTODETECT_TEXTURE_TARGET 0x0807
 
 
 // Values
-#define ILUT_VERSION_NUM IL_VERSION_NUM
-#define ILUT_VENDOR      IL_VENDOR
+#define VERSION_NUM IL_VERSION_NUM
+#define VENDOR      IL_VENDOR
 
-#define ILUT_OPENGL     0
-#define ILUT_ALLEGRO    1
-#define ILUT_WIN32      2
-#define ILUT_DIRECT3D8  3
-#define	ILUT_DIRECT3D9  4
-#define ILUT_X11        5
-#define	ILUT_DIRECT3D10 6
+#define OPENGL     0
+#define ALLEGRO    1
+#define WIN32      2
+#define DIRECT3D8  3
+#define	DIRECT3D9  4
+#define X11        5
+#define	DIRECT3D10 6
 
-#define ILUT_USE_OPENGL
+#define USE_OPENGL
 
 %rename("%(strip:[ilut])s") "";
 
