@@ -5,11 +5,12 @@ require("luagl")
 require("luaglu")
 require("array")
 require("gl2")
-require("il")
-require("devilut")
+require("luail")
+require("luailut")
 require("cl")
 
-ilut=devilut
+il=luail
+ilut=luailut
 gl2.init()
 cl.host_init()
 il.Init()

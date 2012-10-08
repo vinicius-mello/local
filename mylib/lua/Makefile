@@ -2,7 +2,7 @@ include ../make.inc
 
 TARGETS=array$(EXT) cloud$(EXT) blas$(EXT) sparse$(EXT) triplets$(EXT) umfpack$(EXT) \
   arpack$(EXT) ma57$(EXT)\
-	gl2$(EXT) cl$(EXT) il$(EXT) devilut$(EXT) lpt$(EXT) gsl$(EXT) pack$(EXT) ginac$(EXT)
+	gl2$(EXT) cl$(EXT) luail$(EXT) luailut$(EXT) lpt$(EXT) gsl$(EXT) pack$(EXT) ginac$(EXT)
 #	ma47$(EXT) lpt$(EXT)
 
 
@@ -100,13 +100,13 @@ gsl$(EXT): gsl_wrap.cxx
 gsl_wrap.cxx: gsl.i $(MYLIB)/swig/gsl.i $(MYLIB)/wrappers/gsl.hpp
 	swig -o $@ -c++ -lua $<
 
-il$(EXT): il_wrap.cxx 
+luail$(EXT): il_wrap.cxx 
 	g++ -o $@ $(SHARED) $< $(LUA_INC) $(IL_INC) $(LUA_LIB) $(IL_LIB)  -I $(MYLIB)
 
 il_wrap.cxx: $(MYLIB)/swig/il.i 
 	swig -o $@ -c++ -lua $<
 
-devilut$(EXT): ilut_wrap.cxx 
+luailut$(EXT): ilut_wrap.cxx 
 	g++ -o $@ $(SHARED) $< $(LUA_INC) $(IL_INC) $(LUA_LIB) $(IL_LIB)  -I $(MYLIB)
 
 ilut_wrap.cxx: $(MYLIB)/swig/ilut.i 

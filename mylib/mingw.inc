@@ -7,11 +7,8 @@ LAPACK_LIB= "/c/local/Numeric/lib/lapack.a" $(BLAS_LIB)
 ARPACK_LIB= /c/local/Numeric/lib/libarpack.a $(LAPACK_LIB) 
 BLZPACK_LIB= /c/local/Numeric/lib/libblzpack.a $(LAPACK_LIB) 
 
-LUA_LIB= "/c/Program Files/Lua/5.1/lib/lua5.1.lib"
-LUA_INC= -I"/c/Program Files/Lua/5.1/include"
-#LUA_LIB= "/c/Program Files (x86)/Lua/5.1/lib/lua5.1.lib"
-#LUA_INC= -I"/c/Program Files (x86)/Lua/5.1/include"
-
+LUA_LIB= -L"/c/Program Files (x86)/Lua/5.1/lib/" -L"/c/Program Files/Lua/5.1/lib/" -llua5.1
+LUA_INC= -I"/c/Program Files/Lua/5.1/include" -I"/c/Program Files (x86)/Lua/5.1/include"
 
 TCL_LIB= "/c/Tcl/lib/tcl85.lib"
 TCL_INC= -I"/c/Tcl/include"
@@ -43,8 +40,8 @@ MA47_LIB= /c/local/Numeric/lib/libma47.a $(BLAS_LIB)
 GL2_LIB = -lglu32 /mingw/lib/glut32.lib -lopengl32 -lglew32.dll
 GL2_INC = -I .
 
-CL_LIB = "/c/Program Files/AMD APP/lib/x86/OpenCL.lib" -lopengl32
-CL_INC = -I "/c/Program Files/AMD APP/include"
+CL_LIB = -L"/c/Program Files (x86)/AMD APP/lib/x86/" -L"/c/Program Files/AMD APP/lib/x86/" -lOpenCL -lopengl32
+CL_INC = -I "/c/Program Files (x86)/AMD APP/include" -I "/c/Program Files/AMD APP/include"
 
 MAPM_LIB = /c/local/Numeric/lib/libmapm.a 
 MAPM_LIB = /c/local/Numeric/lib/libmapm.a 

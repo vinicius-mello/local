@@ -15,7 +15,7 @@
     The main include file for ILUT
 */
 
-%module devilut
+%module luailut
 %{
 #include <GL/gl.h>
 #define ILUT_USE_OPENGL

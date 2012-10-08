@@ -1,4 +1,4 @@
-%module il
+%module luail
 %{
   #include <IL/il.h>
 %}
