@@ -326,6 +326,12 @@ class kernel {
 	void arg(int i, int p) {
 		host::code_=clSetKernelArg(ker_,i,sizeof(int),&p);
 	}
+	void arg(int i, float p) {
+		host::code_=clSetKernelArg(ker_,i,sizeof(float),&p);
+	}
+	void arg_float(int i, float p) {
+		host::code_=clSetKernelArg(ker_,i,sizeof(float),&p);
+	}
 	void arg(int i, const sampler& s) {
 		host::code_=clSetKernelArg(ker_,i,sizeof(cl_sampler),&s.sam_);
 	}

@@ -17,6 +17,7 @@ il.Init()
 ilut.Init()
 ilut.Enable(ilut.OPENGL_CONV)
 ilut.Renderer(ilut.OPENGL)
+
 print(cl.host_nplatforms())
 print(cl.host_ndevices(0))
 print(cl.host_get_platform_info(0,cl.PLATFORM_NAME))
@@ -27,21 +28,30 @@ print(cl.host_get_device_info(0,0,cl.DEVICE_EXTENSIONS))
 
 kernel_src= [[
 #pragma OPENCL EXTENSION cl_amd_printf : enable
-__kernel void turn_gray(__write_only image2d_t bmp)
+
+const sampler_t samplersrc = CLK_NORMALIZED_COORDS_TRUE |
+                           CLK_ADDRESS_REPEAT         |
+                           CLK_FILTER_LINEAR;
+
+__kernel void kern(float t, __read_only image2d_t src, __write_only image2d_t dst)
 {
 
    int x = get_global_id(0);
    int y = get_global_id(1); 
 	 //printf("%d,%d\n",x,y);
    int2 coords = (int2)(x,y);
+   float2 tcoords = (float2)(x,y);
+   tcoords.x=tcoords.x/512.0+t*0.1;
+   tcoords.y=tcoords.y/512.0+t*0.3;
    //Attention to RGBA order
-	 float4 val=(float4)(1.0f,0.0f,0.0f,1.0f);
-   write_imagef(bmp, coords, val);
+   uint4 c=read_imageui(src,samplersrc,tcoords);
+   //float4 c=(float4)(1.0,0.0,0.0,0.0);
+   write_imageui(dst, coords, c);
 };
 ]]
 
 cnv = iup.glcanvas { buffer="DOUBLE", rastersize = "512x512" }
-dlg = iup.dialog {cnv; title="spline1d"}
+dlg = iup.dialog {cnv; title="clgl"}
 
 function cnv:resize_cb(width, height)
 	--print("resize")
@@ -60,14 +70,19 @@ function cnv:action(x, y)
   gl.Clear('COLOR_BUFFER_BIT,DEPTH_BUFFER_BIT')
   gl.MatrixMode('MODELVIEW')       -- seleciona matriz de modelagem
 	gl.LoadIdentity()   
-	self.cmd:add_object(self.cltex)      
+	self.cmd:add_object(self.cltexsrc)      
+	self.cmd:add_object(self.cltexdst)      
 	self.cmd:aquire_globject()
 	self.cmd:finish()
---	self.krn:arg(0,self.cltex)
---	self.cmd:range_kernel2d(self.krn,0,0,512,512,1,1)
+	self.krn:arg_float(0,self.t)
+	self.krn:arg(1,self.cltexsrc)
+	self.krn:arg(2,self.cltexdst)
+	self.cmd:range_kernel2d(self.krn,0,0,512,512,1,1)
 	print(cl.host_get_error())
 	self.cmd:finish()
-	self.cmd:add_object(self.cltex)      
+	print(cl.host_get_error())
+	self.cmd:add_object(self.cltexsrc)      
+	self.cmd:add_object(self.cltexdst)      
 	self.cmd:release_globject()
 	self.cmd:finish()
 	gl.Enable('TEXTURE_2D')
@@ -84,6 +99,8 @@ function cnv:action(x, y)
 	gl.Disable('TEXTURE_2D')
   -- troca buffers
   iup.GLSwapBuffers(self)
+	self.t=self.t+0.1
+	print(self.t)
 end
 
 -- chamada quando a janela OpenGL é criada
@@ -95,29 +112,26 @@ function cnv:map_cb()
   gl.Disable('DEPTH_TEST')                         -- habilita teste z-buffer
   gl.Enable('CULL_FACE')                         
   gl.ShadeModel('FLAT')
---[[	self.buff=array.array_float(512*4,512)
-	for i=1,512 do 
-		for j=1,512 do
-			self.buff:set((i-1)*4,j-1,((i*4+j+27) % 256)/256);
-			self.buff:set((i-1)*4+1,j-1,((i*4+1+j+11) % 256)/256);
-			self.buff:set((i-1)*4+2,j-1,((i*4+2+j+59) % 256)/256);
-			self.buff:set((i-1)*4+3,j-1,1.0);
-		end
-	end]]
 
 	self.ctx=cl.context(0)
 	self.ctx:add_device(0)
 	self.ctx:initGL()
 	self.cmd=cl.command_queue(self.ctx,0,0)
 	self.prg=cl.program(self.ctx,kernel_src)
-	self.krn=cl.kernel(self.prg, "turn_gray")
---	self.tex=gl2.color_texture2d()
---	print(self.tex:object_id())
---	self.tex:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.FLOAT,self.buff:data())
+	self.krn=cl.kernel(self.prg, "kern")
+
 	local texid=ilut.GLLoadImage("mandril.png")
-	self.cltex=cl.gl_texture2d(self.ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0,texid)
---	self.cltex=cl.gl_texture2d(self.ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0, self.tex:object_id())
+	print(texid)
+	self.cltexsrc=cl.gl_texture2d(self.ctx,cl.MEM_READ_ONLY,gl.TEXTURE_2D,0,texid)
 	print(cl.host_get_error())
+
+	local null=array.array_uint()
+	self.tex=gl2.color_texture2d()
+	print(self.tex:object_id())
+	self.tex:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,null:data())
+	self.cltexdst=cl.gl_texture2d(self.ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0, self.tex:object_id())
+	print(cl.host_get_error())
+	self.t=0
 end
 
 -- chamada quando uma tecla é pressionada
@@ -128,7 +142,16 @@ function cnv:k_any(c)
   end
 end
 
+timer = iup.timer{time=1}
+
+function timer:action_cb()
+  cnv:action(0,0)
+  return iup.DEFAULT
+end
+
+
 -- exibe a janela
 dlg:show()
+timer.run = "YES"
 -- entra no loop de eventos
 iup.MainLoop()

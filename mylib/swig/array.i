@@ -9,6 +9,7 @@ typedef unsigned char byte;
 template <class T>
 class array {
 	public:
+	array(); 
 	array(size_t n, size_t m=1);
 	array(size_t n, void * d);
 	array(size_t n, size_t m, void * d);

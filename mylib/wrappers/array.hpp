@@ -17,7 +17,7 @@ class array {
 	size_t width_;
 	T * data_;
 	public:
-	array() : alloc(false), dim_(0) {
+	array() : alloc(false), dim_(0), data_(0) {
 	  debug_print("array default(%p): alloc?%d\n",this,alloc?1:0);
 	}
 	array(size_t n, size_t m=1) : alloc(true), dim_(n), width_(m) {

@@ -81,6 +81,7 @@ class kernel {
 	kernel(const kernel& ker) : ker_(ker.ker_);
 	void arg(int i, const mem& mo);
 	void arg(int i, int p);
+	void arg_float(int i, float p);
 	void arg(int i, const sampler& s);
 	~kernel();
 };
