@@ -17,6 +17,7 @@
 %module luailu
 %{
 #include <IL/ilu.h>
+#define iluScaleColors  iluScaleColours
 %}
 
 typedef unsigned int   ILenum;
