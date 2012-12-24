@@ -101,7 +101,7 @@ class command_queue {
 	command_queue(const command_queue& que);
 	~command_queue();
 	void add_wait(const event& ev);
-	void event(const event& ev);
+	void set_event(const event& ev);
 	void write_buffer(const mem& mo, bool block, size_t offset, size_t count, 
 		void * ptr) ;
 	void read_buffer(const mem& mo, bool block, size_t offset, size_t count, 

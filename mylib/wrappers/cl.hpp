@@ -10,13 +10,26 @@
 
 using namespace std;
 
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#include <OpenGL/CGLDevice.h>
+#include <OpenGL/gl.h>
+#include <OpenCL/cl.h>
+#include <OpenCL/opencl.h>
+#include <OpenCL/cl_gl.h>
+#else
 #include <GL/gl.h>
 #include <CL/cl.h>
 #include <CL/cl_gl.h>
+#endif
 #if defined(_WIN32) 
 #include <windows.h>
 #else
-#include <GL/glx.h>
+  #ifdef __APPLE__
+  #include <AGL/agl.h>
+  #else
+  #include <GL/glx.h>
+  #endif
 #endif
 
 class host {
@@ -125,12 +138,22 @@ class context {
    			0
 			};
 #else
+  #ifdef __APPLE__
+	CGLContextObj glContext = CGLGetCurrentContext();
+	CGLShareGroupObj shareGroup = CGLGetShareGroup(glContext);
+	
+	cl_context_properties properties[] = {
+   		CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE,
+   		(cl_context_properties)shareGroup,
+   		0};
+  #else
 			cl_context_properties properties[] = {
    			CL_GL_CONTEXT_KHR, (cl_context_properties) glXGetCurrentContext(),
    			CL_GLX_DISPLAY_KHR, (cl_context_properties) glXGetCurrentDisplay(), 
    			CL_CONTEXT_PLATFORM, (cl_context_properties) host::platform(platform_), 
    			0
 			};
+  #endif
 #endif
 			ctx_=clCreateContext(properties,dev_ids_.size(),
 				&dev_ids_[0],NULL,NULL,&host::code_);
@@ -401,7 +424,7 @@ class command_queue {
 	void add_wait(const event& ev) {
 		wait_.push_back(ev.ev_);
 	}
-	void event(const event& ev) {
+	void set_event(const event& ev) {
 		ev_=(cl_event *)&ev.ev_;
 	}
 	void write_buffer(const mem& mo, bool block, size_t offset, size_t count, 

@@ -1,8 +1,8 @@
 include ../make.inc
 
 TARGETS=array$(EXT) cloud$(EXT) blas$(EXT) sparse$(EXT) triplets$(EXT) umfpack$(EXT) \
-  arpack$(EXT) ma57$(EXT)\
-	gl2$(EXT) cl$(EXT) luail$(EXT) luailu$(EXT) luailut$(EXT) lpt$(EXT) gsl$(EXT) pack$(EXT) ginac$(EXT)
+	gl2$(EXT) cl$(EXT) tcl$(EXT) lpt$(EXT) gsl$(EXT) pack$(EXT) ginac$(EXT) \
+  arpack$(EXT) ma57$(EXT) luail$(EXT) luailu$(EXT) luailut$(EXT) \
 #	ma47$(EXT) lpt$(EXT)
 
 
@@ -87,7 +87,7 @@ gl2_wrap.cxx: $(MYLIB)/swig/gl2.i $(MYLIB)/wrappers/gl2.hpp  $(MYLIB)/wrappers/f
 	swig -o $@ -c++ -lua $<
 
 cl$(EXT): cl_wrap.cxx $(MYLIB)/wrappers/cl.o
-	g++ -o $@ $(SHARED) $< $(MYLIB)/wrappers/cl.o $(LUA_INC) $(CL_INC) $(LUA_LIB) $(CL_LIB)  -I $(MYLIB)
+	g++ -o $@ $(SHARED) $< $(MYLIB)/wrappers/cl.o -DDEBUG $(LUA_INC) $(CL_INC) $(LUA_LIB) $(CL_LIB)  -I $(MYLIB)
 
 cl_wrap.cxx: $(MYLIB)/swig/cl.i $(MYLIB)/wrappers/cl.hpp 
 	swig -o $@ -c++ -lua $<
@@ -130,6 +130,9 @@ pack$(EXT): lpack.c
 
 ginac$(EXT): lginac.cpp 
 	g++ -o $@ $(SHARED) $< $(LUA_INC) $(GINAC_INC) $(LUA_LIB) $(GINAC_LIB) -I $(MYLIB)
+
+tcl$(EXT): tcl.c 
+	gcc -o $@ $(SHARED) $< $(LUA_INC) $(TCL_INC) $(LUA_LIB) $(TCL_LIB) -I $(MYLIB)
 
 clean:
 	rm -rf *_wrap.cxx 
