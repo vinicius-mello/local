@@ -94,10 +94,10 @@ static char * trace_proc(ClientData clientdata,
  lua_State *L=(lua_State *)clientdata;
  if(flags==TCL_TRACE_READS) {
    lua_getglobal(L,name1);
-   Tcl_SetVar(interp,name1,lua_tostring(L,-1),0);
+   Tcl_SetVar(interp,name1,lua_tostring(L,-1),TCL_NAMESPACE_ONLY|TCL_GLOBAL_ONLY);
    lua_remove(L,-1);
  } else if(flags==TCL_TRACE_WRITES) {
-   lua_pushstring(L,Tcl_GetVar(interp,name1,0));
+   lua_pushstring(L,Tcl_GetVar(interp,name1,TCL_NAMESPACE_ONLY|TCL_GLOBAL_ONLY));
    if(lua_isnumber(L,-1)) {
      lua_Number n=lua_tonumber(L,-1);
      lua_remove(L,-1);
@@ -112,14 +112,17 @@ static int lua_proc_proc(ClientData clientdata,
  Tcl_Interp *interp, int argc, const char *argv[]) 
 {
  lua_State *L=(lua_State *)clientdata;
- lua_getglobal(L,"_tcl_procs");
- lua_pushstring(L,argv[1]);
- lua_getglobal(L,argv[1]);
- lua_rawset(L,-3);
- lua_remove(L,-1);
- Tcl_CreateCommand(interp,argv[1],call_proc,(ClientData)L,
-  (Tcl_CmdDeleteProc *)NULL);
-  return TCL_OK;
+ int i;
+ for(i=1;i<argc;++i) {
+   lua_getglobal(L,"_tcl_procs");
+   lua_pushstring(L,argv[i]);
+   lua_getglobal(L,argv[i]);
+   lua_rawset(L,-3);
+   lua_remove(L,-1);
+   Tcl_CreateCommand(interp,argv[i],call_proc,(ClientData)L,
+    (Tcl_CmdDeleteProc *)NULL);
+ }
+ return TCL_OK;
 }
 
 static int lua_global_proc(ClientData clientdata,
@@ -128,8 +131,8 @@ static int lua_global_proc(ClientData clientdata,
  lua_State *L=(lua_State *)clientdata;
  int i;
  for(i=1;i<argc;++i) {
-   Tcl_SetVar(interp,argv[i],"",0);
-   Tcl_TraceVar(interp,argv[i],TCL_TRACE_READS|TCL_TRACE_WRITES,trace_proc,(ClientData)L);
+   Tcl_SetVar(interp,argv[i],"0",TCL_NAMESPACE_ONLY|TCL_GLOBAL_ONLY);
+   Tcl_TraceVar(interp,argv[i],TCL_NAMESPACE_ONLY|TCL_GLOBAL_ONLY|TCL_TRACE_READS|TCL_TRACE_WRITES,trace_proc,(ClientData)L);
  }
  return TCL_OK;
 }

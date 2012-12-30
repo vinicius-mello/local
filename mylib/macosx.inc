@@ -1,6 +1,6 @@
 EXT=.so
 SHARED= -shared -fPIC 
-FORTRAN_LIB= -lgfortran
+FORTRAN_LIB= -L/usr/local/gfortran/lib -lgfortran
 BLAS_LIB= -framework vecLib
 #BLAS_LIB= /opt/intel/mkl/lib/intel64/libmkl_rt.so $(FORTRAN_LIB)
 #BLAS_LIB= /opt/acml5.0.0/gfortran64/lib/libacml.a $(FORTRAN_LIB)
@@ -52,6 +52,9 @@ IL_INC =
 
 GSL_LIB = -lgsl $(BLAS_LIB)
 GSL_INC= 
+
+LBFGSB_LIB = ~/local/Numeric/Lbfgsb.3.0/timer.o ~/local/Numeric/Lbfgsb.3.0/linpack.o ~/local/Numeric/Lbfgsb.3.0/lbfgsb.o $(BLAS_LIB) $(FORTRAN_LIB)
+LBFGSB_INC= 
 
 GINAC_LIB = -lginac -lcln
 GINAC_INC= 

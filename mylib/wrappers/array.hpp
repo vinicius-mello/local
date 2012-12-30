@@ -24,9 +24,9 @@ class array {
 	  debug_print("array new(%p): alloc?%d\n",this,alloc?1:0);
 	  data_=new T[n*m];
 	}
-	array(size_t n, void * d) : alloc(false), dim_(n), width_(1) {
+	array(size_t n, void * d, size_t offset=0) : alloc(false), dim_(n), width_(1) {
 	  debug_print("array alias(%p): alloc?%d\n",this,alloc?1:0);
-	  data_=(T *)d;
+	  data_=((T *)d)+offset;
 	}
 	array(size_t n, size_t m, void * d) : alloc(false), dim_(n), width_(m) {
 	  debug_print("array alias(%p): alloc?%d\n",this,alloc?1:0);
@@ -84,8 +84,21 @@ class array {
 		data_[i*width_]=v;
 		return v;
 	}
+	T add_to(size_t i, T v) {
+		data_[i*width_]+=v;
+		return v;
+	}
 	T set(size_t i, size_t j, T v) {
 		data_[i*width_+j]=v;
+		return v;
+	}
+	T sym_get(size_t i, size_t j) const {
+		if(i>j) return data_[j + (i+1)*i/2]; // column order
+		return data_[i + (j+1)*j/2];
+	}
+	T sym_set(size_t i, size_t j, T v) {
+		if(i>j) data_[j + (i+1)*i/2]=v;
+		else data_[i + (j+1)*j/2]=v;
 		return v;
 	}
 	const T& operator[](size_t i) const {
@@ -94,8 +107,8 @@ class array {
 	T& operator[](size_t i) {
 	  return data_[i];
 	}
-	T * data() const {
-	  return data_;
+	T * data(size_t offset=0) const {
+	  return data_+offset;
 	}
 	void copy(const array& b, size_t offset=0) {
 		for(size_t i=0;i<b.size();++i) data_[i+offset]=b.data_[i];
@@ -136,6 +149,25 @@ class array {
 	}
 	size_t columns() const {
 		return width_;
+	}
+	void rearrange(size_t m, size_t n, size_t p,
+	 	const char * ijk, array<T>& y) const {
+		size_t stride[3];
+		stride[0]=1;
+		stride[1]=m;
+		stride[2]=m*n;
+		char perm[3];
+		perm[0]=ijk[0]-'i';
+		perm[1]=ijk[1]-'i';
+		perm[2]=ijk[2]-'i';
+		for(size_t k=0;k<p;++k) {
+			for(size_t j=0;j<n;++j) { 
+				for(size_t i=0;i<m;++i) {
+					y.data_[k*stride[perm[2]]+j*stride[perm[1]]+i*stride[perm[0]]]=
+						data_[k*stride[2]+j*stride[1]+i*stride[0]];
+				}
+			}
+		} 
 	}
 };
 

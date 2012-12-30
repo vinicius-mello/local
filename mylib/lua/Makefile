@@ -1,7 +1,7 @@
 include ../make.inc
 
 TARGETS=array$(EXT) cloud$(EXT) blas$(EXT) sparse$(EXT) triplets$(EXT) umfpack$(EXT) \
-	gl2$(EXT) cl$(EXT) tcl$(EXT) lpt$(EXT) gsl$(EXT) pack$(EXT) ginac$(EXT) \
+	gl2$(EXT) cl$(EXT) tcl$(EXT) lpt$(EXT) gsl$(EXT) lbfgsb$(EXT) pack$(EXT) ginac$(EXT) \
   arpack$(EXT) ma57$(EXT) luail$(EXT) luailu$(EXT) luailut$(EXT) \
 #	ma47$(EXT) lpt$(EXT)
 
@@ -24,6 +24,12 @@ blas$(EXT): blas_wrap.cxx
 	g++ -o $@ $(SHARED) $< $(LUA_INC) $(LUA_LIB) $(BLAS_LIB) -I $(MYLIB)
 
 blas_wrap.cxx: $(MYLIB)/swig/blas.i $(MYLIB)/wrappers/blas.hpp
+	swig -o $@ -c++ -lua $<
+
+lapack$(EXT): lapack_wrap.cxx 
+	g++ -o $@ $(SHARED) $< $(LUA_INC) $(LUA_LIB) $(LAPACK_LIB) -I $(MYLIB)
+
+lapack_wrap.cxx: $(MYLIB)/swig/lapack.i $(MYLIB)/wrappers/lapack.hpp
 	swig -o $@ -c++ -lua $<
 
 sparse$(EXT): sparse_wrap.cxx
@@ -99,6 +105,13 @@ gsl$(EXT): gsl_wrap.cxx
 #gsl_wrap.cxx: $(MYLIB)/swig/gsl.i $(MYLIB)/wrappers/gsl.hpp
 gsl_wrap.cxx: gsl.i $(MYLIB)/swig/gsl.i $(MYLIB)/wrappers/gsl.hpp
 	swig -o $@ -c++ -lua $<
+
+lbfgsb$(EXT): lbfgsb_wrap.cxx 
+	g++ -o $@ $(SHARED) $< $(LUA_INC) $(LBFGSB_INC) $(LUA_LIB) $(LBFGSB_LIB)  -I $(MYLIB)
+
+lbfgsb_wrap.cxx: $(MYLIB)/swig/lbfgsb.i $(MYLIB)/wrappers/lbfgsb.hpp
+	swig -o $@ -c++ -lua $<
+
 
 luail$(EXT): il_wrap.cxx 
 	g++ -o $@ $(SHARED) $< $(LUA_INC) $(IL_INC) $(LUA_LIB) $(IL_LIB)  -I $(MYLIB)

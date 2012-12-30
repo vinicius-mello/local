@@ -15,30 +15,41 @@ function DisplayCallback(win)
   gl.Viewport(0,0,300,300) 
   gl.ClearColor(0,0,0,0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
+	gl.Color(1,0,0,0)
+	gl.Begin('TRIANGLES')
+	gl.Vertex(1.0,0.0)
+	gl.Vertex(-0.3,0.7)
+	gl.Vertex(-0.3,-0.7)
+  gl.End()
 	gl.Flush()
-	print(win)
 	tcl(win.." swapbuffers")
 end
 
-function TimerCallback()
-	print("Timer")
+function MotionCallback(x,y)
+	print(x,y)
 end
 
 tcl [[
 
   package require Togl 2.1
-	lua_proc DisplayCallback
-	lua_proc ReshapeCallback
-	lua_proc CreateCallback
-	lua_proc TimerCallback
-  togl .hello -time 1 -width 500 -height 500 \
+	lua_proc DisplayCallback ReshapeCallback CreateCallback 
+	lua_proc MotionCallback
+  togl .hello -width 500 -height 500 \
                      -double true -depth true \
                      -createproc CreateCallback \
                      -reshapeproc ReshapeCallback \
-                     -timercommand TimerCallback \
                      -displayproc DisplayCallback 
   pack .hello
-
+	bind . <Motion> {
+		MotionCallback %x %y
+	}
+	bind . <Enter> {
+		puts Enter
+	}
+	bind . <Leave> {
+		puts Leave
+	}
+  grab .
 ]]
 
 TkMainLoop()

@@ -1755,6 +1755,34 @@ static int _wrap_new_array_double__SWIG_3(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   void *arg2 = (void *) 0 ;
+  size_t arg3 ;
+  array< double > *result = 0 ;
+  
+  SWIG_check_num_args("array< double >::array",3,3)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("array< double >::array",1,"size_t");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("array< double >::array",2,"void *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< double >::array",3,"size_t");
+  SWIG_contract_assert((lua_tonumber(L,1)>=0),"number must not be negative")
+  arg1 = (size_t)lua_tonumber(L, 1);
+  arg2=(void *)SWIG_MustGetPtr(L,2,0,0,2,"new_array_double");
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (array< double > *)new array< double >(arg1,arg2,arg3);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_arrayT_double_t,1); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_new_array_double__SWIG_4(lua_State* L) {
+  int SWIG_arg = 0;
+  size_t arg1 ;
+  void *arg2 = (void *) 0 ;
   array< double > *result = 0 ;
   
   SWIG_check_num_args("array< double >::array",2,2)
@@ -1775,7 +1803,7 @@ fail:
 }
 
 
-static int _wrap_new_array_double__SWIG_4(lua_State* L) {
+static int _wrap_new_array_double__SWIG_5(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   size_t arg2 ;
@@ -1803,7 +1831,7 @@ fail:
 }
 
 
-static int _wrap_new_array_double__SWIG_5(lua_State* L) {
+static int _wrap_new_array_double__SWIG_6(lua_State* L) {
   int SWIG_arg = 0;
   array< double > *arg1 = 0 ;
   array< double > *result = 0 ;
@@ -1827,7 +1855,7 @@ fail:
 }
 
 
-static int _wrap_new_array_double__SWIG_6(lua_State* L) {
+static int _wrap_new_array_double__SWIG_7(lua_State* L) {
   int SWIG_arg = 0;
   char *arg1 = (char *) 0 ;
   array< double > *result = 0 ;
@@ -1868,7 +1896,7 @@ static int _wrap_new_array_double(lua_State* L) {
       }
     }
     if (_v) {
-      return _wrap_new_array_double__SWIG_5(L);
+      return _wrap_new_array_double__SWIG_6(L);
     }
   }
   if (argc == 1) {
@@ -1886,7 +1914,7 @@ static int _wrap_new_array_double(lua_State* L) {
       _v = SWIG_lua_isnilstring(L,argv[0]);
     }
     if (_v) {
-      return _wrap_new_array_double__SWIG_6(L);
+      return _wrap_new_array_double__SWIG_7(L);
     }
   }
   if (argc == 2) {
@@ -1904,7 +1932,7 @@ static int _wrap_new_array_double(lua_State* L) {
         }
       }
       if (_v) {
-        return _wrap_new_array_double__SWIG_3(L);
+        return _wrap_new_array_double__SWIG_4(L);
       }
     }
   }
@@ -1929,6 +1957,30 @@ static int _wrap_new_array_double(lua_State* L) {
     }
     if (_v) {
       {
+        void *ptr;
+        if (SWIG_isptrtype(L,argv[1])==0 || SWIG_ConvertPtr(L,argv[1], (void **) &ptr, 0, 0)) {
+          _v = 0;
+        } else {
+          _v = 1;
+        }
+      }
+      if (_v) {
+        {
+          _v = lua_isnumber(L,argv[2]);
+        }
+        if (_v) {
+          return _wrap_new_array_double__SWIG_3(L);
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      _v = lua_isnumber(L,argv[0]);
+    }
+    if (_v) {
+      {
         _v = lua_isnumber(L,argv[1]);
       }
       if (_v) {
@@ -1941,7 +1993,7 @@ static int _wrap_new_array_double(lua_State* L) {
           }
         }
         if (_v) {
-          return _wrap_new_array_double__SWIG_4(L);
+          return _wrap_new_array_double__SWIG_5(L);
         }
       }
     }
@@ -1952,6 +2004,7 @@ static int _wrap_new_array_double(lua_State* L) {
     "    array< double >::array()\n"
     "    array< double >::array(size_t,size_t)\n"
     "    array< double >::array(size_t)\n"
+    "    array< double >::array(size_t,void *,size_t)\n"
     "    array< double >::array(size_t,void *)\n"
     "    array< double >::array(size_t,size_t,void *)\n"
     "    array< double >::array(array< double > const &)\n"
@@ -2136,6 +2189,37 @@ fail:
 }
 
 
+static int _wrap_array_double_add_to(lua_State* L) {
+  int SWIG_arg = 0;
+  array< double > *arg1 = (array< double > *) 0 ;
+  size_t arg2 ;
+  double arg3 ;
+  double result;
+  
+  SWIG_check_num_args("array< double >::add_to",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< double >::add_to",1,"array< double > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< double >::add_to",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< double >::add_to",3,"double");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_double_t,0))){
+    SWIG_fail_ptr("array_double_add_to",1,SWIGTYPE_p_arrayT_double_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  arg3 = (double)lua_tonumber(L, 3);
+  result = (double)(arg1)->add_to(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_double_set__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< double > *arg1 = (array< double > *) 0 ;
@@ -2240,7 +2324,102 @@ static int _wrap_array_double_set(lua_State* L) {
 }
 
 
-static int _wrap_array_double_data(lua_State* L) {
+static int _wrap_array_double_sym_get(lua_State* L) {
+  int SWIG_arg = 0;
+  array< double > *arg1 = (array< double > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  double result;
+  
+  SWIG_check_num_args("array< double >::sym_get",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< double >::sym_get",1,"array< double > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< double >::sym_get",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< double >::sym_get",3,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_double_t,0))){
+    SWIG_fail_ptr("array_double_sym_get",1,SWIGTYPE_p_arrayT_double_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (double)((array< double > const *)arg1)->sym_get(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_double_sym_set(lua_State* L) {
+  int SWIG_arg = 0;
+  array< double > *arg1 = (array< double > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  double arg4 ;
+  double result;
+  
+  SWIG_check_num_args("array< double >::sym_set",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< double >::sym_set",1,"array< double > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< double >::sym_set",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< double >::sym_set",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< double >::sym_set",4,"double");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_double_t,0))){
+    SWIG_fail_ptr("array_double_sym_set",1,SWIGTYPE_p_arrayT_double_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  arg4 = (double)lua_tonumber(L, 4);
+  result = (double)(arg1)->sym_set(arg2,arg3,arg4);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_double_data__SWIG_0(lua_State* L) {
+  int SWIG_arg = 0;
+  array< double > *arg1 = (array< double > *) 0 ;
+  size_t arg2 ;
+  double *result = 0 ;
+  
+  SWIG_check_num_args("array< double >::data",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< double >::data",1,"array< double > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< double >::data",2,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_double_t,0))){
+    SWIG_fail_ptr("array_double_data",1,SWIGTYPE_p_arrayT_double_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  result = (double *)((array< double > const *)arg1)->data(arg2);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_double,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_double_data__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< double > *arg1 = (array< double > *) 0 ;
   double *result = 0 ;
@@ -2261,6 +2440,55 @@ static int _wrap_array_double_data(lua_State* L) {
 fail:
   lua_error(L);
   return SWIG_arg;
+}
+
+
+static int _wrap_array_double_data(lua_State* L) {
+  int argc;
+  int argv[3]={
+    1,2,3
+  };
+  
+  argc = lua_gettop(L);
+  if (argc == 1) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_double_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      return _wrap_array_double_data__SWIG_1(L);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_double_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      {
+        _v = lua_isnumber(L,argv[1]);
+      }
+      if (_v) {
+        return _wrap_array_double_data__SWIG_0(L);
+      }
+    }
+  }
+  
+  lua_pushstring(L,"Wrong arguments for overloaded function 'array_double_data'\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    array< double >::data(size_t) const\n"
+    "    array< double >::data() const\n");
+  lua_error(L);return 0;
 }
 
 
@@ -2394,6 +2622,51 @@ static int _wrap_array_double_copy(lua_State* L) {
     "    array< double >::copy(array< double > &,size_t)\n"
     "    array< double >::copy(array< double > &)\n");
   lua_error(L);return 0;
+}
+
+
+static int _wrap_array_double_rearrange(lua_State* L) {
+  int SWIG_arg = 0;
+  array< double > *arg1 = (array< double > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  size_t arg4 ;
+  char *arg5 = (char *) 0 ;
+  array< double > *arg6 = 0 ;
+  
+  SWIG_check_num_args("array< double >::rearrange",6,6)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< double >::rearrange",1,"array< double > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< double >::rearrange",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< double >::rearrange",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< double >::rearrange",4,"size_t");
+  if(!SWIG_lua_isnilstring(L,5)) SWIG_fail_arg("array< double >::rearrange",5,"char const *");
+  if(!lua_isuserdata(L,6)) SWIG_fail_arg("array< double >::rearrange",6,"array< double > &");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_double_t,0))){
+    SWIG_fail_ptr("array_double_rearrange",1,SWIGTYPE_p_arrayT_double_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (size_t)lua_tonumber(L, 4);
+  arg5 = (char *)lua_tostring(L, 5);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&arg6,SWIGTYPE_p_arrayT_double_t,0))){
+    SWIG_fail_ptr("array_double_rearrange",6,SWIGTYPE_p_arrayT_double_t);
+  }
+  
+  ((array< double > const *)arg1)->rearrange(arg2,arg3,arg4,(char const *)arg5,*arg6);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
 }
 
 
@@ -2707,9 +2980,13 @@ delete arg1;
 static swig_lua_method swig_array_Sl_double_Sg__methods[] = {
     {"save", _wrap_array_double_save}, 
     {"get", _wrap_array_double_get}, 
+    {"add_to", _wrap_array_double_add_to}, 
     {"set", _wrap_array_double_set}, 
+    {"sym_get", _wrap_array_double_sym_get}, 
+    {"sym_set", _wrap_array_double_sym_set}, 
     {"data", _wrap_array_double_data}, 
     {"copy", _wrap_array_double_copy}, 
+    {"rearrange", _wrap_array_double_rearrange}, 
     {"zero", _wrap_array_double_zero}, 
     {"set_all", _wrap_array_double_set_all}, 
     {"times_to", _wrap_array_double_times_to}, 
@@ -2797,6 +3074,34 @@ static int _wrap_new_array_float__SWIG_3(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   void *arg2 = (void *) 0 ;
+  size_t arg3 ;
+  array< float > *result = 0 ;
+  
+  SWIG_check_num_args("array< float >::array",3,3)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("array< float >::array",1,"size_t");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("array< float >::array",2,"void *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< float >::array",3,"size_t");
+  SWIG_contract_assert((lua_tonumber(L,1)>=0),"number must not be negative")
+  arg1 = (size_t)lua_tonumber(L, 1);
+  arg2=(void *)SWIG_MustGetPtr(L,2,0,0,2,"new_array_float");
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (array< float > *)new array< float >(arg1,arg2,arg3);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_arrayT_float_t,1); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_new_array_float__SWIG_4(lua_State* L) {
+  int SWIG_arg = 0;
+  size_t arg1 ;
+  void *arg2 = (void *) 0 ;
   array< float > *result = 0 ;
   
   SWIG_check_num_args("array< float >::array",2,2)
@@ -2817,7 +3122,7 @@ fail:
 }
 
 
-static int _wrap_new_array_float__SWIG_4(lua_State* L) {
+static int _wrap_new_array_float__SWIG_5(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   size_t arg2 ;
@@ -2845,7 +3150,7 @@ fail:
 }
 
 
-static int _wrap_new_array_float__SWIG_5(lua_State* L) {
+static int _wrap_new_array_float__SWIG_6(lua_State* L) {
   int SWIG_arg = 0;
   array< float > *arg1 = 0 ;
   array< float > *result = 0 ;
@@ -2869,7 +3174,7 @@ fail:
 }
 
 
-static int _wrap_new_array_float__SWIG_6(lua_State* L) {
+static int _wrap_new_array_float__SWIG_7(lua_State* L) {
   int SWIG_arg = 0;
   char *arg1 = (char *) 0 ;
   array< float > *result = 0 ;
@@ -2910,7 +3215,7 @@ static int _wrap_new_array_float(lua_State* L) {
       }
     }
     if (_v) {
-      return _wrap_new_array_float__SWIG_5(L);
+      return _wrap_new_array_float__SWIG_6(L);
     }
   }
   if (argc == 1) {
@@ -2928,7 +3233,7 @@ static int _wrap_new_array_float(lua_State* L) {
       _v = SWIG_lua_isnilstring(L,argv[0]);
     }
     if (_v) {
-      return _wrap_new_array_float__SWIG_6(L);
+      return _wrap_new_array_float__SWIG_7(L);
     }
   }
   if (argc == 2) {
@@ -2946,7 +3251,7 @@ static int _wrap_new_array_float(lua_State* L) {
         }
       }
       if (_v) {
-        return _wrap_new_array_float__SWIG_3(L);
+        return _wrap_new_array_float__SWIG_4(L);
       }
     }
   }
@@ -2971,6 +3276,30 @@ static int _wrap_new_array_float(lua_State* L) {
     }
     if (_v) {
       {
+        void *ptr;
+        if (SWIG_isptrtype(L,argv[1])==0 || SWIG_ConvertPtr(L,argv[1], (void **) &ptr, 0, 0)) {
+          _v = 0;
+        } else {
+          _v = 1;
+        }
+      }
+      if (_v) {
+        {
+          _v = lua_isnumber(L,argv[2]);
+        }
+        if (_v) {
+          return _wrap_new_array_float__SWIG_3(L);
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      _v = lua_isnumber(L,argv[0]);
+    }
+    if (_v) {
+      {
         _v = lua_isnumber(L,argv[1]);
       }
       if (_v) {
@@ -2983,7 +3312,7 @@ static int _wrap_new_array_float(lua_State* L) {
           }
         }
         if (_v) {
-          return _wrap_new_array_float__SWIG_4(L);
+          return _wrap_new_array_float__SWIG_5(L);
         }
       }
     }
@@ -2994,6 +3323,7 @@ static int _wrap_new_array_float(lua_State* L) {
     "    array< float >::array()\n"
     "    array< float >::array(size_t,size_t)\n"
     "    array< float >::array(size_t)\n"
+    "    array< float >::array(size_t,void *,size_t)\n"
     "    array< float >::array(size_t,void *)\n"
     "    array< float >::array(size_t,size_t,void *)\n"
     "    array< float >::array(array< float > const &)\n"
@@ -3178,6 +3508,37 @@ fail:
 }
 
 
+static int _wrap_array_float_add_to(lua_State* L) {
+  int SWIG_arg = 0;
+  array< float > *arg1 = (array< float > *) 0 ;
+  size_t arg2 ;
+  float arg3 ;
+  float result;
+  
+  SWIG_check_num_args("array< float >::add_to",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< float >::add_to",1,"array< float > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< float >::add_to",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< float >::add_to",3,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_float_t,0))){
+    SWIG_fail_ptr("array_float_add_to",1,SWIGTYPE_p_arrayT_float_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  arg3 = (float)lua_tonumber(L, 3);
+  result = (float)(arg1)->add_to(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_float_set__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< float > *arg1 = (array< float > *) 0 ;
@@ -3282,7 +3643,102 @@ static int _wrap_array_float_set(lua_State* L) {
 }
 
 
-static int _wrap_array_float_data(lua_State* L) {
+static int _wrap_array_float_sym_get(lua_State* L) {
+  int SWIG_arg = 0;
+  array< float > *arg1 = (array< float > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  float result;
+  
+  SWIG_check_num_args("array< float >::sym_get",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< float >::sym_get",1,"array< float > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< float >::sym_get",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< float >::sym_get",3,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_float_t,0))){
+    SWIG_fail_ptr("array_float_sym_get",1,SWIGTYPE_p_arrayT_float_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (float)((array< float > const *)arg1)->sym_get(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_float_sym_set(lua_State* L) {
+  int SWIG_arg = 0;
+  array< float > *arg1 = (array< float > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  float arg4 ;
+  float result;
+  
+  SWIG_check_num_args("array< float >::sym_set",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< float >::sym_set",1,"array< float > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< float >::sym_set",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< float >::sym_set",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< float >::sym_set",4,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_float_t,0))){
+    SWIG_fail_ptr("array_float_sym_set",1,SWIGTYPE_p_arrayT_float_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  result = (float)(arg1)->sym_set(arg2,arg3,arg4);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_float_data__SWIG_0(lua_State* L) {
+  int SWIG_arg = 0;
+  array< float > *arg1 = (array< float > *) 0 ;
+  size_t arg2 ;
+  float *result = 0 ;
+  
+  SWIG_check_num_args("array< float >::data",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< float >::data",1,"array< float > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< float >::data",2,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_float_t,0))){
+    SWIG_fail_ptr("array_float_data",1,SWIGTYPE_p_arrayT_float_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  result = (float *)((array< float > const *)arg1)->data(arg2);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_float,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_float_data__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< float > *arg1 = (array< float > *) 0 ;
   float *result = 0 ;
@@ -3303,6 +3759,55 @@ static int _wrap_array_float_data(lua_State* L) {
 fail:
   lua_error(L);
   return SWIG_arg;
+}
+
+
+static int _wrap_array_float_data(lua_State* L) {
+  int argc;
+  int argv[3]={
+    1,2,3
+  };
+  
+  argc = lua_gettop(L);
+  if (argc == 1) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_float_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      return _wrap_array_float_data__SWIG_1(L);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_float_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      {
+        _v = lua_isnumber(L,argv[1]);
+      }
+      if (_v) {
+        return _wrap_array_float_data__SWIG_0(L);
+      }
+    }
+  }
+  
+  lua_pushstring(L,"Wrong arguments for overloaded function 'array_float_data'\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    array< float >::data(size_t) const\n"
+    "    array< float >::data() const\n");
+  lua_error(L);return 0;
 }
 
 
@@ -3436,6 +3941,51 @@ static int _wrap_array_float_copy(lua_State* L) {
     "    array< float >::copy(array< float > &,size_t)\n"
     "    array< float >::copy(array< float > &)\n");
   lua_error(L);return 0;
+}
+
+
+static int _wrap_array_float_rearrange(lua_State* L) {
+  int SWIG_arg = 0;
+  array< float > *arg1 = (array< float > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  size_t arg4 ;
+  char *arg5 = (char *) 0 ;
+  array< float > *arg6 = 0 ;
+  
+  SWIG_check_num_args("array< float >::rearrange",6,6)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< float >::rearrange",1,"array< float > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< float >::rearrange",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< float >::rearrange",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< float >::rearrange",4,"size_t");
+  if(!SWIG_lua_isnilstring(L,5)) SWIG_fail_arg("array< float >::rearrange",5,"char const *");
+  if(!lua_isuserdata(L,6)) SWIG_fail_arg("array< float >::rearrange",6,"array< float > &");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_float_t,0))){
+    SWIG_fail_ptr("array_float_rearrange",1,SWIGTYPE_p_arrayT_float_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (size_t)lua_tonumber(L, 4);
+  arg5 = (char *)lua_tostring(L, 5);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&arg6,SWIGTYPE_p_arrayT_float_t,0))){
+    SWIG_fail_ptr("array_float_rearrange",6,SWIGTYPE_p_arrayT_float_t);
+  }
+  
+  ((array< float > const *)arg1)->rearrange(arg2,arg3,arg4,(char const *)arg5,*arg6);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
 }
 
 
@@ -3749,9 +4299,13 @@ delete arg1;
 static swig_lua_method swig_array_Sl_float_Sg__methods[] = {
     {"save", _wrap_array_float_save}, 
     {"get", _wrap_array_float_get}, 
+    {"add_to", _wrap_array_float_add_to}, 
     {"set", _wrap_array_float_set}, 
+    {"sym_get", _wrap_array_float_sym_get}, 
+    {"sym_set", _wrap_array_float_sym_set}, 
     {"data", _wrap_array_float_data}, 
     {"copy", _wrap_array_float_copy}, 
+    {"rearrange", _wrap_array_float_rearrange}, 
     {"zero", _wrap_array_float_zero}, 
     {"set_all", _wrap_array_float_set_all}, 
     {"times_to", _wrap_array_float_times_to}, 
@@ -3839,6 +4393,34 @@ static int _wrap_new_array_int__SWIG_3(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   void *arg2 = (void *) 0 ;
+  size_t arg3 ;
+  array< int > *result = 0 ;
+  
+  SWIG_check_num_args("array< int >::array",3,3)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("array< int >::array",1,"size_t");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("array< int >::array",2,"void *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< int >::array",3,"size_t");
+  SWIG_contract_assert((lua_tonumber(L,1)>=0),"number must not be negative")
+  arg1 = (size_t)lua_tonumber(L, 1);
+  arg2=(void *)SWIG_MustGetPtr(L,2,0,0,2,"new_array_int");
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (array< int > *)new array< int >(arg1,arg2,arg3);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_arrayT_int_t,1); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_new_array_int__SWIG_4(lua_State* L) {
+  int SWIG_arg = 0;
+  size_t arg1 ;
+  void *arg2 = (void *) 0 ;
   array< int > *result = 0 ;
   
   SWIG_check_num_args("array< int >::array",2,2)
@@ -3859,7 +4441,7 @@ fail:
 }
 
 
-static int _wrap_new_array_int__SWIG_4(lua_State* L) {
+static int _wrap_new_array_int__SWIG_5(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   size_t arg2 ;
@@ -3887,7 +4469,7 @@ fail:
 }
 
 
-static int _wrap_new_array_int__SWIG_5(lua_State* L) {
+static int _wrap_new_array_int__SWIG_6(lua_State* L) {
   int SWIG_arg = 0;
   array< int > *arg1 = 0 ;
   array< int > *result = 0 ;
@@ -3911,7 +4493,7 @@ fail:
 }
 
 
-static int _wrap_new_array_int__SWIG_6(lua_State* L) {
+static int _wrap_new_array_int__SWIG_7(lua_State* L) {
   int SWIG_arg = 0;
   char *arg1 = (char *) 0 ;
   array< int > *result = 0 ;
@@ -3952,7 +4534,7 @@ static int _wrap_new_array_int(lua_State* L) {
       }
     }
     if (_v) {
-      return _wrap_new_array_int__SWIG_5(L);
+      return _wrap_new_array_int__SWIG_6(L);
     }
   }
   if (argc == 1) {
@@ -3970,7 +4552,7 @@ static int _wrap_new_array_int(lua_State* L) {
       _v = SWIG_lua_isnilstring(L,argv[0]);
     }
     if (_v) {
-      return _wrap_new_array_int__SWIG_6(L);
+      return _wrap_new_array_int__SWIG_7(L);
     }
   }
   if (argc == 2) {
@@ -3988,7 +4570,7 @@ static int _wrap_new_array_int(lua_State* L) {
         }
       }
       if (_v) {
-        return _wrap_new_array_int__SWIG_3(L);
+        return _wrap_new_array_int__SWIG_4(L);
       }
     }
   }
@@ -4013,6 +4595,30 @@ static int _wrap_new_array_int(lua_State* L) {
     }
     if (_v) {
       {
+        void *ptr;
+        if (SWIG_isptrtype(L,argv[1])==0 || SWIG_ConvertPtr(L,argv[1], (void **) &ptr, 0, 0)) {
+          _v = 0;
+        } else {
+          _v = 1;
+        }
+      }
+      if (_v) {
+        {
+          _v = lua_isnumber(L,argv[2]);
+        }
+        if (_v) {
+          return _wrap_new_array_int__SWIG_3(L);
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      _v = lua_isnumber(L,argv[0]);
+    }
+    if (_v) {
+      {
         _v = lua_isnumber(L,argv[1]);
       }
       if (_v) {
@@ -4025,7 +4631,7 @@ static int _wrap_new_array_int(lua_State* L) {
           }
         }
         if (_v) {
-          return _wrap_new_array_int__SWIG_4(L);
+          return _wrap_new_array_int__SWIG_5(L);
         }
       }
     }
@@ -4036,6 +4642,7 @@ static int _wrap_new_array_int(lua_State* L) {
     "    array< int >::array()\n"
     "    array< int >::array(size_t,size_t)\n"
     "    array< int >::array(size_t)\n"
+    "    array< int >::array(size_t,void *,size_t)\n"
     "    array< int >::array(size_t,void *)\n"
     "    array< int >::array(size_t,size_t,void *)\n"
     "    array< int >::array(array< int > const &)\n"
@@ -4220,6 +4827,37 @@ fail:
 }
 
 
+static int _wrap_array_int_add_to(lua_State* L) {
+  int SWIG_arg = 0;
+  array< int > *arg1 = (array< int > *) 0 ;
+  size_t arg2 ;
+  int arg3 ;
+  int result;
+  
+  SWIG_check_num_args("array< int >::add_to",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< int >::add_to",1,"array< int > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< int >::add_to",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< int >::add_to",3,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_int_t,0))){
+    SWIG_fail_ptr("array_int_add_to",1,SWIGTYPE_p_arrayT_int_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  arg3 = (int)lua_tonumber(L, 3);
+  result = (int)(arg1)->add_to(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_int_set__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< int > *arg1 = (array< int > *) 0 ;
@@ -4324,7 +4962,102 @@ static int _wrap_array_int_set(lua_State* L) {
 }
 
 
-static int _wrap_array_int_data(lua_State* L) {
+static int _wrap_array_int_sym_get(lua_State* L) {
+  int SWIG_arg = 0;
+  array< int > *arg1 = (array< int > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  int result;
+  
+  SWIG_check_num_args("array< int >::sym_get",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< int >::sym_get",1,"array< int > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< int >::sym_get",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< int >::sym_get",3,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_int_t,0))){
+    SWIG_fail_ptr("array_int_sym_get",1,SWIGTYPE_p_arrayT_int_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (int)((array< int > const *)arg1)->sym_get(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_int_sym_set(lua_State* L) {
+  int SWIG_arg = 0;
+  array< int > *arg1 = (array< int > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  int arg4 ;
+  int result;
+  
+  SWIG_check_num_args("array< int >::sym_set",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< int >::sym_set",1,"array< int > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< int >::sym_set",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< int >::sym_set",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< int >::sym_set",4,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_int_t,0))){
+    SWIG_fail_ptr("array_int_sym_set",1,SWIGTYPE_p_arrayT_int_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  arg4 = (int)lua_tonumber(L, 4);
+  result = (int)(arg1)->sym_set(arg2,arg3,arg4);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_int_data__SWIG_0(lua_State* L) {
+  int SWIG_arg = 0;
+  array< int > *arg1 = (array< int > *) 0 ;
+  size_t arg2 ;
+  int *result = 0 ;
+  
+  SWIG_check_num_args("array< int >::data",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< int >::data",1,"array< int > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< int >::data",2,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_int_t,0))){
+    SWIG_fail_ptr("array_int_data",1,SWIGTYPE_p_arrayT_int_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  result = (int *)((array< int > const *)arg1)->data(arg2);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_int,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_int_data__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< int > *arg1 = (array< int > *) 0 ;
   int *result = 0 ;
@@ -4345,6 +5078,55 @@ static int _wrap_array_int_data(lua_State* L) {
 fail:
   lua_error(L);
   return SWIG_arg;
+}
+
+
+static int _wrap_array_int_data(lua_State* L) {
+  int argc;
+  int argv[3]={
+    1,2,3
+  };
+  
+  argc = lua_gettop(L);
+  if (argc == 1) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_int_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      return _wrap_array_int_data__SWIG_1(L);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_int_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      {
+        _v = lua_isnumber(L,argv[1]);
+      }
+      if (_v) {
+        return _wrap_array_int_data__SWIG_0(L);
+      }
+    }
+  }
+  
+  lua_pushstring(L,"Wrong arguments for overloaded function 'array_int_data'\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    array< int >::data(size_t) const\n"
+    "    array< int >::data() const\n");
+  lua_error(L);return 0;
 }
 
 
@@ -4478,6 +5260,51 @@ static int _wrap_array_int_copy(lua_State* L) {
     "    array< int >::copy(array< int > &,size_t)\n"
     "    array< int >::copy(array< int > &)\n");
   lua_error(L);return 0;
+}
+
+
+static int _wrap_array_int_rearrange(lua_State* L) {
+  int SWIG_arg = 0;
+  array< int > *arg1 = (array< int > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  size_t arg4 ;
+  char *arg5 = (char *) 0 ;
+  array< int > *arg6 = 0 ;
+  
+  SWIG_check_num_args("array< int >::rearrange",6,6)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< int >::rearrange",1,"array< int > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< int >::rearrange",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< int >::rearrange",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< int >::rearrange",4,"size_t");
+  if(!SWIG_lua_isnilstring(L,5)) SWIG_fail_arg("array< int >::rearrange",5,"char const *");
+  if(!lua_isuserdata(L,6)) SWIG_fail_arg("array< int >::rearrange",6,"array< int > &");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_int_t,0))){
+    SWIG_fail_ptr("array_int_rearrange",1,SWIGTYPE_p_arrayT_int_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (size_t)lua_tonumber(L, 4);
+  arg5 = (char *)lua_tostring(L, 5);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&arg6,SWIGTYPE_p_arrayT_int_t,0))){
+    SWIG_fail_ptr("array_int_rearrange",6,SWIGTYPE_p_arrayT_int_t);
+  }
+  
+  ((array< int > const *)arg1)->rearrange(arg2,arg3,arg4,(char const *)arg5,*arg6);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
 }
 
 
@@ -4791,9 +5618,13 @@ delete arg1;
 static swig_lua_method swig_array_Sl_int_Sg__methods[] = {
     {"save", _wrap_array_int_save}, 
     {"get", _wrap_array_int_get}, 
+    {"add_to", _wrap_array_int_add_to}, 
     {"set", _wrap_array_int_set}, 
+    {"sym_get", _wrap_array_int_sym_get}, 
+    {"sym_set", _wrap_array_int_sym_set}, 
     {"data", _wrap_array_int_data}, 
     {"copy", _wrap_array_int_copy}, 
+    {"rearrange", _wrap_array_int_rearrange}, 
     {"zero", _wrap_array_int_zero}, 
     {"set_all", _wrap_array_int_set_all}, 
     {"times_to", _wrap_array_int_times_to}, 
@@ -4881,6 +5712,34 @@ static int _wrap_new_array_uint__SWIG_3(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   void *arg2 = (void *) 0 ;
+  size_t arg3 ;
+  array< uint > *result = 0 ;
+  
+  SWIG_check_num_args("array< uint >::array",3,3)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("array< uint >::array",1,"size_t");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("array< uint >::array",2,"void *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< uint >::array",3,"size_t");
+  SWIG_contract_assert((lua_tonumber(L,1)>=0),"number must not be negative")
+  arg1 = (size_t)lua_tonumber(L, 1);
+  arg2=(void *)SWIG_MustGetPtr(L,2,0,0,2,"new_array_uint");
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (array< uint > *)new array< uint >(arg1,arg2,arg3);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_arrayT_unsigned_int_t,1); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_new_array_uint__SWIG_4(lua_State* L) {
+  int SWIG_arg = 0;
+  size_t arg1 ;
+  void *arg2 = (void *) 0 ;
   array< uint > *result = 0 ;
   
   SWIG_check_num_args("array< uint >::array",2,2)
@@ -4901,7 +5760,7 @@ fail:
 }
 
 
-static int _wrap_new_array_uint__SWIG_4(lua_State* L) {
+static int _wrap_new_array_uint__SWIG_5(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   size_t arg2 ;
@@ -4929,7 +5788,7 @@ fail:
 }
 
 
-static int _wrap_new_array_uint__SWIG_5(lua_State* L) {
+static int _wrap_new_array_uint__SWIG_6(lua_State* L) {
   int SWIG_arg = 0;
   array< uint > *arg1 = 0 ;
   array< uint > *result = 0 ;
@@ -4953,7 +5812,7 @@ fail:
 }
 
 
-static int _wrap_new_array_uint__SWIG_6(lua_State* L) {
+static int _wrap_new_array_uint__SWIG_7(lua_State* L) {
   int SWIG_arg = 0;
   char *arg1 = (char *) 0 ;
   array< uint > *result = 0 ;
@@ -4994,7 +5853,7 @@ static int _wrap_new_array_uint(lua_State* L) {
       }
     }
     if (_v) {
-      return _wrap_new_array_uint__SWIG_5(L);
+      return _wrap_new_array_uint__SWIG_6(L);
     }
   }
   if (argc == 1) {
@@ -5012,7 +5871,7 @@ static int _wrap_new_array_uint(lua_State* L) {
       _v = SWIG_lua_isnilstring(L,argv[0]);
     }
     if (_v) {
-      return _wrap_new_array_uint__SWIG_6(L);
+      return _wrap_new_array_uint__SWIG_7(L);
     }
   }
   if (argc == 2) {
@@ -5030,7 +5889,7 @@ static int _wrap_new_array_uint(lua_State* L) {
         }
       }
       if (_v) {
-        return _wrap_new_array_uint__SWIG_3(L);
+        return _wrap_new_array_uint__SWIG_4(L);
       }
     }
   }
@@ -5055,6 +5914,30 @@ static int _wrap_new_array_uint(lua_State* L) {
     }
     if (_v) {
       {
+        void *ptr;
+        if (SWIG_isptrtype(L,argv[1])==0 || SWIG_ConvertPtr(L,argv[1], (void **) &ptr, 0, 0)) {
+          _v = 0;
+        } else {
+          _v = 1;
+        }
+      }
+      if (_v) {
+        {
+          _v = lua_isnumber(L,argv[2]);
+        }
+        if (_v) {
+          return _wrap_new_array_uint__SWIG_3(L);
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      _v = lua_isnumber(L,argv[0]);
+    }
+    if (_v) {
+      {
         _v = lua_isnumber(L,argv[1]);
       }
       if (_v) {
@@ -5067,7 +5950,7 @@ static int _wrap_new_array_uint(lua_State* L) {
           }
         }
         if (_v) {
-          return _wrap_new_array_uint__SWIG_4(L);
+          return _wrap_new_array_uint__SWIG_5(L);
         }
       }
     }
@@ -5078,6 +5961,7 @@ static int _wrap_new_array_uint(lua_State* L) {
     "    array< uint >::array()\n"
     "    array< uint >::array(size_t,size_t)\n"
     "    array< uint >::array(size_t)\n"
+    "    array< uint >::array(size_t,void *,size_t)\n"
     "    array< uint >::array(size_t,void *)\n"
     "    array< uint >::array(size_t,size_t,void *)\n"
     "    array< uint >::array(array< uint > const &)\n"
@@ -5263,6 +6147,38 @@ fail:
 }
 
 
+static int _wrap_array_uint_add_to(lua_State* L) {
+  int SWIG_arg = 0;
+  array< uint > *arg1 = (array< uint > *) 0 ;
+  size_t arg2 ;
+  unsigned int arg3 ;
+  unsigned int result;
+  
+  SWIG_check_num_args("array< uint >::add_to",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< uint >::add_to",1,"array< uint > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< uint >::add_to",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< uint >::add_to",3,"unsigned int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_int_t,0))){
+    SWIG_fail_ptr("array_uint_add_to",1,SWIGTYPE_p_arrayT_unsigned_int_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (unsigned int)lua_tonumber(L, 3);
+  result = (unsigned int)(arg1)->add_to(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_uint_set__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< uint > *arg1 = (array< uint > *) 0 ;
@@ -5368,7 +6284,103 @@ static int _wrap_array_uint_set(lua_State* L) {
 }
 
 
-static int _wrap_array_uint_data(lua_State* L) {
+static int _wrap_array_uint_sym_get(lua_State* L) {
+  int SWIG_arg = 0;
+  array< uint > *arg1 = (array< uint > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  unsigned int result;
+  
+  SWIG_check_num_args("array< uint >::sym_get",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< uint >::sym_get",1,"array< uint > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< uint >::sym_get",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< uint >::sym_get",3,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_int_t,0))){
+    SWIG_fail_ptr("array_uint_sym_get",1,SWIGTYPE_p_arrayT_unsigned_int_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (unsigned int)((array< uint > const *)arg1)->sym_get(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_uint_sym_set(lua_State* L) {
+  int SWIG_arg = 0;
+  array< uint > *arg1 = (array< uint > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  unsigned int arg4 ;
+  unsigned int result;
+  
+  SWIG_check_num_args("array< uint >::sym_set",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< uint >::sym_set",1,"array< uint > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< uint >::sym_set",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< uint >::sym_set",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< uint >::sym_set",4,"unsigned int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_int_t,0))){
+    SWIG_fail_ptr("array_uint_sym_set",1,SWIGTYPE_p_arrayT_unsigned_int_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (unsigned int)lua_tonumber(L, 4);
+  result = (unsigned int)(arg1)->sym_set(arg2,arg3,arg4);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_uint_data__SWIG_0(lua_State* L) {
+  int SWIG_arg = 0;
+  array< uint > *arg1 = (array< uint > *) 0 ;
+  size_t arg2 ;
+  unsigned int *result = 0 ;
+  
+  SWIG_check_num_args("array< uint >::data",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< uint >::data",1,"array< uint > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< uint >::data",2,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_int_t,0))){
+    SWIG_fail_ptr("array_uint_data",1,SWIGTYPE_p_arrayT_unsigned_int_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  result = (unsigned int *)((array< uint > const *)arg1)->data(arg2);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_unsigned_int,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_uint_data__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< uint > *arg1 = (array< uint > *) 0 ;
   unsigned int *result = 0 ;
@@ -5389,6 +6401,55 @@ static int _wrap_array_uint_data(lua_State* L) {
 fail:
   lua_error(L);
   return SWIG_arg;
+}
+
+
+static int _wrap_array_uint_data(lua_State* L) {
+  int argc;
+  int argv[3]={
+    1,2,3
+  };
+  
+  argc = lua_gettop(L);
+  if (argc == 1) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_unsigned_int_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      return _wrap_array_uint_data__SWIG_1(L);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_unsigned_int_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      {
+        _v = lua_isnumber(L,argv[1]);
+      }
+      if (_v) {
+        return _wrap_array_uint_data__SWIG_0(L);
+      }
+    }
+  }
+  
+  lua_pushstring(L,"Wrong arguments for overloaded function 'array_uint_data'\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    array< uint >::data(size_t) const\n"
+    "    array< uint >::data() const\n");
+  lua_error(L);return 0;
 }
 
 
@@ -5522,6 +6583,51 @@ static int _wrap_array_uint_copy(lua_State* L) {
     "    array< uint >::copy(array< uint > &,size_t)\n"
     "    array< uint >::copy(array< uint > &)\n");
   lua_error(L);return 0;
+}
+
+
+static int _wrap_array_uint_rearrange(lua_State* L) {
+  int SWIG_arg = 0;
+  array< uint > *arg1 = (array< uint > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  size_t arg4 ;
+  char *arg5 = (char *) 0 ;
+  array< unsigned int > *arg6 = 0 ;
+  
+  SWIG_check_num_args("array< uint >::rearrange",6,6)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< uint >::rearrange",1,"array< uint > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< uint >::rearrange",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< uint >::rearrange",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< uint >::rearrange",4,"size_t");
+  if(!SWIG_lua_isnilstring(L,5)) SWIG_fail_arg("array< uint >::rearrange",5,"char const *");
+  if(!lua_isuserdata(L,6)) SWIG_fail_arg("array< uint >::rearrange",6,"array< unsigned int > &");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_int_t,0))){
+    SWIG_fail_ptr("array_uint_rearrange",1,SWIGTYPE_p_arrayT_unsigned_int_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (size_t)lua_tonumber(L, 4);
+  arg5 = (char *)lua_tostring(L, 5);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&arg6,SWIGTYPE_p_arrayT_unsigned_int_t,0))){
+    SWIG_fail_ptr("array_uint_rearrange",6,SWIGTYPE_p_arrayT_unsigned_int_t);
+  }
+  
+  ((array< uint > const *)arg1)->rearrange(arg2,arg3,arg4,(char const *)arg5,*arg6);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
 }
 
 
@@ -5836,9 +6942,13 @@ delete arg1;
 static swig_lua_method swig_array_Sl_uint_Sg__methods[] = {
     {"save", _wrap_array_uint_save}, 
     {"get", _wrap_array_uint_get}, 
+    {"add_to", _wrap_array_uint_add_to}, 
     {"set", _wrap_array_uint_set}, 
+    {"sym_get", _wrap_array_uint_sym_get}, 
+    {"sym_set", _wrap_array_uint_sym_set}, 
     {"data", _wrap_array_uint_data}, 
     {"copy", _wrap_array_uint_copy}, 
+    {"rearrange", _wrap_array_uint_rearrange}, 
     {"zero", _wrap_array_uint_zero}, 
     {"set_all", _wrap_array_uint_set_all}, 
     {"times_to", _wrap_array_uint_times_to}, 
@@ -5926,6 +7036,34 @@ static int _wrap_new_array_size_t__SWIG_3(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   void *arg2 = (void *) 0 ;
+  size_t arg3 ;
+  array< size_t > *result = 0 ;
+  
+  SWIG_check_num_args("array< size_t >::array",3,3)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("array< size_t >::array",1,"size_t");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("array< size_t >::array",2,"void *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< size_t >::array",3,"size_t");
+  SWIG_contract_assert((lua_tonumber(L,1)>=0),"number must not be negative")
+  arg1 = (size_t)lua_tonumber(L, 1);
+  arg2=(void *)SWIG_MustGetPtr(L,2,0,0,2,"new_array_size_t");
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (array< size_t > *)new array< size_t >(arg1,arg2,arg3);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_arrayT_size_t_t,1); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_new_array_size_t__SWIG_4(lua_State* L) {
+  int SWIG_arg = 0;
+  size_t arg1 ;
+  void *arg2 = (void *) 0 ;
   array< size_t > *result = 0 ;
   
   SWIG_check_num_args("array< size_t >::array",2,2)
@@ -5946,7 +7084,7 @@ fail:
 }
 
 
-static int _wrap_new_array_size_t__SWIG_4(lua_State* L) {
+static int _wrap_new_array_size_t__SWIG_5(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   size_t arg2 ;
@@ -5974,7 +7112,7 @@ fail:
 }
 
 
-static int _wrap_new_array_size_t__SWIG_5(lua_State* L) {
+static int _wrap_new_array_size_t__SWIG_6(lua_State* L) {
   int SWIG_arg = 0;
   array< size_t > *arg1 = 0 ;
   array< size_t > *result = 0 ;
@@ -5998,7 +7136,7 @@ fail:
 }
 
 
-static int _wrap_new_array_size_t__SWIG_6(lua_State* L) {
+static int _wrap_new_array_size_t__SWIG_7(lua_State* L) {
   int SWIG_arg = 0;
   char *arg1 = (char *) 0 ;
   array< size_t > *result = 0 ;
@@ -6039,7 +7177,7 @@ static int _wrap_new_array_size_t(lua_State* L) {
       }
     }
     if (_v) {
-      return _wrap_new_array_size_t__SWIG_5(L);
+      return _wrap_new_array_size_t__SWIG_6(L);
     }
   }
   if (argc == 1) {
@@ -6057,7 +7195,7 @@ static int _wrap_new_array_size_t(lua_State* L) {
       _v = SWIG_lua_isnilstring(L,argv[0]);
     }
     if (_v) {
-      return _wrap_new_array_size_t__SWIG_6(L);
+      return _wrap_new_array_size_t__SWIG_7(L);
     }
   }
   if (argc == 2) {
@@ -6075,7 +7213,7 @@ static int _wrap_new_array_size_t(lua_State* L) {
         }
       }
       if (_v) {
-        return _wrap_new_array_size_t__SWIG_3(L);
+        return _wrap_new_array_size_t__SWIG_4(L);
       }
     }
   }
@@ -6100,6 +7238,30 @@ static int _wrap_new_array_size_t(lua_State* L) {
     }
     if (_v) {
       {
+        void *ptr;
+        if (SWIG_isptrtype(L,argv[1])==0 || SWIG_ConvertPtr(L,argv[1], (void **) &ptr, 0, 0)) {
+          _v = 0;
+        } else {
+          _v = 1;
+        }
+      }
+      if (_v) {
+        {
+          _v = lua_isnumber(L,argv[2]);
+        }
+        if (_v) {
+          return _wrap_new_array_size_t__SWIG_3(L);
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      _v = lua_isnumber(L,argv[0]);
+    }
+    if (_v) {
+      {
         _v = lua_isnumber(L,argv[1]);
       }
       if (_v) {
@@ -6112,7 +7274,7 @@ static int _wrap_new_array_size_t(lua_State* L) {
           }
         }
         if (_v) {
-          return _wrap_new_array_size_t__SWIG_4(L);
+          return _wrap_new_array_size_t__SWIG_5(L);
         }
       }
     }
@@ -6123,6 +7285,7 @@ static int _wrap_new_array_size_t(lua_State* L) {
     "    array< size_t >::array()\n"
     "    array< size_t >::array(size_t,size_t)\n"
     "    array< size_t >::array(size_t)\n"
+    "    array< size_t >::array(size_t,void *,size_t)\n"
     "    array< size_t >::array(size_t,void *)\n"
     "    array< size_t >::array(size_t,size_t,void *)\n"
     "    array< size_t >::array(array< size_t > const &)\n"
@@ -6308,6 +7471,38 @@ fail:
 }
 
 
+static int _wrap_array_size_t_add_to(lua_State* L) {
+  int SWIG_arg = 0;
+  array< size_t > *arg1 = (array< size_t > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  size_t result;
+  
+  SWIG_check_num_args("array< size_t >::add_to",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< size_t >::add_to",1,"array< size_t > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< size_t >::add_to",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< size_t >::add_to",3,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_size_t_t,0))){
+    SWIG_fail_ptr("array_size_t_add_to",1,SWIGTYPE_p_arrayT_size_t_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (arg1)->add_to(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_size_t_set__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< size_t > *arg1 = (array< size_t > *) 0 ;
@@ -6413,7 +7608,103 @@ static int _wrap_array_size_t_set(lua_State* L) {
 }
 
 
-static int _wrap_array_size_t_data(lua_State* L) {
+static int _wrap_array_size_t_sym_get(lua_State* L) {
+  int SWIG_arg = 0;
+  array< size_t > *arg1 = (array< size_t > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  size_t result;
+  
+  SWIG_check_num_args("array< size_t >::sym_get",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< size_t >::sym_get",1,"array< size_t > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< size_t >::sym_get",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< size_t >::sym_get",3,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_size_t_t,0))){
+    SWIG_fail_ptr("array_size_t_sym_get",1,SWIGTYPE_p_arrayT_size_t_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = ((array< size_t > const *)arg1)->sym_get(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_size_t_sym_set(lua_State* L) {
+  int SWIG_arg = 0;
+  array< size_t > *arg1 = (array< size_t > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  size_t arg4 ;
+  size_t result;
+  
+  SWIG_check_num_args("array< size_t >::sym_set",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< size_t >::sym_set",1,"array< size_t > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< size_t >::sym_set",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< size_t >::sym_set",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< size_t >::sym_set",4,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_size_t_t,0))){
+    SWIG_fail_ptr("array_size_t_sym_set",1,SWIGTYPE_p_arrayT_size_t_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (size_t)lua_tonumber(L, 4);
+  result = (arg1)->sym_set(arg2,arg3,arg4);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_size_t_data__SWIG_0(lua_State* L) {
+  int SWIG_arg = 0;
+  array< size_t > *arg1 = (array< size_t > *) 0 ;
+  size_t arg2 ;
+  size_t *result = 0 ;
+  
+  SWIG_check_num_args("array< size_t >::data",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< size_t >::data",1,"array< size_t > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< size_t >::data",2,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_size_t_t,0))){
+    SWIG_fail_ptr("array_size_t_data",1,SWIGTYPE_p_arrayT_size_t_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  result = (size_t *)((array< size_t > const *)arg1)->data(arg2);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_size_t,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_size_t_data__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< size_t > *arg1 = (array< size_t > *) 0 ;
   size_t *result = 0 ;
@@ -6434,6 +7725,55 @@ static int _wrap_array_size_t_data(lua_State* L) {
 fail:
   lua_error(L);
   return SWIG_arg;
+}
+
+
+static int _wrap_array_size_t_data(lua_State* L) {
+  int argc;
+  int argv[3]={
+    1,2,3
+  };
+  
+  argc = lua_gettop(L);
+  if (argc == 1) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_size_t_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      return _wrap_array_size_t_data__SWIG_1(L);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_size_t_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      {
+        _v = lua_isnumber(L,argv[1]);
+      }
+      if (_v) {
+        return _wrap_array_size_t_data__SWIG_0(L);
+      }
+    }
+  }
+  
+  lua_pushstring(L,"Wrong arguments for overloaded function 'array_size_t_data'\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    array< size_t >::data(size_t) const\n"
+    "    array< size_t >::data() const\n");
+  lua_error(L);return 0;
 }
 
 
@@ -6567,6 +7907,51 @@ static int _wrap_array_size_t_copy(lua_State* L) {
     "    array< size_t >::copy(array< size_t > &,size_t)\n"
     "    array< size_t >::copy(array< size_t > &)\n");
   lua_error(L);return 0;
+}
+
+
+static int _wrap_array_size_t_rearrange(lua_State* L) {
+  int SWIG_arg = 0;
+  array< size_t > *arg1 = (array< size_t > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  size_t arg4 ;
+  char *arg5 = (char *) 0 ;
+  array< size_t > *arg6 = 0 ;
+  
+  SWIG_check_num_args("array< size_t >::rearrange",6,6)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< size_t >::rearrange",1,"array< size_t > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< size_t >::rearrange",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< size_t >::rearrange",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< size_t >::rearrange",4,"size_t");
+  if(!SWIG_lua_isnilstring(L,5)) SWIG_fail_arg("array< size_t >::rearrange",5,"char const *");
+  if(!lua_isuserdata(L,6)) SWIG_fail_arg("array< size_t >::rearrange",6,"array< size_t > &");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_size_t_t,0))){
+    SWIG_fail_ptr("array_size_t_rearrange",1,SWIGTYPE_p_arrayT_size_t_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (size_t)lua_tonumber(L, 4);
+  arg5 = (char *)lua_tostring(L, 5);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&arg6,SWIGTYPE_p_arrayT_size_t_t,0))){
+    SWIG_fail_ptr("array_size_t_rearrange",6,SWIGTYPE_p_arrayT_size_t_t);
+  }
+  
+  ((array< size_t > const *)arg1)->rearrange(arg2,arg3,arg4,(char const *)arg5,*arg6);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
 }
 
 
@@ -6881,9 +8266,13 @@ delete arg1;
 static swig_lua_method swig_array_Sl_size_t_Sg__methods[] = {
     {"save", _wrap_array_size_t_save}, 
     {"get", _wrap_array_size_t_get}, 
+    {"add_to", _wrap_array_size_t_add_to}, 
     {"set", _wrap_array_size_t_set}, 
+    {"sym_get", _wrap_array_size_t_sym_get}, 
+    {"sym_set", _wrap_array_size_t_sym_set}, 
     {"data", _wrap_array_size_t_data}, 
     {"copy", _wrap_array_size_t_copy}, 
+    {"rearrange", _wrap_array_size_t_rearrange}, 
     {"zero", _wrap_array_size_t_zero}, 
     {"set_all", _wrap_array_size_t_set_all}, 
     {"times_to", _wrap_array_size_t_times_to}, 
@@ -6971,6 +8360,34 @@ static int _wrap_new_array_char__SWIG_3(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   void *arg2 = (void *) 0 ;
+  size_t arg3 ;
+  array< char > *result = 0 ;
+  
+  SWIG_check_num_args("array< char >::array",3,3)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("array< char >::array",1,"size_t");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("array< char >::array",2,"void *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< char >::array",3,"size_t");
+  SWIG_contract_assert((lua_tonumber(L,1)>=0),"number must not be negative")
+  arg1 = (size_t)lua_tonumber(L, 1);
+  arg2=(void *)SWIG_MustGetPtr(L,2,0,0,2,"new_array_char");
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (array< char > *)new array< char >(arg1,arg2,arg3);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_arrayT_char_t,1); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_new_array_char__SWIG_4(lua_State* L) {
+  int SWIG_arg = 0;
+  size_t arg1 ;
+  void *arg2 = (void *) 0 ;
   array< char > *result = 0 ;
   
   SWIG_check_num_args("array< char >::array",2,2)
@@ -6991,7 +8408,7 @@ fail:
 }
 
 
-static int _wrap_new_array_char__SWIG_4(lua_State* L) {
+static int _wrap_new_array_char__SWIG_5(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   size_t arg2 ;
@@ -7019,7 +8436,7 @@ fail:
 }
 
 
-static int _wrap_new_array_char__SWIG_5(lua_State* L) {
+static int _wrap_new_array_char__SWIG_6(lua_State* L) {
   int SWIG_arg = 0;
   array< char > *arg1 = 0 ;
   array< char > *result = 0 ;
@@ -7043,7 +8460,7 @@ fail:
 }
 
 
-static int _wrap_new_array_char__SWIG_6(lua_State* L) {
+static int _wrap_new_array_char__SWIG_7(lua_State* L) {
   int SWIG_arg = 0;
   char *arg1 = (char *) 0 ;
   array< char > *result = 0 ;
@@ -7084,7 +8501,7 @@ static int _wrap_new_array_char(lua_State* L) {
       }
     }
     if (_v) {
-      return _wrap_new_array_char__SWIG_5(L);
+      return _wrap_new_array_char__SWIG_6(L);
     }
   }
   if (argc == 1) {
@@ -7102,7 +8519,7 @@ static int _wrap_new_array_char(lua_State* L) {
       _v = SWIG_lua_isnilstring(L,argv[0]);
     }
     if (_v) {
-      return _wrap_new_array_char__SWIG_6(L);
+      return _wrap_new_array_char__SWIG_7(L);
     }
   }
   if (argc == 2) {
@@ -7120,7 +8537,7 @@ static int _wrap_new_array_char(lua_State* L) {
         }
       }
       if (_v) {
-        return _wrap_new_array_char__SWIG_3(L);
+        return _wrap_new_array_char__SWIG_4(L);
       }
     }
   }
@@ -7145,6 +8562,30 @@ static int _wrap_new_array_char(lua_State* L) {
     }
     if (_v) {
       {
+        void *ptr;
+        if (SWIG_isptrtype(L,argv[1])==0 || SWIG_ConvertPtr(L,argv[1], (void **) &ptr, 0, 0)) {
+          _v = 0;
+        } else {
+          _v = 1;
+        }
+      }
+      if (_v) {
+        {
+          _v = lua_isnumber(L,argv[2]);
+        }
+        if (_v) {
+          return _wrap_new_array_char__SWIG_3(L);
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      _v = lua_isnumber(L,argv[0]);
+    }
+    if (_v) {
+      {
         _v = lua_isnumber(L,argv[1]);
       }
       if (_v) {
@@ -7157,7 +8598,7 @@ static int _wrap_new_array_char(lua_State* L) {
           }
         }
         if (_v) {
-          return _wrap_new_array_char__SWIG_4(L);
+          return _wrap_new_array_char__SWIG_5(L);
         }
       }
     }
@@ -7168,6 +8609,7 @@ static int _wrap_new_array_char(lua_State* L) {
     "    array< char >::array()\n"
     "    array< char >::array(size_t,size_t)\n"
     "    array< char >::array(size_t)\n"
+    "    array< char >::array(size_t,void *,size_t)\n"
     "    array< char >::array(size_t,void *)\n"
     "    array< char >::array(size_t,size_t,void *)\n"
     "    array< char >::array(array< char > const &)\n"
@@ -7352,6 +8794,37 @@ fail:
 }
 
 
+static int _wrap_array_char_add_to(lua_State* L) {
+  int SWIG_arg = 0;
+  array< char > *arg1 = (array< char > *) 0 ;
+  size_t arg2 ;
+  char arg3 ;
+  char result;
+  
+  SWIG_check_num_args("array< char >::add_to",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< char >::add_to",1,"array< char > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< char >::add_to",2,"size_t");
+  if(!SWIG_lua_isnilstring(L,3)) SWIG_fail_arg("array< char >::add_to",3,"char");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_char_t,0))){
+    SWIG_fail_ptr("array_char_add_to",1,SWIGTYPE_p_arrayT_char_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  arg3 = (lua_tostring(L, 3))[0];
+  result = (char)(arg1)->add_to(arg2,arg3);
+  lua_pushfstring(L,"%c",result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_char_set__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< char > *arg1 = (array< char > *) 0 ;
@@ -7456,7 +8929,102 @@ static int _wrap_array_char_set(lua_State* L) {
 }
 
 
-static int _wrap_array_char_data(lua_State* L) {
+static int _wrap_array_char_sym_get(lua_State* L) {
+  int SWIG_arg = 0;
+  array< char > *arg1 = (array< char > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  char result;
+  
+  SWIG_check_num_args("array< char >::sym_get",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< char >::sym_get",1,"array< char > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< char >::sym_get",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< char >::sym_get",3,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_char_t,0))){
+    SWIG_fail_ptr("array_char_sym_get",1,SWIGTYPE_p_arrayT_char_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (char)((array< char > const *)arg1)->sym_get(arg2,arg3);
+  lua_pushfstring(L,"%c",result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_char_sym_set(lua_State* L) {
+  int SWIG_arg = 0;
+  array< char > *arg1 = (array< char > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  char arg4 ;
+  char result;
+  
+  SWIG_check_num_args("array< char >::sym_set",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< char >::sym_set",1,"array< char > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< char >::sym_set",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< char >::sym_set",3,"size_t");
+  if(!SWIG_lua_isnilstring(L,4)) SWIG_fail_arg("array< char >::sym_set",4,"char");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_char_t,0))){
+    SWIG_fail_ptr("array_char_sym_set",1,SWIGTYPE_p_arrayT_char_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  arg4 = (lua_tostring(L, 4))[0];
+  result = (char)(arg1)->sym_set(arg2,arg3,arg4);
+  lua_pushfstring(L,"%c",result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_char_data__SWIG_0(lua_State* L) {
+  int SWIG_arg = 0;
+  array< char > *arg1 = (array< char > *) 0 ;
+  size_t arg2 ;
+  char *result = 0 ;
+  
+  SWIG_check_num_args("array< char >::data",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< char >::data",1,"array< char > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< char >::data",2,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_char_t,0))){
+    SWIG_fail_ptr("array_char_data",1,SWIGTYPE_p_arrayT_char_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  result = (char *)((array< char > const *)arg1)->data(arg2);
+  lua_pushstring(L,(const char *)result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_char_data__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< char > *arg1 = (array< char > *) 0 ;
   char *result = 0 ;
@@ -7477,6 +9045,55 @@ static int _wrap_array_char_data(lua_State* L) {
 fail:
   lua_error(L);
   return SWIG_arg;
+}
+
+
+static int _wrap_array_char_data(lua_State* L) {
+  int argc;
+  int argv[3]={
+    1,2,3
+  };
+  
+  argc = lua_gettop(L);
+  if (argc == 1) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_char_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      return _wrap_array_char_data__SWIG_1(L);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_char_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      {
+        _v = lua_isnumber(L,argv[1]);
+      }
+      if (_v) {
+        return _wrap_array_char_data__SWIG_0(L);
+      }
+    }
+  }
+  
+  lua_pushstring(L,"Wrong arguments for overloaded function 'array_char_data'\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    array< char >::data(size_t) const\n"
+    "    array< char >::data() const\n");
+  lua_error(L);return 0;
 }
 
 
@@ -7610,6 +9227,51 @@ static int _wrap_array_char_copy(lua_State* L) {
     "    array< char >::copy(array< char > &,size_t)\n"
     "    array< char >::copy(array< char > &)\n");
   lua_error(L);return 0;
+}
+
+
+static int _wrap_array_char_rearrange(lua_State* L) {
+  int SWIG_arg = 0;
+  array< char > *arg1 = (array< char > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  size_t arg4 ;
+  char *arg5 = (char *) 0 ;
+  array< char > *arg6 = 0 ;
+  
+  SWIG_check_num_args("array< char >::rearrange",6,6)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< char >::rearrange",1,"array< char > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< char >::rearrange",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< char >::rearrange",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< char >::rearrange",4,"size_t");
+  if(!SWIG_lua_isnilstring(L,5)) SWIG_fail_arg("array< char >::rearrange",5,"char const *");
+  if(!lua_isuserdata(L,6)) SWIG_fail_arg("array< char >::rearrange",6,"array< char > &");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_char_t,0))){
+    SWIG_fail_ptr("array_char_rearrange",1,SWIGTYPE_p_arrayT_char_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (size_t)lua_tonumber(L, 4);
+  arg5 = (char *)lua_tostring(L, 5);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&arg6,SWIGTYPE_p_arrayT_char_t,0))){
+    SWIG_fail_ptr("array_char_rearrange",6,SWIGTYPE_p_arrayT_char_t);
+  }
+  
+  ((array< char > const *)arg1)->rearrange(arg2,arg3,arg4,(char const *)arg5,*arg6);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
 }
 
 
@@ -7923,9 +9585,13 @@ delete arg1;
 static swig_lua_method swig_array_Sl_char_Sg__methods[] = {
     {"save", _wrap_array_char_save}, 
     {"get", _wrap_array_char_get}, 
+    {"add_to", _wrap_array_char_add_to}, 
     {"set", _wrap_array_char_set}, 
+    {"sym_get", _wrap_array_char_sym_get}, 
+    {"sym_set", _wrap_array_char_sym_set}, 
     {"data", _wrap_array_char_data}, 
     {"copy", _wrap_array_char_copy}, 
+    {"rearrange", _wrap_array_char_rearrange}, 
     {"zero", _wrap_array_char_zero}, 
     {"set_all", _wrap_array_char_set_all}, 
     {"times_to", _wrap_array_char_times_to}, 
@@ -8013,6 +9679,34 @@ static int _wrap_new_array_byte__SWIG_3(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   void *arg2 = (void *) 0 ;
+  size_t arg3 ;
+  array< byte > *result = 0 ;
+  
+  SWIG_check_num_args("array< byte >::array",3,3)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("array< byte >::array",1,"size_t");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("array< byte >::array",2,"void *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< byte >::array",3,"size_t");
+  SWIG_contract_assert((lua_tonumber(L,1)>=0),"number must not be negative")
+  arg1 = (size_t)lua_tonumber(L, 1);
+  arg2=(void *)SWIG_MustGetPtr(L,2,0,0,2,"new_array_byte");
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (array< byte > *)new array< byte >(arg1,arg2,arg3);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_arrayT_unsigned_char_t,1); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_new_array_byte__SWIG_4(lua_State* L) {
+  int SWIG_arg = 0;
+  size_t arg1 ;
+  void *arg2 = (void *) 0 ;
   array< byte > *result = 0 ;
   
   SWIG_check_num_args("array< byte >::array",2,2)
@@ -8033,7 +9727,7 @@ fail:
 }
 
 
-static int _wrap_new_array_byte__SWIG_4(lua_State* L) {
+static int _wrap_new_array_byte__SWIG_5(lua_State* L) {
   int SWIG_arg = 0;
   size_t arg1 ;
   size_t arg2 ;
@@ -8061,7 +9755,7 @@ fail:
 }
 
 
-static int _wrap_new_array_byte__SWIG_5(lua_State* L) {
+static int _wrap_new_array_byte__SWIG_6(lua_State* L) {
   int SWIG_arg = 0;
   array< byte > *arg1 = 0 ;
   array< byte > *result = 0 ;
@@ -8085,7 +9779,7 @@ fail:
 }
 
 
-static int _wrap_new_array_byte__SWIG_6(lua_State* L) {
+static int _wrap_new_array_byte__SWIG_7(lua_State* L) {
   int SWIG_arg = 0;
   char *arg1 = (char *) 0 ;
   array< byte > *result = 0 ;
@@ -8126,7 +9820,7 @@ static int _wrap_new_array_byte(lua_State* L) {
       }
     }
     if (_v) {
-      return _wrap_new_array_byte__SWIG_5(L);
+      return _wrap_new_array_byte__SWIG_6(L);
     }
   }
   if (argc == 1) {
@@ -8144,7 +9838,7 @@ static int _wrap_new_array_byte(lua_State* L) {
       _v = SWIG_lua_isnilstring(L,argv[0]);
     }
     if (_v) {
-      return _wrap_new_array_byte__SWIG_6(L);
+      return _wrap_new_array_byte__SWIG_7(L);
     }
   }
   if (argc == 2) {
@@ -8162,7 +9856,7 @@ static int _wrap_new_array_byte(lua_State* L) {
         }
       }
       if (_v) {
-        return _wrap_new_array_byte__SWIG_3(L);
+        return _wrap_new_array_byte__SWIG_4(L);
       }
     }
   }
@@ -8187,6 +9881,30 @@ static int _wrap_new_array_byte(lua_State* L) {
     }
     if (_v) {
       {
+        void *ptr;
+        if (SWIG_isptrtype(L,argv[1])==0 || SWIG_ConvertPtr(L,argv[1], (void **) &ptr, 0, 0)) {
+          _v = 0;
+        } else {
+          _v = 1;
+        }
+      }
+      if (_v) {
+        {
+          _v = lua_isnumber(L,argv[2]);
+        }
+        if (_v) {
+          return _wrap_new_array_byte__SWIG_3(L);
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      _v = lua_isnumber(L,argv[0]);
+    }
+    if (_v) {
+      {
         _v = lua_isnumber(L,argv[1]);
       }
       if (_v) {
@@ -8199,7 +9917,7 @@ static int _wrap_new_array_byte(lua_State* L) {
           }
         }
         if (_v) {
-          return _wrap_new_array_byte__SWIG_4(L);
+          return _wrap_new_array_byte__SWIG_5(L);
         }
       }
     }
@@ -8210,6 +9928,7 @@ static int _wrap_new_array_byte(lua_State* L) {
     "    array< byte >::array()\n"
     "    array< byte >::array(size_t,size_t)\n"
     "    array< byte >::array(size_t)\n"
+    "    array< byte >::array(size_t,void *,size_t)\n"
     "    array< byte >::array(size_t,void *)\n"
     "    array< byte >::array(size_t,size_t,void *)\n"
     "    array< byte >::array(array< byte > const &)\n"
@@ -8395,6 +10114,38 @@ fail:
 }
 
 
+static int _wrap_array_byte_add_to(lua_State* L) {
+  int SWIG_arg = 0;
+  array< byte > *arg1 = (array< byte > *) 0 ;
+  size_t arg2 ;
+  unsigned char arg3 ;
+  unsigned char result;
+  
+  SWIG_check_num_args("array< byte >::add_to",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< byte >::add_to",1,"array< byte > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< byte >::add_to",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< byte >::add_to",3,"unsigned char");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_char_t,0))){
+    SWIG_fail_ptr("array_byte_add_to",1,SWIGTYPE_p_arrayT_unsigned_char_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (unsigned char)lua_tonumber(L, 3);
+  result = (unsigned char)(arg1)->add_to(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_array_byte_set__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< byte > *arg1 = (array< byte > *) 0 ;
@@ -8500,7 +10251,103 @@ static int _wrap_array_byte_set(lua_State* L) {
 }
 
 
-static int _wrap_array_byte_data(lua_State* L) {
+static int _wrap_array_byte_sym_get(lua_State* L) {
+  int SWIG_arg = 0;
+  array< byte > *arg1 = (array< byte > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  unsigned char result;
+  
+  SWIG_check_num_args("array< byte >::sym_get",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< byte >::sym_get",1,"array< byte > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< byte >::sym_get",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< byte >::sym_get",3,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_char_t,0))){
+    SWIG_fail_ptr("array_byte_sym_get",1,SWIGTYPE_p_arrayT_unsigned_char_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  result = (unsigned char)((array< byte > const *)arg1)->sym_get(arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_byte_sym_set(lua_State* L) {
+  int SWIG_arg = 0;
+  array< byte > *arg1 = (array< byte > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  unsigned char arg4 ;
+  unsigned char result;
+  
+  SWIG_check_num_args("array< byte >::sym_set",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< byte >::sym_set",1,"array< byte > *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< byte >::sym_set",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< byte >::sym_set",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< byte >::sym_set",4,"unsigned char");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_char_t,0))){
+    SWIG_fail_ptr("array_byte_sym_set",1,SWIGTYPE_p_arrayT_unsigned_char_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (unsigned char)lua_tonumber(L, 4);
+  result = (unsigned char)(arg1)->sym_set(arg2,arg3,arg4);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_byte_data__SWIG_0(lua_State* L) {
+  int SWIG_arg = 0;
+  array< byte > *arg1 = (array< byte > *) 0 ;
+  size_t arg2 ;
+  unsigned char *result = 0 ;
+  
+  SWIG_check_num_args("array< byte >::data",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< byte >::data",1,"array< byte > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< byte >::data",2,"size_t");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_char_t,0))){
+    SWIG_fail_ptr("array_byte_data",1,SWIGTYPE_p_arrayT_unsigned_char_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  result = (unsigned char *)((array< byte > const *)arg1)->data(arg2);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_unsigned_char,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_array_byte_data__SWIG_1(lua_State* L) {
   int SWIG_arg = 0;
   array< byte > *arg1 = (array< byte > *) 0 ;
   unsigned char *result = 0 ;
@@ -8521,6 +10368,55 @@ static int _wrap_array_byte_data(lua_State* L) {
 fail:
   lua_error(L);
   return SWIG_arg;
+}
+
+
+static int _wrap_array_byte_data(lua_State* L) {
+  int argc;
+  int argv[3]={
+    1,2,3
+  };
+  
+  argc = lua_gettop(L);
+  if (argc == 1) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_unsigned_char_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      return _wrap_array_byte_data__SWIG_1(L);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    {
+      void *ptr;
+      if (SWIG_isptrtype(L,argv[0])==0 || SWIG_ConvertPtr(L,argv[0], (void **) &ptr, SWIGTYPE_p_arrayT_unsigned_char_t, 0)) {
+        _v = 0;
+      } else {
+        _v = 1;
+      }
+    }
+    if (_v) {
+      {
+        _v = lua_isnumber(L,argv[1]);
+      }
+      if (_v) {
+        return _wrap_array_byte_data__SWIG_0(L);
+      }
+    }
+  }
+  
+  lua_pushstring(L,"Wrong arguments for overloaded function 'array_byte_data'\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    array< byte >::data(size_t) const\n"
+    "    array< byte >::data() const\n");
+  lua_error(L);return 0;
 }
 
 
@@ -8654,6 +10550,51 @@ static int _wrap_array_byte_copy(lua_State* L) {
     "    array< byte >::copy(array< byte > &,size_t)\n"
     "    array< byte >::copy(array< byte > &)\n");
   lua_error(L);return 0;
+}
+
+
+static int _wrap_array_byte_rearrange(lua_State* L) {
+  int SWIG_arg = 0;
+  array< byte > *arg1 = (array< byte > *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  size_t arg4 ;
+  char *arg5 = (char *) 0 ;
+  array< unsigned char > *arg6 = 0 ;
+  
+  SWIG_check_num_args("array< byte >::rearrange",6,6)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("array< byte >::rearrange",1,"array< byte > const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("array< byte >::rearrange",2,"size_t");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("array< byte >::rearrange",3,"size_t");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("array< byte >::rearrange",4,"size_t");
+  if(!SWIG_lua_isnilstring(L,5)) SWIG_fail_arg("array< byte >::rearrange",5,"char const *");
+  if(!lua_isuserdata(L,6)) SWIG_fail_arg("array< byte >::rearrange",6,"array< unsigned char > &");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_arrayT_unsigned_char_t,0))){
+    SWIG_fail_ptr("array_byte_rearrange",1,SWIGTYPE_p_arrayT_unsigned_char_t);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (size_t)lua_tonumber(L, 2);
+  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
+  arg3 = (size_t)lua_tonumber(L, 3);
+  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
+  arg4 = (size_t)lua_tonumber(L, 4);
+  arg5 = (char *)lua_tostring(L, 5);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&arg6,SWIGTYPE_p_arrayT_unsigned_char_t,0))){
+    SWIG_fail_ptr("array_byte_rearrange",6,SWIGTYPE_p_arrayT_unsigned_char_t);
+  }
+  
+  ((array< byte > const *)arg1)->rearrange(arg2,arg3,arg4,(char const *)arg5,*arg6);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
 }
 
 
@@ -8968,9 +10909,13 @@ delete arg1;
 static swig_lua_method swig_array_Sl_byte_Sg__methods[] = {
     {"save", _wrap_array_byte_save}, 
     {"get", _wrap_array_byte_get}, 
+    {"add_to", _wrap_array_byte_add_to}, 
     {"set", _wrap_array_byte_set}, 
+    {"sym_get", _wrap_array_byte_sym_get}, 
+    {"sym_set", _wrap_array_byte_sym_set}, 
     {"data", _wrap_array_byte_data}, 
     {"copy", _wrap_array_byte_copy}, 
+    {"rearrange", _wrap_array_byte_rearrange}, 
     {"zero", _wrap_array_byte_zero}, 
     {"set_all", _wrap_array_byte_set_all}, 
     {"times_to", _wrap_array_byte_times_to}, 
