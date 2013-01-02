@@ -6,8 +6,8 @@ require("luaglu")
 require("array")
 require("lpt")
 
-vert=array.array_double(6)
-pnt=array.array_double(2);
+vert=array.double(6)
+pnt=array.double(2);
 
 tree=lpt.lpt2d_tree()
 selected=nil

@@ -18,11 +18,11 @@ mht=ply.load(file_mht)
 mesh:print_header()
 mht:print_header()
 
-deg=array.array_uint(mesh.vertex.size)
-are=array.array_float(mesh.vertex.size)
-vtx=array.array_float(mesh.vertex.size,3)
-nml=array.array_float(mesh.vertex.size,3)
-idx=array.array_uint(mesh.face.size,3)
+deg=array.uint(mesh.vertex.size)
+are=array.float(mesh.vertex.size)
+vtx=array.float(mesh.vertex.size,3)
+nml=array.float(mesh.vertex.size,3)
+idx=array.uint(mesh.face.size,3)
 
 bb={ 
   xa=math.huge,
@@ -33,7 +33,7 @@ bb={
 	zb=-math.huge
 }  --bounding box
 
-clr=array.array_float(128,3)
+clr=array.float(128,3)
 
 colormap.rgbmap(clr, 
   {
@@ -42,9 +42,9 @@ colormap.rgbmap(clr,
 		g={0.000, 0.000, 1.000, 1.000, 0.000, 0.000},
 		b={0.500, 1.000, 1.000, 0.000, 0.000, 0.000} } )
 
-local attrs=array.array_float(mesh.vertex.size)
-local values=array.array_float(mht.eigenvector.size)
-local mh=array.array_float(mht.eigenvector.size,mesh.vertex.size)
+local attrs=array.float(mesh.vertex.size)
+local values=array.float(mht.eigenvector.size)
+local mh=array.float(mht.eigenvector.size,mesh.vertex.size)
 
 function mht.eigenvector_read_cb(i,reg) 
   values:set(i,reg.eigenvalue)
@@ -101,12 +101,12 @@ mesh:read_data()
 mht:read_data()
 print("Bounding Box: ["..bb.xa..","..bb.xb.."]x["..bb.ya..","..bb.yb.."]x["..bb.za..","..bb.zb.."]")
 
-fil=array.array_float(mht.eigenvector.size)
+fil=array.float(mht.eigenvector.size)
 fil:zero()
-fil_exp=array.array_float(mht.eigenvector.size)
-coef=array.array_float(mht.eigenvector.size,3)
-coef_t=array.array_float(mht.eigenvector.size,3)
-vtx_high=array.array_float(mesh.vertex.size,3)
+fil_exp=array.float(mht.eigenvector.size)
+coef=array.float(mht.eigenvector.size,3)
+coef_t=array.float(mht.eigenvector.size,3)
+vtx_high=array.float(mesh.vertex.size,3)
 vtx:times_to(are,vtx_high)
 blas.gemm(1.0,mh,vtx_high,0.0,coef)
 blas.gemm(1.0,mh,coef,0.0,vtx_high,true)

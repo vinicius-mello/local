@@ -10,7 +10,7 @@ function matrix.new(m,n)
 	if type(m)=="table" then
 		t.m=#m
 		t.n=#m[1]
-		t.array=array.array_double(t.m,t.n)
+		t.array=array.double(t.m,t.n)
 		for i=1,t.m do
 			for j=1,t.n do 
 				t.array:set(i-1,j-1,m[i][j])
@@ -19,7 +19,7 @@ function matrix.new(m,n)
 	else 
 		t.m=m
 		t.n=n
-		t.array=array.array_double(t.m,t.n)
+		t.array=array.double(t.m,t.n)
 	end
   setmetatable(t,mt)
   return t
@@ -133,12 +133,12 @@ function matrix:lu_decomp()
 	if m~=n then
 		error("not a square matrix")
 	end
-	self.lu=array.array_double(m,n)
+	self.lu=array.double(m,n)
 	blas.copy(self.array,self.lu)
-	self.p=array.array_size_t(m)
+	self.p=array.size_t(m)
 	local signum=gsl.LU_decomp(self.lu,self.p)
 	self.det=gsl.LU_det(self.lu,signum)
-	self.residual=array.array_double(m)
+	self.residual=array.double(m)
 end
 
 function matrix:solve(b)

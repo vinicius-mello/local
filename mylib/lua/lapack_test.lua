@@ -1,8 +1,8 @@
 require("array")
 require("lapack")
 
-a=array.array_double(6)
-b=array.array_double(3)
+a=array.double(6)
+b=array.double(3)
 
 a:sym_set(0,0,25)
 a:sym_set(0,1,15)
@@ -36,7 +36,7 @@ a:sym_set(1,1,18)
 a:sym_set(1,2,0)
 a:sym_set(2,2,11)
 
-z=array.array_double(3,3)
+z=array.double(3,3)
 	
 lapack.spev(3,a,b,z)
 for i=0,2 do print(b:get(i)) end

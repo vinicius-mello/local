@@ -20,9 +20,9 @@ ctx:add_device(1)
 ctx:init()
 
 
-inputdata=array.array_float(data_size)
+inputdata=array.float(data_size)
 for i=1,data_size do inputdata:set(i-1,i) end
-results=array.array_float(data_size)
+results=array.float(data_size)
 for i=1,data_size do results:set(i-1,11-i) end
 
 cmd=cl.command_queue(ctx,0,0)

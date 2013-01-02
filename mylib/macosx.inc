@@ -38,7 +38,7 @@ MA57_LIB= ~/local/Numeric/ma57-3.7.0/src/libma57.a \
 
 #MA47_LIB= -L/home/vinicius/Numeric/lib -lma47 $(BLAS_LIB)
 
-GL2_LIB = -framework GLUT -framework AGL -framework OpenGL -lGLEW
+GL2_LIB = -lGLEW -framework GLUT -framework AGL -framework OpenGL
 GL2_INC = 
 
 CL_LIB = -framework OpenCL $(GL2_LIB)

@@ -1,7 +1,8 @@
 colormap={}
 function colormap.rgbmap(a,m) 
-  local size=a:size()/a:width()
+  local size=a:height()
   local step=1/(size-1)
+	local i
   local j=1
   for i=0,size-1 do
     local s=i*step

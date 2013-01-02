@@ -37,3 +37,6 @@ Numeric
 Icon?
 ehthumbs.db
 Thumbs.db
+
+# SWIG 
+*_wrap.cxx

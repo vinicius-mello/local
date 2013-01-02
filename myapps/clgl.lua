@@ -125,7 +125,7 @@ function cnv:map_cb()
 	self.cltexsrc=cl.gl_texture2d(self.ctx,cl.MEM_READ_ONLY,gl.TEXTURE_2D,0,texid)
 	print(cl.host_get_error())
 
-	local null=array.array_uint()
+	local null=array.uint()
 	self.tex=gl2.color_texture2d()
 	print(self.tex:object_id())
 	self.tex:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,null:data())

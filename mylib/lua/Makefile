@@ -1,8 +1,12 @@
 include ../make.inc
 
-TARGETS=array$(EXT) cloud$(EXT) blas$(EXT) sparse$(EXT) triplets$(EXT) umfpack$(EXT) \
-	gl2$(EXT) cl$(EXT) tcl$(EXT) lpt$(EXT) gsl$(EXT) lbfgsb$(EXT) pack$(EXT) ginac$(EXT) \
-  arpack$(EXT) ma57$(EXT) luail$(EXT) luailu$(EXT) luailut$(EXT) \
+TARGETS=array$(EXT) cloud$(EXT) blas$(EXT) lapack$(EXT) \
+  cubic$(EXT) sparse$(EXT) triplets$(EXT) umfpack$(EXT) \
+	gl2$(EXT) cl$(EXT) tcl$(EXT) lpt$(EXT) gsl$(EXT) \
+	lbfgsb$(EXT) pack$(EXT) ginac$(EXT) \
+  arpack$(EXT) 
+# ma57$(EXT)
+# luail$(EXT) luailu$(EXT) luailut$(EXT) \
 #	ma47$(EXT) lpt$(EXT)
 
 
@@ -11,13 +15,19 @@ all: $(TARGETS)
 array$(EXT): array_wrap.cxx 
 	g++ -o $@ $(SHARED) $< $(LUA_INC) $(LUA_LIB) -I $(MYLIB)
 
-array_wrap.cxx: $(MYLIB)/swig/array.i $(MYLIB)/wrappers/array.hpp
+array_wrap.cxx: array.i $(MYLIB)/swig/array.i $(MYLIB)/wrappers/array.hpp
 	swig -o $@ -c++ -lua $<
 
 cloud$(EXT): cloud_wrap.cxx 
 	g++ -o $@ $(SHARED) $< $(LUA_INC) $(LUA_LIB) -I $(MYLIB)
 
 cloud_wrap.cxx: $(MYLIB)/swig/cloud.i $(MYLIB)/wrappers/cloud.hpp
+	swig -o $@ -c++ -lua $<
+
+cubic$(EXT): cubic_wrap.cxx 
+	g++ -o $@ $(SHARED) $< $(LUA_INC) $(LUA_LIB) -I $(MYLIB)
+
+cubic_wrap.cxx: $(MYLIB)/swig/cubic.i $(MYLIB)/wrappers/cubic.hpp
 	swig -o $@ -c++ -lua $<
 
 blas$(EXT): blas_wrap.cxx 
@@ -92,8 +102,8 @@ gl2$(EXT): gl2_wrap.cxx $(MYLIB)/wrappers/gl2.hpp  $(MYLIB)/wrappers/fbo.h
 gl2_wrap.cxx: $(MYLIB)/swig/gl2.i $(MYLIB)/wrappers/gl2.hpp  $(MYLIB)/wrappers/fbo.h 
 	swig -o $@ -c++ -lua $<
 
-cl$(EXT): cl_wrap.cxx $(MYLIB)/wrappers/cl.o
-	g++ -o $@ $(SHARED) $< $(MYLIB)/wrappers/cl.o -DDEBUG $(LUA_INC) $(CL_INC) $(LUA_LIB) $(CL_LIB)  -I $(MYLIB)
+cl$(EXT): cl_wrap.cxx $(MYLIB)/wrappers/cl.cpp
+	g++ -o $@ $(SHARED) $< $(MYLIB)/wrappers/cl.cpp $(LUA_INC) $(CL_INC) $(LUA_LIB) $(CL_LIB)  -I $(MYLIB)
 
 cl_wrap.cxx: $(MYLIB)/swig/cl.i $(MYLIB)/wrappers/cl.hpp 
 	swig -o $@ -c++ -lua $<

@@ -7,7 +7,7 @@ require("luaglu")
 
 function vec(t) 
   local m=#t
-  local a=array.array_double(m)
+  local a=array.double(m)
   for i=1,m do
     a:set(i-1,t[i])
   end

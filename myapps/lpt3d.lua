@@ -9,10 +9,10 @@ require("queue")
 require("vec")
 require("lpt")
 
-vert=array.array_double(12)
-pnt=array.array_double(3);
-pnt2=array.array_double(3);
-temp=array.array_double(3);
+vert=array.double(12)
+pnt=array.double(3);
+pnt2=array.double(3);
+temp=array.double(3);
 selected=nil
 visible={true,true,true,true,true,true}
 

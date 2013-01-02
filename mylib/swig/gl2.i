@@ -39,33 +39,33 @@ void disable_vertex_attrib_array(uint i);
   SWIG_arg++;
 }*/
 
-  class trackball {
-  public:
-      trackball();
-      void reset();
-      void resize(double rad=1.0);
-      void start_motion(int x, int y);
-      void move_rotation(int x, int y);
-      void move_pan(int x, int y);
-      void move_zoom(int x, int y);
-      void move_scaling(int x, int y);
-      void transform();
-      void rotate();
-  };
+class trackball {
+    public:
+        trackball();
+        void reset();
+        void resize(double rad=1.0);
+        void start_motion(int x, int y);
+        void move_rotation(int x, int y);
+        void move_pan(int x, int y);
+        void move_zoom(int x, int y);
+        void move_scaling(int x, int y);
+        void transform();
+        void rotate();
+};
 
 
-  class unprojection {
-  public:
-    unprojection();
-    void reset();
-    void to_space(double * p_ptr, double * q_ptr) const;
-    void to_plane(double * p_ptr, double * ps_ptr, double * w_ptr) const;
-    void to_line(double * p_ptr, double * ps_ptr, double * t) const;
-    bool to_tetra(double * p_ptr, double * ps_ptr, double * r_ptr, double * t, int o=1) const;
-    void perspective_on();
-    void perspective_off();
-    bool perspective() const;
-  };
+class unprojection {
+    public:
+        unprojection();
+        void reset();
+        void to_space(double * p_ptr, double * q_ptr) const;
+        void to_plane(double * p_ptr, double * ps_ptr, double * w_ptr) const;
+        void to_line(double * p_ptr, double * ps_ptr, double * t) const;
+        bool to_tetra(double * p_ptr, double * ps_ptr, double * r_ptr, double * t, int o=1) const;
+        void perspective_on();
+        void perspective_off();
+        bool perspective() const;
+};
 
 
 /*
@@ -94,97 +94,101 @@ protected:
 
 class shader 
 {
-public:
-	typedef enum
-	{
-		VERTEX,
-		FRAGMENT,
-		GEOMETRY
-	} ShaderType;
+    public:
+        typedef enum
+        {
+            VERTEX,
+            FRAGMENT,
+            GEOMETRY
+        } ShaderType;
 
-	shader(void);
-	void gen(void);
-	void del(void);
-	virtual ShaderType type(void) const = 0;
-	void set_source(const char * src);
-	bool load_source(const char * fileName);
-	bool compile(void);
-	bool is_compiled(void);
-	//std::string info_log(void);
-  void print_log(void);
+        shader(void);
+        void gen(void);
+        void del(void);
+        virtual ShaderType type(void) const = 0;
+        void set_source(const char * src);
+        bool load_source(const char * fileName);
+        bool compile(void);
+        bool is_compiled(void);
+        //std::string info_log(void);
+        void print_log(void);
 };
 
 class vertex_shader : public shader 
 {
-public:
-	vertex_shader(void);
-	ShaderType type(void) const;
+    public:
+        vertex_shader(void);
+        ShaderType type(void) const;
 };
 
 class fragment_shader : public shader
 {
-public:
-	fragment_shader(void);
-	ShaderType type(void) const;
+    public:
+        fragment_shader(void);
+        ShaderType type(void) const;
 };
 
 class geometry_shader : public shader
 {
-public:
-	geometry_shader(void);
-	ShaderType type(void) const;
+    public:
+        geometry_shader(void);
+        ShaderType type(void) const;
 };
 
 class program 
 {
-public:
-	program(void);
-	void gen(void);
-	void del(void);
-	void attach(shader * shd);
-	void detach(shader * shd);
-	GLsizei attached_shaders(void) const;
-	shader * attached_shader(int i);
-	bool link(void);
-	void bind(void);
-	void unbind(void);
-	bool is_linked(void) const;
-	//std::string info_log(void);
-  void print_log(void);
-	void uniformi(const char * name, int x);
-	void uniformi(const char * name, int x, int y);
-	void uniformi(const char * name, int x, int y, int z);
-  void uniformi(const char * name, int x, int y, int z, int w);
-	void uniform(const char * name, float x);
-	void uniform(const char * name, float x, float y);
-	void uniform(const char * name, float x, float y, float z);
-	void uniform(const char * name, float x, float y, float z, float w);
-	void parameter(GLenum pname, int value);
-	void attribute(int index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
-	void bind_attribute(int index, const char * name);
+    public:
+        program(void);
+        void gen(void);
+        void del(void);
+        void attach(shader * shd);
+        void detach(shader * shd);
+        GLsizei attached_shaders(void) const;
+        shader * attached_shader(int i);
+        bool link(void);
+        void bind(void);
+        void unbind(void);
+        bool is_linked(void) const;
+        //std::string info_log(void);
+        void print_log(void);
+        void uniformi(const char * name, int x);
+        void uniformi(const char * name, int x, int y);
+        void uniformi(const char * name, int x, int y, int z);
+        void uniformi(const char * name, int x, int y, int z, int w);
+        void uniform(const char * name, float x);
+        void uniform(const char * name, float x, float y);
+        void uniform(const char * name, float x, float y, float z);
+        void uniform(const char * name, float x, float y, float z, float w);
+        void parameter(GLenum pname, int value);
+        void attribute(int index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+        void bind_attribute(int index, const char * name);
 };
 
 class color_texture1d 
 {
-public:
-	color_texture1d(void);
-	unsigned object_id(void) const;
-	size_t width(void) const;
-	int dimensions(void) const;
-	size_t size(const unsigned i) const;
-	unsigned target(void) const;
-	bool set(int level, int internalFormat, size_t width, int border, unsigned format, unsigned type, const void * pixels);
+    public:
+        color_texture1d(void);
+        unsigned object_id(void) const;
+        size_t width(void) const;
+        int dimensions(void) const;
+        size_t size(const unsigned i) const;
+        unsigned target(void) const;
+        void bind(void);
+        void unbind(void);
+        bool set(int level, int internalFormat, size_t width, int border, unsigned format, unsigned type, const void * pixels);
 };
 
 class color_texture2d 
 {
-public:
-	color_texture2d(void);
-	unsigned object_id(void) const;
-	size_t width(void) const;
-	size_t height(void) const;
-	int dimensions(void) const;
-	size_t size(const unsigned i) const;
-	unsigned target(void) const;
-	bool set(int level, int internalFormat, size_t width, size_t height, int border, unsigned format, unsigned type, const void * pixels);
+    public:
+        color_texture2d(void);
+        unsigned object_id(void) const;
+        size_t width(void) const;
+        size_t height(void) const;
+        int dimensions(void) const;
+        size_t size(const unsigned i) const;
+        unsigned target(void) const;
+        void bind(void);
+        void unbind(void);
+        bool set(int level, int internalFormat, size_t width, size_t height, int border, unsigned format, unsigned type, const void * pixels);
 };

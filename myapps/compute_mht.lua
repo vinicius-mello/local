@@ -31,10 +31,10 @@ file_out=filename:match("(.*)%.ply").."_mht.ply"
 mesh=ply.load(arg[1])
 mesh:print_header()
 
-deg=array.array_uint(mesh.vertex.size)
-are=array.array_double(mesh.vertex.size)
-vtx=array.array_float(mesh.vertex.size,3)
-idx=array.array_uint(mesh.face.size,3)
+deg=array.uint(mesh.vertex.size)
+are=array.double(mesh.vertex.size)
+vtx=array.float(mesh.vertex.size,3)
+idx=array.uint(mesh.face.size,3)
 
 A=triplets.triplets()
 B=triplets.triplets()
@@ -74,13 +74,13 @@ function mesh.face_read_cb(i,reg)
 		a, b = 1/na*a, 1/nb*b
 		local cos=a%b
 		local cot=cos/math.sqrt(1-cos*cos)/2
-		A:addto(ii[i1],ii[i2],-cot)
-	  B:addto(ii[i1],ii[i2],area/12)
-		A:addto(ii[i2],ii[i1],-cot)
-	  B:addto(ii[i2],ii[i1],area/12)
-	  A:addto(ii[i1],ii[i1],cot)
-	  A:addto(ii[i2],ii[i2],cot)
-	  B:addto(ii[i0],ii[i0],area/6)
+		A:add_to(ii[i1],ii[i2],-cot)
+	  B:add_to(ii[i1],ii[i2],area/12)
+		A:add_to(ii[i2],ii[i1],-cot)
+	  B:add_to(ii[i2],ii[i1],area/12)
+	  A:add_to(ii[i1],ii[i1],cot)
+	  A:add_to(ii[i2],ii[i2],cot)
+	  B:add_to(ii[i0],ii[i0],area/6)
 	end
 end
 

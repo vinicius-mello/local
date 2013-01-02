@@ -1,3 +1,7 @@
+dofile("modules.lua")
+require("gl2")
+ 
+gl2.init()
 a={}
 
 a[0]=1

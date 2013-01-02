@@ -23,13 +23,13 @@ struct superlu_options_t {
     yes_no_t      PivotGrowth;
     yes_no_t      ConditionNumber;
     rowperm_t     RowPerm;
-    int 	  ILU_DropRule;
-    double	  ILU_DropTol;    /* threshold for dropping */
-    double	  ILU_FillFactor; /* gamma in the secondary dropping */
-    norm_t	  ILU_Norm;       /* infinity-norm, 1-norm, or 2-norm */
-    double	  ILU_FillTol;    /* threshold for zero pivot perturbation */
-    milu_t	  ILU_MILU;
-    double	  ILU_MILU_Dim;   /* Dimension of PDE (if available) */
+    int           ILU_DropRule;
+    double        ILU_DropTol;    /* threshold for dropping */
+    double        ILU_FillFactor; /* gamma in the secondary dropping */
+    norm_t        ILU_Norm;       /* infinity-norm, 1-norm, or 2-norm */
+    double        ILU_FillTol;    /* threshold for zero pivot perturbation */
+    milu_t        ILU_MILU_DimU;
+    double        ILU_MILU_Dim;   /* Dimension of PDE (if available) */
     yes_no_t      ParSymbFact;
     yes_no_t      ReplaceTinyPivot; /* used in SuperLU_DIST */
     yes_no_t      SolveInitialized;
@@ -40,11 +40,11 @@ struct superlu_options_t {
 extern void set_default_options(superlu_options_t& opt);
 
 class superlu {
-	public:
-  superlu(const sparse& _S);
-  ~superlu();
-  void set_options(const superlu_options_t& opt);
-  void factor();
-	void solve(const array<double>& b, array<double>& x) const;
+    public:
+        superlu(const sparse& _S);
+        ~superlu();
+        void set_options(const superlu_options_t& opt);
+        void factor();
+        void solve(const array<double>& b, array<double>& x) const;
 };
 
