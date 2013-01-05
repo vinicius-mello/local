@@ -5,9 +5,78 @@ require("lapack")
 require("lbfgsb")
 require("cubic")
 require("tcl")
+require("gl2")
 require("luagl")
 require("luaglu")
+require("cl")
 
+kernel_src= [[
+
+float g(float t)
+{
+    return exp(-t*t);
+}
+
+double bspline(double t)
+{
+    t = (t>0) ? t :  (-t);
+    double a = 2.0 - t;
+
+    if (t < 1.0)
+        return 2.0/3.0 - 0.5*t*t*a;
+    else if (t < 2.0)
+        return a*a*a / 6.0;
+    else
+        return 0.0;
+}
+
+double cubic_eval(int l, __global double* c, double t)
+{
+    double v=0;
+    double tt=t*((double)(l-1));
+    double b=(double)floor((float)tt);
+    double delta=tt-b;
+    int bi=(int)b;
+    int i;
+    for(i=-1;i<=2;++i) {
+        int index=bi+i;
+        if(index<0) index=-index;
+        else if(index>=l) index=2*l-index-2;
+        v+=c[index]*bspline(delta-i);
+    }
+    return v;
+}
+
+__kernel void kern(float tf, float dtf, int N, int m, int gr,
+    __global double * cq, __global double * calpha, __global double * grid)
+{
+    double t=(double)tf;
+    double dt=(double)dtf;
+    int I = get_global_id(0);
+    int J = get_global_id(1);
+
+    double2 v=(double2)(0.0,0.0);
+    double2 p=(double2)(grid[2*(gr+1)*I+2*J],grid[2*(gr+1)*I+2*J+1]);
+    for(int i=0;i<N;++i) {
+        double2 qt;
+        qt.x=cubic_eval(m+1,cq+i*2*(m+1),t);
+        qt.y=cubic_eval(m+1,cq+i*2*(m+1)+(m+1),t);
+        double2 alphat;
+        alphat.x=cubic_eval(m+1,calpha+i*2*(m+1),t);
+        alphat.y=cubic_eval(m+1,calpha+i*2*(m+1)+(m+1),t);
+        float2 d;
+        d.x=(float)(qt.x-p.x);
+        d.y=(float)(qt.y-p.y);
+        double r=(double)g(hypot(d.x,d.y));
+        v.x+=alphat.x*r;
+        v.y+=alphat.y*r;
+    }
+    p.x=p.x+v.x*dt;
+    p.y=p.y+v.y*dt;
+    grid[2*(gr+1)*I+2*J]=p.x;
+    grid[2*(gr+1)*I+2*J+1]=p.y;
+};
+]]
 
 function distance_matrix(pts,dist)
     local N=pts:columns()
@@ -178,6 +247,44 @@ function gen_q(pts0, pts1, m)
     return q,src,dst
 end
 
+function setup_cl()
+    cl.host_init()
+    ctx=cl.context(0)
+    ctx:add_device(1)
+    ctx:init()
+    cmd=cl.command_queue(ctx,0,0)
+    prg=cl.program(ctx,kernel_src)
+    print(cl.host_get_error())
+    krn=cl.kernel(prg, "kern")
+    print(cl.host_get_error())
+
+    memcq=cl.mem(ctx,cl.MEM_READ_ONLY,cq:size_of())
+    print(cq:size_of(),cl.host_get_error())
+    memcalpha=cl.mem(ctx,cl.MEM_READ_ONLY,calpha:size_of())
+    print(calpha:size_of(),cl.host_get_error())
+    memgrid=cl.mem(ctx,cl.MEM_READ_WRITE,grid:size_of())
+    print(grid:size_of(),cl.host_get_error())
+end
+
+function run_kernel()
+    print("run_kernel")
+    cmd:write_buffer(memcq, true, 0, cq:size_of(), cq:data())
+    cmd:write_buffer(memcalpha, true, 0, calpha:size_of(), calpha:data())
+    cmd:write_buffer(memgrid, true, 0, grid:size_of(), grid:data())
+    krn:arg_float(0,t)
+    krn:arg_float(1,dt)
+    krn:arg(2,N)
+    krn:arg(3,m)
+    krn:arg(4,gr)
+    krn:arg(5,memcq)
+    krn:arg(6,memcalpha)
+    krn:arg(7,memgrid)
+    cmd:range_kernel2d(krn,0,0,gr+1,gr+1,1,1)
+    print(cl.host_get_error())
+    cmd:finish()
+    print(cl.host_get_error())
+    cmd:read_buffer(memgrid, true, 0, grid:size_of(), grid:data())
+end
 
 G={ g=function (x) return math.exp(-x*x) end,
 dg=function (x) return -2*x*math.exp(-x*x) end,
@@ -185,7 +292,7 @@ delta=0.00 }
 n=2
 N=3
 m=100
-gr=20
+gr=64
 t=0
 steps=2
 dt=1/m/steps
@@ -202,6 +309,10 @@ work={
 
 --q=gen_q( {{-0.5,-0.5},{-0.5,0.0},{-0.5,0.5}},
 --  {{0.5,-0.05},{0.5,0.0},{0.5,0.05}}, m)
+--[[q,src,dst=gen_q(
+    {{-0.5,-0.45},{0.5,-0.45},{0.0,0.0}},
+    {{-0.7,-0.1},{0.7,-0.1},{0.0,0.0}},
+    m)]]
 q,src,dst=gen_q(
     {{-0.5,0.0},{0.0,-0.5},{0.1,0.0}},
     {{0.0,0.4},{-0.4,0.1},{0.3,0.0}},
@@ -215,8 +326,8 @@ vxt=array.double(2)
 
 for i=0,gr do
     for j=0,gr do
-        grid:set(i,j,0,-1.0+2*i/gr)
-        grid:set(i,j,1,-1.0+2*j/gr)
+        grid:set(i,j,0,-1.0+2*j/gr)
+        grid:set(i,j,1,-1.0+2*i/gr)
     end
 end
 opt=lbfgsb.lbfgsb((m-1)*n*N,20)
@@ -267,34 +378,56 @@ function DisplayCallback(win)
         end
         gl.End()
     end
-    gl.Color(0.5,0.5,0.5)
-    for i=0,gr do
-        gl.Begin('LINE_STRIP')
-        for j=0,gr do
-            local x=grid:row(i,j)
-            gl.Vertex(x:get(0),x:get(1),0.5)
+    texsrc:bind()
+    gl.Enable('TEXTURE_2D')
+    for i=0,gr-1 do
+        for j=0,gr-1 do
+            gl.Begin('QUADS')
+            local x0y1=grid:row(i+1,j)
+            local x1y1=grid:row(i+1,j+1)
+            local x1y0=grid:row(i,j+1)
+            local x0y0=grid:row(i,j)
+            --[[
+            gl.TexCoord((x0y1:get(0)+1)/2,1-(x0y1:get(1)+1)/2)
+            gl.Vertex(2*j/gr-1,2*(i+1)/gr-1,0.5)
+            gl.TexCoord((x0y0:get(0)+1)/2,1-(x0y0:get(1)+1)/2)
+            gl.Vertex(2*j/gr-1,2*(i)/gr-1,0.5)
+            gl.TexCoord((x1y0:get(0)+1)/2,1-(x1y0:get(1)+1)/2)
+            gl.Vertex(2*(j+1)/gr-1,2*(i)/gr-1,0.5)
+            gl.TexCoord((x1y1:get(0)+1)/2,1-(x1y1:get(1)+1)/2)
+            gl.Vertex(2*(j+1)/gr-1,2*(i+1)/gr-1,0.5)
+            --]]
+            gl.TexCoord(j/gr,1.0-(i+1)/gr)
+            gl.Vertex(x0y1:get(0),x0y1:get(1),0.5)
+            gl.TexCoord(j/gr,1.0-i/gr)
+            gl.Vertex(x0y0:get(0),x0y0:get(1),0.5)
+            gl.TexCoord((j+1)/gr,1.0-i/gr)
+            gl.Vertex(x1y0:get(0),x1y0:get(1),0.5)
+            gl.TexCoord((j+1)/gr,1.0-(i+1)/gr)
+            gl.Vertex(x1y1:get(0),x1y1:get(1),0.5)
+            
+            gl.End()
         end
-        gl.End()
     end
-    for j=0,gr do
-        gl.Begin('LINE_STRIP')
-        for i=0,gr do
-            local x=grid:row(i,j)
-            gl.Vertex(x:get(0),x:get(1),0.5)
-        end
-        gl.End()
-    end
+    gl.Disable('TEXTURE_2D')
     tcl(win.." swapbuffers")
 end
 
 
 -- chamada quando a janela OpenGL é criada
 function CreateCallback(win)
+    gl2.init()
+    setup_cl()
     gl.ClearColor(0.0,0.0,0.0,0.0)                  -- cor de fundo preta
     gl.ClearDepth(1.0)                              -- valor do z-buffer
     gl.Enable('DEPTH_TEST')                         -- habilita teste z-buffer
     gl.Enable('CULL_FACE')
     gl.ShadeModel('FLAT')
+
+    image=array.byte(512,512,4)
+    image:read("mandril.512x512.rgba")
+    texsrc=gl2.color_texture2d()
+    texsrc:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,image:data())
 end
 
 
@@ -324,17 +457,20 @@ function TimerCallback(win)
     elseif task=="integrate" then
         --print("integrate")
         for it=1,steps do
+            --[[
             for i=0,gr do
                 for j=0,gr do
                     local x=grid:row(i,j)
-                    v(x,1.0-t,G,cq,calpha,vxt)
-                    blas.axpy(-dt,vxt,x)
+                    v(x,t,G,cq,calpha,vxt)
+                    blas.axpy(dt,vxt,x)
                 end
             end
+            --]]
+            run_kernel()
             for i=0,N-1 do
-                local x=dst:row(i)
-                v(x,1.0-t,G,cq,calpha,vxt)
-                blas.axpy(-dt,vxt,x)
+                local x=src:row(i)
+                v(x,t,G,cq,calpha,vxt)
+                blas.axpy(dt,vxt,x)
             end
             t=t+dt
         end

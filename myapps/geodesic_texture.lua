@@ -7,7 +7,99 @@ require("cubic")
 require("tcl")
 require("luagl")
 require("luaglu")
+require("gl2")
+require("cl")
 
+
+cl.host_init()
+
+print(cl.host_nplatforms())
+print(cl.host_ndevices(0))
+print(cl.host_get_platform_info(0,cl.PLATFORM_NAME))
+print(cl.host_get_device_info(0,1,cl.DEVICE_NAME))
+print(cl.host_get_device_info(0,1,cl.DEVICE_EXTENSIONS))
+
+kernel_src= [[
+
+const sampler_t samplersrc = CLK_NORMALIZED_COORDS_TRUE | CLK_ADDRESS_CLAMP | CLK_FILTER_LINEAR;
+
+float g(float t)
+{
+    return exp(-t*t);
+}
+
+double bspline(double t)
+{
+    t = (t>0) ? t :  (-t);
+    double a = 2.0 - t;
+
+    if (t < 1.0)
+        return 2.0/3.0 - 0.5*t*t*a;
+    else if (t < 2.0)
+        return a*a*a / 6.0;
+    else
+        return 0.0;
+}
+
+double cubic_eval(int l, __global double* c, double t)
+{
+    double v=0;
+    double tt=t*((double)(l-1));
+    double b=(double)floor((float)tt);
+    double delta=tt-b;
+    int bi=(int)b;
+    int i;
+    for(i=-1;i<=2;++i) {
+        int index=bi+i;
+        if(index<0) index=-index;
+        else if(index>=l) index=2*l-index-2;
+        v+=c[index]*bspline(delta-i);
+    }
+    return v;
+}
+
+__kernel void kern(float tf, float dtf, __read_only image2d_t src, __write_only image2d_t dst,
+    int N, int m, __global double * cq, __global double * calpha)
+{
+    double t=(double)tf;
+    double dt=(double)dtf;
+    int x = get_global_id(0);
+    int y = get_global_id(1);
+    int2 c = (int2)(x,y);
+    float2 tex = (float2)(x,y);
+    tex/=(float2)(512.0);
+    double2 p=(double2)(tex.x,tex.y);
+    p*=(double2)(2.0);
+    p-=(double2)(1.0);
+    for(double t1=0.0;t1<=t;t1+=dt) {
+        double2 v=(double2)(0.0,0.0);
+        int i;
+        for(i=0;i<N;++i) {
+            double2 qt;
+            qt.x=cubic_eval(m+1,cq+i*2*(m+1),1.0-t1);
+            qt.y=cubic_eval(m+1,cq+i*2*(m+1)+(m+1),1.0-t1);
+            double2 alphat;
+            alphat.x=cubic_eval(m+1,calpha+i*2*(m+1),1.0-t1);
+            alphat.y=cubic_eval(m+1,calpha+i*2*(m+1)+(m+1),1.0-t1);
+            float2 d;
+            d.x=(float)(qt.x-p.x);
+            d.y=(float)(qt.y-p.y);
+            double r=(double)g(hypot(d.x,d.y));
+            v.x+=alphat.x*r;
+            v.y+=alphat.y*r;
+        }
+        p.x=p.x-v.x*dt;
+        p.y=p.y-v.y*dt;
+    }
+    tex=(float2)(p.x,p.y);
+    tex+=(float2)(1.0);
+    tex/=(float2)(2.0);
+    //tex.y=1.0-tex.y;
+    float4 clr=read_imagef(src,samplersrc,tex);
+    //float4 clr=(float4)(1.0,0,0,0);
+    write_imagef(dst, c, clr);
+};
+]]
 
 function distance_matrix(pts,dist)
     local N=pts:columns()
@@ -36,6 +128,17 @@ function S_matrix(N,G,dist,S,dS)
             local dij=dist:sym_get(i,j)
             S:sym_set(i,j,G.g(dij))
             dS:sym_set(i,j,G.dg(dij)/dij)
+        end
+    end
+end
+
+function S_matrix2(N,G,dist,S)
+    local i,j
+    for i=0,N-1 do
+        S:sym_set(i,i,G.g(0)+G.delta)
+        for j=i+1,N-1 do
+            local dij=dist:sym_get(i,j)
+            S:sym_set(i,j,G.g(dij))
         end
     end
 end
@@ -101,14 +204,14 @@ function geodesic_alpha(G,n,N,m,q,cq,alpha,work)
     local k,d,i,t
 
     local dist=work.dist
-    local S=work.S
-    local dS=work.dS
+    local S=array.double(N*(N+1)/2)
+    --local S=array.float(N*(N+1)/2)
 
     for k=0,m do
         t=h*k
         local projk=q:plane(k)
         distance_matrix(projk,dist)
-        S_matrix(N,G,dist,S,dS)
+        S_matrix2(N,G,dist,S)
         lapack.pptrf(N,S)
         for d=0,n-1 do
             local alphakd=alpha:row(k,d)
@@ -136,7 +239,8 @@ function v(x,t,G,cq,calpha,vxt)
             px:add_to(d,-cubic.eval(cqid,t))
             pv:set(d,cubic.eval(calphaid,t))
         end
-        local dist=math.sqrt(blas.dot(px,px))
+        local dist=blas.dot(px,px)
+        if dist<0 then dist=0 else dist=math.sqrt(dist) end
         blas.axpy(G.g(dist),pv,vxt)
     end
 end
@@ -181,14 +285,13 @@ end
 
 G={ g=function (x) return math.exp(-x*x) end,
 dg=function (x) return -2*x*math.exp(-x*x) end,
-delta=0.00 }
+delta=0.01 }
 n=2
 N=3
 m=100
-gr=20
 t=0
 steps=2
-dt=1/m/steps
+dt=1.0/m/steps
 
 work={
     mid=array.double(n,N),
@@ -206,19 +309,17 @@ q,src,dst=gen_q(
     {{-0.5,0.0},{0.0,-0.5},{0.1,0.0}},
     {{0.0,0.4},{-0.4,0.1},{0.3,0.0}},
     m)
-grad=array.double(m+1,n,N)
+
+--qf=array.float(m+1,n,N)
 alpha=array.double(m+1,n,N)
+--alphaf=array.float(m+1,n,N)
+grad=array.double(m+1,n,N)
 cq=array.double(N,n,m+1)
+--cqf=array.float(N,n,m+1)
 calpha=array.double(N,n,m+1)
-grid=array.double(gr+1,gr+1,2)
+--calphaf=array.float(N,n,m+1)
 vxt=array.double(2)
 
-for i=0,gr do
-    for j=0,gr do
-        grid:set(i,j,0,-1.0+2*i/gr)
-        grid:set(i,j,1,-1.0+2*j/gr)
-    end
-end
 opt=lbfgsb.lbfgsb((m-1)*n*N,20)
 opt:n_set((m-1)*n*N)
 opt:m_set(20)
@@ -267,34 +368,85 @@ function DisplayCallback(win)
         end
         gl.End()
     end
-    gl.Color(0.5,0.5,0.5)
-    for i=0,gr do
-        gl.Begin('LINE_STRIP')
-        for j=0,gr do
-            local x=grid:row(i,j)
-            gl.Vertex(x:get(0),x:get(1),0.5)
-        end
-        gl.End()
+
+    if task=="integrate" or task=="finished" then
+        cmd:add_object(cltexsrc)
+        cmd:add_object(cltexdst)
+        cmd:aquire_globject()
+        cmd:finish()
+        krn:arg_float(0,t)
+        krn:arg_float(1,dt)
+        krn:arg(2,cltexsrc)
+        krn:arg(3,cltexdst)
+        krn:arg(4,N)
+        krn:arg(5,m)
+        krn:arg(6,memcq)
+        krn:arg(7,memcalpha)
+        cmd:range_kernel2d(krn,0,0,512,512,1,1)
+        print(cl.host_get_error())
+        print("finish")
+        cmd:finish()
+        print("end")
+        print(cl.host_get_error())
+        cmd:add_object(cltexsrc)
+        cmd:add_object(cltexdst)
+        cmd:release_globject()
+        cmd:finish()
+
+        texdst:bind()
+    else
+        texsrc:bind()
     end
-    for j=0,gr do
-        gl.Begin('LINE_STRIP')
-        for i=0,gr do
-            local x=grid:row(i,j)
-            gl.Vertex(x:get(0),x:get(1),0.5)
-        end
-        gl.End()
-    end
+
+    gl.Enable('TEXTURE_2D')
+    gl.Begin('QUADS')
+    gl.TexCoord(0,1)
+    gl.Vertex(-1,-1,0.5)
+    gl.TexCoord(1,1)
+    gl.Vertex(1,-1,0.5)
+    gl.TexCoord(1,0)
+    gl.Vertex(1,1,0.5)
+    gl.TexCoord(0,0)
+    gl.Vertex(-1,1,0.5)
+    gl.End()
+
+    gl.Disable('TEXTURE_2D')
     tcl(win.." swapbuffers")
 end
 
 
 -- chamada quando a janela OpenGL é criada
 function CreateCallback(win)
+    gl2.init()
     gl.ClearColor(0.0,0.0,0.0,0.0)                  -- cor de fundo preta
     gl.ClearDepth(1.0)                              -- valor do z-buffer
     gl.Enable('DEPTH_TEST')                         -- habilita teste z-buffer
     gl.Enable('CULL_FACE')
     gl.ShadeModel('FLAT')
+
+    ctx=cl.context(0)
+    ctx:add_device(1)
+    ctx:initGL()
+    cmd=cl.command_queue(ctx,0,0)
+    prg=cl.program(ctx,kernel_src)
+    print(cl.host_get_error())
+    krn=cl.kernel(prg, "kern")
+    print(cl.host_get_error())
+
+    image=array.byte(512,512,4)
+    image:read("mandril.512x512.rgba")
+    texsrc=gl2.color_texture2d()
+    texsrc:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,image:data())
+
+    cltexsrc=cl.gl_texture2d(ctx,cl.MEM_READ_ONLY,gl.TEXTURE_2D,0,texsrc:object_id())
+    print(cl.host_get_error())
+
+    imagedst=array.byte(512,512,4)
+    texdst=gl2.color_texture2d()
+    texdst:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,imagedst:data())
+    cltexdst=cl.gl_texture2d(ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0, texdst:object_id())
+    print(cl.host_get_error())
+
 end
 
 
@@ -315,26 +467,33 @@ function TimerCallback(win)
         print("abno")
     elseif task=="conv" then
         print("conv")
+    --    qf:from_double(q)
+    --    qf:rearrange("210",cqf)
+    --    to_cubic(cqf)
         q:rearrange("210",cq)
         to_cubic(cq)
         geodesic_alpha(G,n,N,m,q,cq,alpha,work)
         alpha:rearrange("210",calpha)
         to_cubic(calpha)
+        memcq=cl.mem(ctx,cl.MEM_READ_ONLY+cl.MEM_COPY_HOST_PTR,cq:size_of(),cq:data())
+        print(cq:size_of(),cl.host_get_error())
+        memcalpha=cl.mem(ctx,cl.MEM_READ_ONLY+cl.MEM_COPY_HOST_PTR,calpha:size_of(),calpha:data())
+        print(calpha:size_of(),cl.host_get_error())
+        --cqf:from_double(cq)
+    --    calphaf:from_double(calpha)
         task="integrate"
     elseif task=="integrate" then
-        --print("integrate")
+      --  print("integrate")
+        print(t,dt)
         for it=1,steps do
-            for i=0,gr do
-                for j=0,gr do
-                    local x=grid:row(i,j)
-                    v(x,1.0-t,G,cq,calpha,vxt)
-                    blas.axpy(-dt,vxt,x)
-                end
-            end
             for i=0,N-1 do
-                local x=dst:row(i)
-                v(x,1.0-t,G,cq,calpha,vxt)
-                blas.axpy(-dt,vxt,x)
+                local x=src:row(i)
+                v(x,t,G,cq,calpha,vxt)
+                if i==0 then
+                    print(x:get(0,0),x:get(0,1))
+                    print(vxt:get(0),vxt:get(1))
+                end
+                blas.axpy(dt,vxt,x)
             end
             t=t+dt
         end
@@ -354,7 +513,7 @@ tcl [[
     lua_proc CreateCallback
     lua_proc TimerCallback
     lua_global task
-    togl .hello -time 50 -width 500 -height 500 \
+    togl .hello -time 50 -width 512 -height 512 \
     -double true -depth true \
     -createproc CreateCallback \
     -reshapeproc ReshapeCallback \

@@ -51,6 +51,28 @@ class array {
     {
         debug_print("array copy_cons(%p): alloc?%d\n",this,alloc?1:0);
     }
+    void from_double(const array<double>& bl)
+    {
+        for(int k=0;k<depth_;++k) {
+            for(int i=0;i<height_;++i) {
+                for(int j=0;j<width_;++j) {
+                    T d=(T)bl.get(k,i,j);
+                    set(k,i,j,d);
+                }
+            }
+        }
+    }
+    void to_double(array<double>& bl) const
+    {
+        for(int k=0;k<depth_;++k) {
+            for(int i=0;i<height_;++i) {
+                for(int j=0;j<width_;++j) {
+                    double d=(double)get(k,i,j);
+                    bl.set(k,i,j,d);
+                }
+            }
+        }
+    }
     ~array() {
         debug_print("~array(%p): alloc?%d\n",this,alloc?1:0);
         if(alloc) delete [] data_;
@@ -211,6 +233,9 @@ class array {
     }
     size_t size() const {
         return depth_*height_*width_;
+    }
+    size_t size_of() const {
+        return depth_*height_*width_*sizeof(T);
     }
     size_t depth() const {
         return depth_;

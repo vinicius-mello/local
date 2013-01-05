@@ -3,7 +3,6 @@
 #include "array.hpp"
 #include <cmath>
 
-
 template <class T>
 T initial_causal_coefficient(size_t l, const T* c)
 {
@@ -26,7 +25,7 @@ T initial_causal_coefficient(size_t l, const T* c)
 }
 
 template <class T>
-T initial_anti_causal_coefficient(size_t l, const T* c)
+T initial_anti_causal_coefficient( size_t l, const T* c)
 {
     // this initialization corresponds to mirror boundaries
     const T pole=(T)(sqrt(3.0)-2.0);
@@ -34,7 +33,7 @@ T initial_anti_causal_coefficient(size_t l, const T* c)
 }
 
 template <class T>
-void convert_to_cubic(size_t l, T* c)
+void convert_to_cubic( size_t l, T* c)
 {
     const T pole=(T)(sqrt(3.0)-2.0);
     // compute the overall gain
@@ -97,7 +96,11 @@ T bsplinedd(T t)
 }
 
 template <class T>
-T cubic_eval(size_t l, const T* c, T t)
+T cubic_eval(
+        size_t l,
+        const T* c,
+        T t
+        )
 {
     T tt=t*(l-1);
     T b=floor(tt);
@@ -114,7 +117,11 @@ T cubic_eval(size_t l, const T* c, T t)
 }
 
 template <class T>
-T cubic_evald(size_t l, const T* c, T t)
+T cubic_evald(
+        size_t l,
+        const T* c,
+        T t
+        )
 {
     T tt=t*(l-1);
     T b=floor(tt);

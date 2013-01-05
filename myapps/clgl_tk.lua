@@ -76,7 +76,7 @@ function DisplayCallback(win)
     cmd:release_globject()
     cmd:finish()
 
-    tex:bind()
+    texdst:bind()
     gl.Enable('TEXTURE_2D')
     gl.Begin('QUADS')
     gl.TexCoord(0,0)
@@ -120,10 +120,9 @@ function CreateCallback(win)
     print(cl.host_get_error())
 
     imagedst=array.byte(512,512,4)
-    tex=gl2.color_texture2d()
-    print(tex:object_id())
-    tex:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,imagedst:data())
-    cltexdst=cl.gl_texture2d(ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0, tex:object_id())
+    texdst=gl2.color_texture2d()
+    texdst:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,imagedst:data())
+    cltexdst=cl.gl_texture2d(ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0, texdst:object_id())
     print(cl.host_get_error())
 
     t=0

@@ -48,7 +48,7 @@ function sample_line(ii,jj)
   local roots=find_roots(lf)
   for i=1,#roots do
     local xt,yt=interp(xi,yi,xj,yj,roots[i])
-	append_point(zeros,xt,yt)
+    append_point(zeros,xt,yt)
   end
 end
 
@@ -56,13 +56,13 @@ function small_area(e)
   return function(cell)
     if #cell.zeros==2 then
       local d=diam(cell.zeros,zeros)
-	  if d<e then
-	    return true
-	  end
+      if d<e then
+        return true
+      end
     elseif area(cell,vertices)<e then
       return true
     end
-	return false
+    return false
   end
 end
 
@@ -84,42 +84,42 @@ function sample_cell(c)
     local d,ii,jj=diam(c.zeros,zeros)
     local xi,yi=point(c.zeros[ii],zeros)
     local xj,yj=point(c.zeros[jj],zeros)
-	l=perp_bisector(xi,yi,xj,yj)
+    l=perp_bisector(xi,yi,xj,yj)
   else
     local m,t,ii,jj=find_min_boundary(c)
-	if t==1 then
-	  l=corner_bisector(c,jj)
-	elseif t==0 then
-	  l=corner_bisector(c,ii)
-	else
-	  local xi,yi=point(c[ii],vertices)
+    if t==1 then
+      l=corner_bisector(c,jj)
+    elseif t==0 then
+      l=corner_bisector(c,ii)
+    else
+      local xi,yi=point(c[ii],vertices)
       local xj,yj=point(c[jj],vertices)
-	  local xt,yt=interp(xi,yi,xj,yj,t)
-	  l=perp(xi,yi,xj,yj,xt,yt)
-	end
+      local xt,yt=interp(xi,yi,xj,yj,t)
+      l=perp(xi,yi,xj,yj,xt,yt)
+    end
   end
 
   local pp,pn,ii,jj=split_convex_polygon(c,l)
   pp.zeros={}
   pn.zeros={}
   for i=1,#c.zeros do
-	local x,y=point(c.zeros[i],zeros)
-	local s=line_eval(l,x,y)
-	if s>0 then
+    local x,y=point(c.zeros[i],zeros)
+    local s=line_eval(l,x,y)
+    if s>0 then
       append(pp.zeros,c.zeros[i])
-	elseif s<0 then
-	  append(pn.zeros,c.zeros[i])
-	else
-	  append(pp.zeros,c.zeros[i])
-	  append(pn.zeros,c.zeros[i])
-	end
+    elseif s<0 then
+      append(pn.zeros,c.zeros[i])
+    else
+      append(pp.zeros,c.zeros[i])
+      append(pn.zeros,c.zeros[i])
+    end
   end
 
   local nz=#zeros.x
   sample_line(ii,jj)
   for pi=nz+1,#zeros.x do
-	append(pp.zeros,pi)
-	append(pn.zeros,pi)
+    append(pp.zeros,pi)
+    append(pn.zeros,pi)
   end
 
   c.left=pp
@@ -136,28 +136,28 @@ function split_convex_polygon(p,l)
   local int={}
   for i=1,n do
     local ni=(i % n)+1
-	if s > 0 then
-	  append(pp,p[i])
-	elseif s<0 then
-	  append(pn,p[i])
-	else
-	  append(pp,p[i])
-	  append(pn,p[i])
-	  append(int,p[i])
-	end
-	local xn,yn=point(p[ni],vertices)
-	local ns=line_eval(l,xn,yn)
-	if ns*s<0 then
-	  local t=line_parameter(x,y,xn,yn,l)
-	  local xt,yt=interp(x,y,xn,yn,t)
-	  local pi=append_point(vertices,xt,yt)
-	  append(pp,pi)
-	  append(pn,pi)
-	  append(int,pi)
-	end
-	s=ns
-	x=xn
-	y=yn
+    if s > 0 then
+      append(pp,p[i])
+    elseif s<0 then
+      append(pn,p[i])
+    else
+      append(pp,p[i])
+      append(pn,p[i])
+      append(int,p[i])
+    end
+    local xn,yn=point(p[ni],vertices)
+    local ns=line_eval(l,xn,yn)
+    if ns*s<0 then
+      local t=line_parameter(x,y,xn,yn,l)
+      local xt,yt=interp(x,y,xn,yn,t)
+      local pi=append_point(vertices,xt,yt)
+      append(pp,pi)
+      append(pn,pi)
+      append(int,pi)
+    end
+    s=ns
+    x=xn
+    y=yn
   end
   return pp,pn,int[1],int[2]
 end
@@ -182,15 +182,15 @@ function find_min_boundary(c)
   local t,ii,jj
   for i=1,n do
     local ni=(i % n)+1
-	local xn,yn=point(c[ni],vertices)
-	local lf=function(t) return f(interp(x,y,xn,yn,t)) end
-	local mi,ti=find_min(lf)
-	if mi<m then
-	  ii,jj=i,ni
-	  m=mi
-	  t=ti
-	end
-	x,y=xn,yn
+    local xn,yn=point(c[ni],vertices)
+    local lf=function(t) return f(interp(x,y,xn,yn,t)) end
+    local mi,ti=find_min(lf)
+    if mi<m then
+      ii,jj=i,ni
+      m=mi
+      t=ti
+    end
+    x,y=xn,yn
   end
   return m,t,ii,jj
 end
@@ -250,7 +250,7 @@ end
 function cnv:k_any(c)
   if c == iup.K_SP then
     coroutine.resume(one_step)
-	cnv:action(0,0)
+    cnv:action(0,0)
   end
 end
 

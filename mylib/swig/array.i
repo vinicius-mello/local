@@ -20,6 +20,8 @@ class array {
         ~array();
         array& operator=(const array& b);
         array(char * filename);
+        void from_double(const array<double>& bl);
+        void to_double(array<double>& bl) const;
         void save(char * filename) const;
         void read(char * filename);
         void write(char * filename);
@@ -46,6 +48,7 @@ class array {
         void zero();
         void set_all(T v);
         size_t size() const;
+        size_t size_of() const;
         size_t depth() const;
         size_t height() const;
         size_t width() const;

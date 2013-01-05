@@ -3,101 +3,101 @@ ad={}
 local mt={}
 
 function ad.zero(...)
-  return 0
+    return 0
 end
 
 function ad.one(...)
-  return 1
+    return 1
 end
 
 function ad.project(i)
-  if i==1 then return function(a) return a end end
-  if i==2 then return function(a,b) return b end end
-  if i==3 then return function(a,b,c) return c end end
-  return function(...) return select(i,...) end
+    if i==1 then return function(a) return a end end
+    if i==2 then return function(a,b) return b end end
+    if i==3 then return function(a,b,c) return c end end
+    return function(...) return select(i,...) end
 end
 
 function ad.var(n,i)
-  local t={}
-  for j=1,n do t[j]=ad.zero end
-  t[i]=ad.one
-  t[0]=ad.project(i)
-  setmetatable(t,mt)
-  return t
+    local t={}
+    for j=1,n do t[j]=ad.zero end
+    t[i]=ad.one
+    t[0]=ad.project(i)
+    setmetatable(t,mt)
+    return t
 end
 
 function ad.cte(n,k)
-  local t={}
-  for j=1,n do t[j]=ad.zero end
-  t[0]=function(...) return k end
-  setmetatable(t,mt)
-  return t
+    local t={}
+    for j=1,n do t[j]=ad.zero end
+    t[0]=function(...) return k end
+    setmetatable(t,mt)
+    return t
 end
 
 function ad.add(a,b)
-  local t={}
-  if getmetatable(a)~=mt then a=ad.cte(#b,a) end
-  if getmetatable(b)~=mt then b=ad.cte(#a,b) end
-  for j=0,#a do t[j]=function(...) return a[j](...)+b[j](...) end end
-  setmetatable(t,mt)
-  return t
+    local t={}
+    if getmetatable(a)~=mt then a=ad.cte(#b,a) end
+    if getmetatable(b)~=mt then b=ad.cte(#a,b) end
+    for j=0,#a do t[j]=function(...) return a[j](...)+b[j](...) end end
+    setmetatable(t,mt)
+    return t
 end
 
 function ad.sub(a,b)
-  local t={}
-  if getmetatable(a)~=mt then a=ad.cte(#b,a) end
-  if getmetatable(b)~=mt then b=ad.cte(#a,b) end
-  for j=0,#a do t[j]=function(...) return a[j](...)-b[j](...) end end
-  setmetatable(t,mt)
-  return t
+    local t={}
+    if getmetatable(a)~=mt then a=ad.cte(#b,a) end
+    if getmetatable(b)~=mt then b=ad.cte(#a,b) end
+    for j=0,#a do t[j]=function(...) return a[j](...)-b[j](...) end end
+    setmetatable(t,mt)
+    return t
 end
 
 function ad.unm(a)
-  local t={}
-  for j=0,#a do t[j]=function(...) return -a[j](...) end end
-  setmetatable(t,mt)
-  return t
+    local t={}
+    for j=0,#a do t[j]=function(...) return -a[j](...) end end
+    setmetatable(t,mt)
+    return t
 end
 
 function ad.mul(a,b)
-  local t={}
-  if getmetatable(a)~=mt then a=ad.cte(#b,a) end
-  if getmetatable(b)~=mt then b=ad.cte(#a,b) end
-  for j=1,#a do t[j]=function(...) return a[j](...)*b[0](...)+a[0](...)*b[j](...) end end
-  t[0]=function(...) return a[0](...)*b[0](...) end
-  setmetatable(t,mt)
-  return t
+    local t={}
+    if getmetatable(a)~=mt then a=ad.cte(#b,a) end
+    if getmetatable(b)~=mt then b=ad.cte(#a,b) end
+    for j=1,#a do t[j]=function(...) return a[j](...)*b[0](...)+a[0](...)*b[j](...) end end
+    t[0]=function(...) return a[0](...)*b[0](...) end
+    setmetatable(t,mt)
+    return t
 end
 
 function ad.div(a,b)
-  local t={}
-  if getmetatable(a)~=mt then a=ad.cte(#b,a) end
-  if getmetatable(b)~=mt then b=ad.cte(#a,b) end
-  for j=1,#a do t[j]=function(...) return (a[j](...)*b[0](...)-a[0](...)*b[j](...))/(b[0](...)*b[0](...)) end end
-  t[0]=function(...) return a[0](...)/b[0](...) end
-  setmetatable(t,mt)
-  return t
+    local t={}
+    if getmetatable(a)~=mt then a=ad.cte(#b,a) end
+    if getmetatable(b)~=mt then b=ad.cte(#a,b) end
+    for j=1,#a do t[j]=function(...) return (a[j](...)*b[0](...)-a[0](...)*b[j](...))/(b[0](...)*b[0](...)) end end
+    t[0]=function(...) return a[0](...)/b[0](...) end
+    setmetatable(t,mt)
+    return t
 end
 
 function ad.pow(a,n)
-  local t={}
-  if getmetatable(a)~=mt then
-    error("exponent must be a number",1)
-  end
-  for j=1,#a do t[j]=function(...) return n*a[0](...)^(n-1)*a[j](...) end end
-  t[0]=function(...) return a[0](...)^n end
-  setmetatable(t,mt)
-  return t
+    local t={}
+    if getmetatable(a)~=mt then
+        error("exponent must be a number",1)
+    end
+    for j=1,#a do t[j]=function(...) return n*a[0](...)^(n-1)*a[j](...) end end
+    t[0]=function(...) return a[0](...)^n end
+    setmetatable(t,mt)
+    return t
 end
 
 function ad.func(f,df)
-  return function(a)
-    local t={}
-    for j=1,#a do t[j]=function(...) return df(a[0](...))*a[j](...) end end
-    t[0]=function(...) return f(a[0](...)) end
-    setmetatable(t,mt)
-    return t
-  end
+    return function(a)
+        local t={}
+        for j=1,#a do t[j]=function(...) return df(a[0](...))*a[j](...) end end
+        t[0]=function(...) return f(a[0](...)) end
+        setmetatable(t,mt)
+        return t
+    end
 end
 
 ad.sin=ad.func(math.sin,math.cos)
