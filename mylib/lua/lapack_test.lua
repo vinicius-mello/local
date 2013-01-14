@@ -12,13 +12,13 @@ a:sym_set(1,2,0)
 a:sym_set(2,2,11)
 
 for i=0,2 do
-	local row=""
-  for j=0,2 do
-		row=row..a:sym_get(i,j).." "
-	end
-	print(row)
-end 
-    
+    local row=""
+    for j=0,2 do
+        row=row..a:sym_get(i,j).." "
+    end
+    print(row)
+end
+
 lapack.pptrf(3,a)
 for i=0,5 do print(a:get(i)) end
 
@@ -37,15 +37,15 @@ a:sym_set(1,2,0)
 a:sym_set(2,2,11)
 
 z=array.double(3,3)
-	
+
 lapack.spev(3,a,b,z)
 for i=0,2 do print(b:get(i)) end
 
 for i=0,2 do
-	local row=""
-  for j=0,2 do
-		row=row..z:get(i,j).." "
-	end
-	print(row)
-end 
-    
+    local row=""
+    for j=0,2 do
+        row=row..z:get(i,j).." "
+    end
+    print(row)
+end
+
