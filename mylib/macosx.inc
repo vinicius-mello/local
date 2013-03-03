@@ -41,6 +41,9 @@ MA57_LIB= ~/local/Numeric/ma57-3.7.0/src/libma57.a \
 GL2_LIB = -lGLEW -framework GLUT -framework AGL -framework OpenGL
 GL2_INC = 
 
+GLUT_LIB = -framework GLUT -framework AGL -framework OpenGL
+GLUT_INC = 
+
 CL_LIB = -framework OpenCL $(GL2_LIB)
 CL_INC = 
 

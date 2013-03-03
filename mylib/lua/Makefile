@@ -102,6 +102,13 @@ gl2$(EXT): gl2_wrap.cxx $(MYLIB)/wrappers/gl2.hpp  $(MYLIB)/wrappers/fbo.h
 gl2_wrap.cxx: $(MYLIB)/swig/gl2.i $(MYLIB)/wrappers/gl2.hpp  $(MYLIB)/wrappers/fbo.h 
 	swig -o $@ -c++ -lua $<
 
+glut$(EXT): glut_wrap.cxx $(MYLIB)/mytl/glut.hpp
+	g++ -o $@ $(SHARED) $< $(LUA_INC) $(GLUT_INC) $(LUA_LIB) $(GLUT_LIB)  -I $(MYLIB)
+
+glut_wrap.cxx: $(MYLIB)/lua/glut.i $(MYLIB)/swig/glut.i $(MYLIB)/mytl/glut.hpp luaglut.cpp
+	swig -o $@ -c++ -lua $<
+
+
 cl$(EXT): cl_wrap.cxx $(MYLIB)/wrappers/cl.cpp
 	g++ -o $@ $(SHARED) $< $(MYLIB)/wrappers/cl.cpp $(LUA_INC) $(CL_INC) $(LUA_LIB) $(CL_LIB)  -I $(MYLIB)
 
@@ -109,11 +116,11 @@ cl_wrap.cxx: $(MYLIB)/swig/cl.i $(MYLIB)/wrappers/cl.hpp
 	swig -o $@ -c++ -lua $<
 
 
-gsl$(EXT): gsl_wrap.cxx 
+gsl$(EXT): gsl_wrap.cxx
 	g++ -o $@ $(SHARED) $< $(LUA_INC) $(GSL_INC) $(LUA_LIB) $(GSL_LIB)  -I $(MYLIB)
 
 #gsl_wrap.cxx: $(MYLIB)/swig/gsl.i $(MYLIB)/wrappers/gsl.hpp
-gsl_wrap.cxx: gsl.i $(MYLIB)/swig/gsl.i $(MYLIB)/wrappers/gsl.hpp
+gsl_wrap.cxx: gsl.i $(MYLIB)/swig/gsl.i luagsl.cpp $(MYLIB)/wrappers/gsl.hpp
 	swig -o $@ -c++ -lua $<
 
 lbfgsb$(EXT): lbfgsb_wrap.cxx 

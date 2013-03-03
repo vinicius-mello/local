@@ -90,3 +90,15 @@ gsl.solve {
 
 print(x:get(0),x:get(1))
 
+function int_f(s)
+    return s*math.exp(-s*s/4)/math.sqrt(math.cosh(s)-math.cosh(2))
+end
+
+result,abserr=gsl.integrate {
+    f=int_f,
+    a=2,
+    b=100,
+    algorithm="cquad"
+}
+
+print(result,abserr)
