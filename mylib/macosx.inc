@@ -44,6 +44,9 @@ GL2_INC =
 GLUT_LIB = -framework GLUT -framework AGL -framework OpenGL
 GLUT_INC = 
 
+TW_LIB = -lAntTweakBar
+TW_INC =
+
 CL_LIB = -framework OpenCL $(GL2_LIB)
 CL_INC = 
 

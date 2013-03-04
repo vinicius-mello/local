@@ -108,6 +108,12 @@ glut$(EXT): glut_wrap.cxx $(MYLIB)/mytl/glut.hpp
 glut_wrap.cxx: $(MYLIB)/lua/glut.i $(MYLIB)/swig/glut.i $(MYLIB)/mytl/glut.hpp luaglut.cpp
 	swig -o $@ -c++ -lua $<
 
+tw$(EXT): tw_wrap.cxx $(MYLIB)/wrappers/tw.cpp
+	g++ -o $@ $(SHARED) $< $(MYLIB)/wrappers/tw.cpp $(LUA_INC) $(TW_INC) $(LUA_LIB) $(TW_LIB)  -I $(MYLIB)
+
+tw_wrap.cxx: $(MYLIB)/swig/tw.i $(MYLIB)/wrappers/tw.hpp
+	swig -o $@ -c++ -lua $<
+
 
 cl$(EXT): cl_wrap.cxx $(MYLIB)/wrappers/cl.cpp
 	g++ -o $@ $(SHARED) $< $(MYLIB)/wrappers/cl.cpp $(LUA_INC) $(CL_INC) $(LUA_LIB) $(CL_LIB)  -I $(MYLIB)
