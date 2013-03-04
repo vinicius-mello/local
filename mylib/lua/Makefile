@@ -1,16 +1,20 @@
 include ../make.inc
 
-TARGETS=array$(EXT) cloud$(EXT) blas$(EXT) lapack$(EXT) \
-  cubic$(EXT) sparse$(EXT) triplets$(EXT) umfpack$(EXT) \
-	gl2$(EXT) cl$(EXT) tcl$(EXT) lpt$(EXT) gsl$(EXT) \
-	lbfgsb$(EXT) pack$(EXT) ginac$(EXT) \
-  arpack$(EXT) 
+BASE = array$(EXT) pack$(EXT)
+GRAPHICS = gl2$(EXT) glut$(EXT) tw$(EXT) cl$(EXT) tcl$(EXT)
+NUMERIC = gsl$(EXT) cubic$(EXT) sparse$(EXT) triplets$(EXT) \
+		  blas$(EXT) lapack$(EXT) umfpack$(EXT) lbfgsb$(EXT) ginac$(EXT) arpack$(EXT)
+EXTRA = cloud$(EXT) lpt$(EXT)
 # ma57$(EXT)
 # luail$(EXT) luailu$(EXT) luailut$(EXT) \
 #	ma47$(EXT) lpt$(EXT)
 
 
-all: $(TARGETS)
+all: $(BASE) $(GRAPHICS) $(NUMERIC) $(EXTRA)
+base: $(BASE)
+graphics: $(GRAPHICS)
+numeric: $(NUMERIC)
+extra: $(EXTRA)
 
 array$(EXT): array_wrap.cxx 
 	g++ -o $@ $(SHARED) $< $(LUA_INC) $(LUA_LIB) -I $(MYLIB)
