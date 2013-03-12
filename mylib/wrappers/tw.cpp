@@ -26,21 +26,39 @@ void TW_CALL set_cb(const void *value, void *clientData) {
     var=vars[names[id]];
     int * ti;
     double * td;
+    char * tc;
     switch(var.type) {
         case TW_TYPE_BOOL32:
             ti=(int *)var.data;
             *ti=*((int *)value);
+            break;
+        case TW_TYPE_CSSTRING_256:
+            tc=(char *)var.data;
+            strncpy(tc,((char *)value),256);
             break;
         case TW_TYPE_DOUBLE:
             td=(double *)var.data;
             *td=*((double *)value);
             break;
         case TW_TYPE_COLOR3F:
+        case TW_TYPE_DIR3F:
             {
                 array<float> a1(3,(float*)value);
                 array<float> a2(*((array<float> *)var.data));
                 a2.copy(a1);
             }
+            break;
+        case TW_TYPE_COLOR4F:
+        case TW_TYPE_QUAT4F:
+            {
+                array<float> a1(4,(float*)value);
+                array<float> a2(*((array<float> *)var.data));
+                a2.copy(a1);
+            }
+            break;
+        default:
+            ti=(int *)var.data;
+            *ti=*((int *)value);
             break;
     }
 }
@@ -51,21 +69,39 @@ void TW_CALL get_cb(void *value, void *clientData) {
     var=vars[names[id]];
     int * ti;
     double * td;
+    char * tc;
     switch(var.type) {
         case TW_TYPE_BOOL32:
             ti=(int *)var.data;
             *((int *)value)=*ti;
+            break;
+        case TW_TYPE_CSSTRING_256:
+            tc=(char *)var.data;
+            strncpy(((char *)value),tc,256);
             break;
         case TW_TYPE_DOUBLE:
             td=(double *)var.data;
             *((double *)value)=*td;
             break;
         case TW_TYPE_COLOR3F:
+        case TW_TYPE_DIR3F:
             {
                 array<float> a1(3,(float*)value);
                 array<float> a2(*((array<float> *)var.data));
                 a1.copy(a2);
             }
+            break;
+        case TW_TYPE_COLOR4F:
+        case TW_TYPE_QUAT4F:
+            {
+                array<float> a1(4,(float*)value);
+                array<float> a2(*((array<float> *)var.data));
+                a1.copy(a2);
+            }
+            break;
+        default:
+            ti=(int *)var.data;
+            *((int *)value)=*ti;
             break;
     }
 
@@ -79,17 +115,37 @@ void TwNewVar(const char * bar_name, const char * var_name, TwType type, const c
         case TW_TYPE_BOOL32:
             var.data=new int(0);
             break;
+        case TW_TYPE_CSSTRING_256:
+            var.data=new char[256];
+            strcpy((char *)var.data,"");
+            break;
         case TW_TYPE_DOUBLE:
             var.data=new double(0);
             break;
         case TW_TYPE_COLOR3F:
+        case TW_TYPE_DIR3F:
             var.data=new array<float>(3);
+            break;
+        case TW_TYPE_COLOR4F:
+        case TW_TYPE_QUAT4F:
+            var.data=new array<float>(4);
             break;
     }
     string full_name=string(bar_name)+"/"+var_name;
     vars[full_name]=var;
     TwAddVarCB(TwGetBarByName(bar_name), var_name,
             type,ro?0:set_cb, get_cb, (void*)names.size(), prop);
+    names.push_back(full_name);
+}
+
+void TwNewEnum(const char * bar_name, const char * var_name, const char * enum_name, const char * enum_values, const char * prop) {
+    TwVar var;
+    var.type=TwDefineEnumFromString(enum_name,enum_values);
+    var.data=new int(0);
+    string full_name=string(bar_name)+"/"+var_name;
+    vars[full_name]=var;
+    TwAddVarCB(TwGetBarByName(bar_name), var_name,
+            var.type,set_cb, get_cb, (void*)names.size(),prop);
     names.push_back(full_name);
 }
 
@@ -108,6 +164,18 @@ void TwSetBoolVarByName(const char * bar_name, const char * var_name, bool v) {
     string full_name=string(bar_name)+"/"+var_name;
     int * value=(int *)vars[full_name].data;
     *value=v?1:0;
+}
+
+char * TwGetStringVarByName(const char * bar_name, const char * var_name) {
+    string full_name=string(bar_name)+"/"+var_name;
+    char * value=(char *)vars[full_name].data;
+    return value;
+}
+
+void TwSetStringVarByName(const char * bar_name, const char * var_name, char * v) {
+    string full_name=string(bar_name)+"/"+var_name;
+    char * value=(char *)vars[full_name].data;
+    strncpy(value,v,256);
 }
 
 double TwGetDoubleVarByName(const char * bar_name, const char * var_name) {

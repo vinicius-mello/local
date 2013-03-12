@@ -70,6 +70,21 @@ void mouse_cb(int button, int state, int x, int y) {
     } else lua_pop(L,2);
 }
 
+void passive_motion_cb(int x, int y) {
+    int id=glutGetWindow();
+    lua_State * L=windows[id].L;
+    int t_index=windows[id].t_index;
+    lua_rawgeti(L,LUA_REGISTRYINDEX,t_index);
+    lua_pushstring(L,"PassiveMotion");
+    lua_gettable(L,-2);
+    if(!lua_isnil(L,-1)) {
+        lua_insert(L,1);
+        lua_pushnumber(L,x);
+        lua_pushnumber(L,y);
+        lua_pcall(L, 3, 0, 0);
+    } else lua_pop(L,2);
+}
+
 void motion_cb(int x, int y) {
     int id=glutGetWindow();
     lua_State * L=windows[id].L;
@@ -114,6 +129,7 @@ void register_cb() {
     glutKeyboardFunc(keyboard_cb);
     glutMouseFunc(mouse_cb);
     glutMotionFunc(motion_cb);
+    glutPassiveMotionFunc(passive_motion_cb);
     glutSpecialFunc(special_cb);
 }
 
