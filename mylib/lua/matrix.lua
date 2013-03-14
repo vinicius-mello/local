@@ -1,5 +1,4 @@
 require("array")
-require("blas")
 require("gsl")
 matrix={}
 
@@ -42,10 +41,10 @@ function matrix.add(a,b)
     local m,n=b.m,b.n
     local c=matrix.new(m,n)
     if type(a)=="number" then
-        blas.copy(b.array,c.array)
+        c.array:copy(b.array)
         gsl.matrix_add_constant(c.array,a)
     else
-        blas.copy(a.array,c.array)
+        c.array:copy(a.array)
         gsl.matrix_add(c.array,b.array)
     end
     return c
@@ -56,18 +55,18 @@ function matrix.sub(a,b)
     if type(a)=="number" then
         local m,n=b.m,b.n
         c=matrix.new(m,n)
-        blas.copy(b.array,c.array)
+        c.array:copy(b.array)
         gsl.matrix_add_constant(c.array,-a)
         gsl.matrix_scale(c.array,-1)
     elseif type(b)=="number" then
         local m,n=a.m,a.n
         c=matrix.new(m,n)
-        blas.copy(a.array,c.array)
+        c.array:copy(a.array)
         gsl.matrix_add_constant(c.array,-b)
     else
         local m,n=b.m,b.n
         c=matrix.new(m,n)
-        blas.copy(a.array,c.array)
+        c.array:copy(a.array)
         gsl.matrix_sub(c.array,b.array)
     end
     return c
@@ -77,7 +76,7 @@ end
 function matrix.unm(a)
     local m,n=a.m,a.n
     local c=matrix.new(m,n)
-    blas.copy(a.array,c.array)
+    c.array:copy(a.array)
     gsl.matrix_scale(c.array,-1)
     return c
 end
@@ -90,7 +89,7 @@ function matrix.mul(a,b)
     if type(a)=="number" then
         local m,n=b.m,b.n
         c=matrix.new(m,n)
-        blas.copy(b.array,c.array)
+        c.array:copy(b.array)
         gsl.matrix_scale(c.array,a)
     else
         local m,n=a.m,a.n
@@ -99,7 +98,7 @@ function matrix.mul(a,b)
             error("wrong dimensions")
         end
         c=matrix.new(m,p)
-        blas.gemm(1,a.array,b.array,0,c.array)
+        gsl.matrix_mul(a.array,b.array,c.array)
     end
     return c
 end
@@ -128,13 +127,21 @@ function matrix:transpose()
     return c
 end
 
+function matrix:get(i,j)
+    return self.array:get(i,j)
+end
+
+function matrix:set(i,j,v)
+    return self.array:set(i,j,v)
+end
+
 function matrix:lu_decomp()
     local m,n=self.m,self.n
     if m~=n then
         error("not a square matrix")
     end
     self.lu=array.double(m,n)
-    blas.copy(self.array,self.lu)
+    self.lu:copy(self.array)
     self.p=array.size_t(m)
     local signum=gsl.LU_decomp(self.lu,self.p)
     self.det=gsl.LU_det(self.lu,signum)

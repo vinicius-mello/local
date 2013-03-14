@@ -65,6 +65,7 @@ namespace gsl {
     void matrix_swap_columns(array<double>& a, uint i, uint j);
     void matrix_transpose(array<double>& a);
     void matrix_transpose(array<double>& a, array<double>& b);
+    bool matrix_mul(array<double>& a, array<double>& b, array<double>& c);
     bool matrix_add(array<double>& a, array<double>& b);
     bool matrix_sub(array<double>& a, array<double>& b);
     bool matrix_mul_elements(array<double>& a, array<double>& b);

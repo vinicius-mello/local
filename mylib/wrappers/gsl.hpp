@@ -1,5 +1,6 @@
 #include <iostream>
 #include "array.hpp"
+#include <gsl/gsl_blas.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_poly.h>
 #include <gsl/gsl_sf.h>
@@ -223,6 +224,21 @@ namespace gsl {
         convert(b,B);
         return gsl_matrix_transpose_memcpy(&A,&B)==GSL_SUCCESS;
     }
+
+
+    inline bool matrix_mul(array<double>& a, array<double>& b,
+      array<double>& c) {
+        gsl_matrix A;
+        convert(a,A);
+        gsl_matrix B;
+        convert(b,B);
+        gsl_matrix C;
+        convert(c,C);
+        return gsl_blas_dgemm (CblasNoTrans, CblasNoTrans,
+                  1.0, &A, &B,
+                  0.0, &C)==GSL_SUCCESS;
+    }
+
 
     inline bool matrix_add(array<double>& a, array<double>& b) {
         gsl_matrix A;
