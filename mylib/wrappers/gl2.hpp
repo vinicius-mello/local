@@ -30,9 +30,45 @@ inline void normal_array(const array<float>& b, int stride=0) {
     glNormalPointer(GL_FLOAT,stride,b.data());
 }
 
+inline void texcoord_array(const array<float>& b, int n=0, int stride=0) {
+    if(n==0) n=b.width();
+    glTexCoordPointer(n,GL_FLOAT,stride,b.data());
+}
+
 inline void color_array(const array<float>& b, int n=0, int stride=0) {
     if(n==0) n=b.width();
     glColorPointer(n,GL_FLOAT,stride,b.data());
+}
+
+inline void vertex_array(const array<double>& b, int n=0, int stride=0) {
+    if(n==0) n=b.width();
+    glVertexPointer(n,GL_DOUBLE,stride,b.data());
+}
+
+inline void normal_array(const array<double>& b, int stride=0) {
+    glNormalPointer(GL_DOUBLE,stride,b.data());
+}
+
+inline void texcoord_array(const array<double>& b, int n=0, int stride=0) {
+    if(n==0) n=b.width();
+    glTexCoordPointer(n,GL_DOUBLE,stride,b.data());
+}
+
+inline void color_array(const array<double>& b, int n=0, int stride=0) {
+    if(n==0) n=b.width();
+    glColorPointer(n,GL_DOUBLE,stride,b.data());
+}
+
+inline void vertex_buffer(int n, unsigned type, size_t stride=0, size_t offset=0) {
+    glVertexPointer(n,type,stride,(void *)offset);
+}
+
+inline void texcoord_buffer(int n, unsigned type, size_t stride=0, size_t offset=0) {
+    glTexCoordPointer(n,type,stride,(void *)offset);
+}
+
+inline void generate_mipmap(unsigned target) {
+    glGenerateMipmap(target);
 }
 
 inline void active_texture(int i) {
@@ -67,6 +103,10 @@ inline void disable_vertex_attrib_array(uint i) {
 
 inline void draw_triangles(const array<uint>& b) {
     glDrawElements(GL_TRIANGLES,b.size(),GL_UNSIGNED_INT,b.data());
+}
+
+inline void draw_quads(const array<uint>& b) {
+    glDrawElements(GL_QUADS,b.size(),GL_UNSIGNED_INT,b.data());
 }
 
 

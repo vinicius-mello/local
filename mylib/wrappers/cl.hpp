@@ -95,6 +95,8 @@ class context {
     friend class mem;
     friend class image2d;
     friend class gl_texture2d;
+    friend class gl_buffer;
+    friend class gl_render_buffer;
     friend class program;
     friend class event;
     friend class sampler;
@@ -270,6 +272,50 @@ class gl_texture2d : public mem {
     }
 };
 
+class gl_buffer : public mem {
+    friend class kernel;
+    friend class command_queue;
+    public:
+    gl_buffer() : mem() {
+        debug_print("gl_buffer default(%p)\n",this);
+    }
+    gl_buffer(const context& ctx, cl_mem_flags flags, GLuint buffer) {
+        mo_=clCreateFromGLBuffer(ctx.ctx_,flags,buffer,&host::code_);
+    }
+    gl_buffer(const gl_buffer& im) {
+        mem::mo_=im.mo_;
+        if(mem::mo_) {
+            clRetainMemObject(mem::mo_);
+            debug_print("gl_buffer copy_cons(%p)\n",this);
+        }
+    }
+    virtual ~gl_buffer() {
+        debug_print("~gl_buffer(%p)",this);
+    }
+};
+
+class gl_render_buffer : public mem {
+    friend class kernel;
+    friend class command_queue;
+    public:
+    gl_render_buffer() : mem() {
+        debug_print("gl_render_buffer default(%p)\n",this);
+    }
+    gl_render_buffer(const context& ctx, cl_mem_flags flags, GLuint buffer) {
+        mo_=clCreateFromGLRenderbuffer(ctx.ctx_,flags,buffer,&host::code_);
+    }
+    gl_render_buffer(const gl_render_buffer& im) {
+        mem::mo_=im.mo_;
+        if(mem::mo_) {
+            clRetainMemObject(mem::mo_);
+            debug_print("gl_render_buffer copy_cons(%p)\n",this);
+        }
+    }
+    virtual ~gl_render_buffer() {
+        debug_print("~gl_render_buffer(%p)",this);
+    }
+};
+
 class program {
     friend class kernel;
     cl_program prg_;
@@ -439,6 +485,12 @@ class command_queue {
         host::code_=clEnqueueReadBuffer(que_,mo.mo_,block,offset,count,ptr,wait_.size(),&wait_[0],ev_);
         wait_.clear();ev_=0;
     }
+    void copy_buffer(const mem& mo_src, const mem& mo_dst,
+            size_t offset_src, size_t offset_dst, size_t count) {
+        host::code_=clEnqueueCopyBuffer(que_,mo_src.mo_,
+                mo_dst.mo_,offset_src,offset_dst,count,wait_.size(),&wait_[0],ev_);
+        wait_.clear();ev_=0;
+    }
     void range_kernel1d(const kernel& ker,size_t offset, size_t global, size_t local) {
         size_t offset_[1]; offset_[0]=offset;
         size_t global_[1]; global_[0]=global;
@@ -474,7 +526,7 @@ class command_queue {
         wait_.clear();ev_=0;
     }
     void release_globject() {
-        host::code_=clEnqueueAcquireGLObjects(que_, obj_.size(), &obj_[0], wait_.size(),
+        host::code_=clEnqueueReleaseGLObjects(que_, obj_.size(), &obj_[0], wait_.size(),
                 &wait_[0],ev_);
         obj_.clear();
         wait_.clear();ev_=0;

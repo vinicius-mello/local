@@ -57,6 +57,22 @@ class gl_texture2d : public mem {
         virtual ~gl_texture2d();
 };
 
+class gl_buffer : public mem {
+    public:
+        gl_buffer() : mem();
+        gl_buffer(const context& ctx, bitfield flags, unsigned buffer);
+        gl_buffer(const gl_buffer& im);
+        virtual ~gl_buffer();
+};
+
+class gl_render_buffer : public mem {
+    public:
+        gl_render_buffer() : mem();
+        gl_render_buffer(const context& ctx, bitfield flags, unsigned buffer);
+        gl_render_buffer(const gl_render_buffer& im);
+        virtual ~gl_render_buffer();
+};
+
 class program {
     public:
         program();
@@ -106,6 +122,8 @@ class command_queue {
                 void * ptr) ;
         void read_buffer(const mem& mo, bool block, size_t offset, size_t count, 
                 void * ptr) ;
+        void copy_buffer(const mem& mo_src, const mem& mo_dst,
+            size_t offset_src, size_t offset_dst, size_t count) ;
         void range_kernel1d(const kernel& ker,size_t offset, size_t global, size_t local) ;
         void range_kernel2d(const kernel& ker,size_t offset_x, size_t offset_y,
                 size_t global_x, size_t global_y, size_t local_x, size_t local_y);

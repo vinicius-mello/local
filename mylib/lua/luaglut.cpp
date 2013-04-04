@@ -3,6 +3,7 @@
 struct params {
     lua_State * L;
     int t_index;
+    bool first;
 };
 
 params windows[256];
@@ -20,21 +21,43 @@ void display_cb() {
     lua_rawgeti(L,LUA_REGISTRYINDEX,t_index);
     lua_pushstring(L,"Display");
     lua_gettable(L,-2);
-    lua_insert(L,1);
-    lua_pcall(L, 1, 0, 0);
+    if(lua_isnil(L,-1)) {
+        fprintf(stderr,"No Display method!\n");
+        lua_pop(L,2);
+    } else {
+        lua_insert(L,1);
+        lua_pcall(L, 1, 0, 0);
+    }
 }
 
 void reshape_cb(int width, int height) {
     int id=glutGetWindow();
     lua_State * L=windows[id].L;
     int t_index=windows[id].t_index;
+    bool first=windows[id].first;
+    if(first) {
+        lua_rawgeti(L,LUA_REGISTRYINDEX,t_index);
+        lua_pushstring(L,"Init");
+        lua_gettable(L,-2);
+        if(lua_isnil(L,-1)) lua_pop(L,2);
+        else {
+            lua_insert(L,1);
+            lua_pcall(L, 1, 0, 0);
+            windows[id].first=false;
+        }
+    }
     lua_rawgeti(L,LUA_REGISTRYINDEX,t_index);
     lua_pushstring(L,"Reshape");
     lua_gettable(L,-2);
-    lua_insert(L,1);
-    lua_pushnumber(L,width);
-    lua_pushnumber(L,height);
-    lua_pcall(L, 3, 0, 0);
+    if(lua_isnil(L,-1)) {
+        fprintf(stderr,"No Reshape method!\n");
+        lua_pop(L,2);
+    } else {
+        lua_insert(L,1);
+        lua_pushnumber(L,width);
+        lua_pushnumber(L,height);
+        lua_pcall(L, 3, 0, 0);
+    }
 }
 
 void keyboard_cb(unsigned char key, int x, int y) {
@@ -123,6 +146,27 @@ int lua_Init(lua_State * L) {
     return 0;
 }
 
+int lua_ActiveCtrl(lua_State * L) {
+    unsigned status=(unsigned)lua_tonumber(L,-1);
+    lua_pop(L,1);
+    lua_pushboolean(L,status&GLUT_ACTIVE_CTRL);
+    return 1;
+}
+
+int lua_ActiveShift(lua_State * L) {
+    unsigned status=(unsigned)lua_tonumber(L,-1);
+    lua_pop(L,1);
+    lua_pushboolean(L,status&GLUT_ACTIVE_SHIFT);
+    return 1;
+}
+
+int lua_ActiveAlt(lua_State * L) {
+    unsigned status=(unsigned)lua_tonumber(L,-1);
+    lua_pop(L,1);
+    lua_pushboolean(L,status&GLUT_ACTIVE_ALT);
+    return 1;
+}
+
 void register_cb() {
     glutDisplayFunc(display_cb);
     glutReshapeFunc(reshape_cb);
@@ -172,6 +216,7 @@ int lua_NewWindow(lua_State * L) {
     int r = luaL_ref(L, LUA_REGISTRYINDEX);
     windows[id].L=L;
     windows[id].t_index=r;
+    windows[id].first=true;
     register_cb();
     lua_rawgeti(L,LUA_REGISTRYINDEX,r);
     return 1;

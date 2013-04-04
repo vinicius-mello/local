@@ -1,9 +1,9 @@
-twbar={}
+bar={}
 require("tw")
 
 local mt={}
 
-function twbar.new(name)
+function bar.new(name)
     tw.NewBar(name)
     local bar={}
     bar.bar=name
@@ -38,4 +38,4 @@ function mt.__newindex(table,key,value)
     end
 end
 
-return twbar
+return bar

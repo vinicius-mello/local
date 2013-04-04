@@ -78,6 +78,179 @@ class frame_buffer_semantic
         }
 };
 
+class buffer_object : public gl_object, public bindable
+{
+    GLenum target_;
+    public:
+        buffer_object(void) : gl_object(), bindable()
+    {
+        gen();
+    }
+
+        void gen(void)
+        {
+            this->del();
+            glGenBuffers(1, &(this->objectID));
+        }
+
+        void del(void)
+        {
+            if (this->objectID == 0) return;
+            glDeleteBuffers(1, &(this->objectID));
+            this->objectID = 0;
+        }
+
+        GLenum target(void) const {
+            return target_;
+        }
+        bool set(GLenum _target, GLsizeiptr _size,
+                GLenum _usage,
+                const GLvoid * _data=0) {
+            target_=_target;
+            this->bind();
+            glBufferData(target_,_size,_data,_usage);
+            this->unbind();
+            return true;
+        }
+    protected:
+
+        void do_bind(void)
+        {
+            glBindBuffer(this->target(), this->objectID);
+        }
+
+        void do_unbind(void)
+        {
+            glBindBuffer(this->target(), 0);
+        }
+};
+
+
+class frame_buffer : public gl_object, public bindable
+{
+    public:
+        frame_buffer(void) : gl_object(), bindable()
+    {
+        gen();
+    }
+
+        void gen(void)
+        {
+            this->del();
+            glGenFramebuffers(1, &(this->objectID));
+        }
+
+        void del(void)
+        {
+            if (this->objectID == 0) return;
+            glDeleteFramebuffers(1, &(this->objectID));
+            this->objectID = 0;
+        }
+
+        bool attach_tex(GLenum attachmentPoint, GLenum textureTarget,
+                GLuint textureId, GLint  level) {
+            this->bind();
+            glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentPoint,
+                    textureTarget, textureId, level);
+            this->unbind();
+            return true;
+        }
+        bool attach_rb(GLenum attachmentPoint, GLuint rbId) {
+            this->bind();
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachmentPoint,
+                    GL_RENDERBUFFER, rbId);
+            this->unbind();
+            return true;
+        }
+        bool check() {
+            this->bind();
+            GLenum result=glCheckFramebufferStatus(GL_FRAMEBUFFER);
+            this->unbind();
+         /*   switch(result) {
+                case GL_FRAMEBUFFER_COMPLETE:
+                    printf("framebuffer complete\n");
+                    break;
+                case GL_FRAMEBUFFER_UNDEFINED:
+                    printf("framebuffer undefined\n");
+                    break;
+                case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                    printf("framebuffer incomplete attachment\n");
+                    break;
+                case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                    printf("framebuffer incomplete missing attachment\n");
+                    break;
+                case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+                    printf("framebuffer incomplete draw buffer\n");
+                    break;
+                case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+                    printf("framebuffer incomplete read buffer\n");
+                    break;
+                case GL_FRAMEBUFFER_UNSUPPORTED:
+                    printf("framebuffer unsupported\n");
+                    break;
+                case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+                    printf("framebuffer incomplete multisample\n");
+                    break;
+                case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+                    printf("framebuffer incomplete layer targets\n");
+                    break;
+            }*/
+            return result==GL_FRAMEBUFFER_COMPLETE;
+        }
+    protected:
+
+        void do_bind(void)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, this->objectID);
+        }
+
+        void do_unbind(void)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+};
+
+class render_buffer : public gl_object, public bindable
+{
+    public:
+        render_buffer(void) : gl_object(), bindable()
+    {
+        gen();
+    }
+
+        void gen(void)
+        {
+            this->del();
+            glGenRenderbuffers(1, &(this->objectID));
+        }
+
+        void del(void)
+        {
+            if (this->objectID == 0) return;
+            glDeleteRenderbuffers(1, &(this->objectID));
+            this->objectID = 0;
+        }
+
+        bool set(GLenum _format, GLsizei _width, GLsizei _height) {
+            this->bind();
+            glRenderbufferStorage(GL_RENDERBUFFER,_format,_width,_height);
+            this->unbind();
+            return true;
+        }
+    protected:
+
+        void do_bind(void)
+        {
+            glBindRenderbuffer(GL_RENDERBUFFER, this->objectID);
+        }
+
+        void do_unbind(void)
+        {
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        }
+};
+
+
 class texture : public gl_object, public bindable, public frame_buffer_semantic
 {
     public:
@@ -273,7 +446,7 @@ class texture2d : public virtual texture
             this->bind();
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, border, format, type, pixels);
+            glTexImage2D(GL_TEXTURE_2D, level, internalFormat, width, height, border, format, type, pixels);
 
             this->unbind();
 
@@ -346,7 +519,7 @@ class texture3d : public virtual texture
             this->bind();
 
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexImage3D(GL_TEXTURE_3D, 0, internalFormat, width, height, depth, border, format, type, pixels);
+            glTexImage3D(GL_TEXTURE_3D, level, internalFormat, width, height, depth, border, format, type, pixels);
 
             this->unbind();
 
