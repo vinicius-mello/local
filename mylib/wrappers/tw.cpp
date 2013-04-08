@@ -1,6 +1,7 @@
 #include "tw.hpp"
 #include <map>
 #include <vector>
+#include <cstring>
 #include <string>
 
 using std::string;

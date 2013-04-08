@@ -326,10 +326,23 @@ class program {
     program(const context& ctx, const char * src) {
         prg_=clCreateProgramWithSource(ctx.ctx_,1,(const char **)&src,0,&host::code_);
         if(clBuildProgram(prg_,0,0,0,0,0)!=CL_SUCCESS) {
-            char buffer[1024];
-            clGetProgramBuildInfo(prg_,
-                ctx.dev_ids_[0], CL_PROGRAM_BUILD_LOG, 1024,buffer,0);
-            cerr<<buffer<<endl;
+            char buffer[64*1024];
+            unsigned err=clGetProgramBuildInfo(prg_,
+                ctx.dev_ids_[0], CL_PROGRAM_BUILD_LOG, 64*1024,buffer,0);
+            switch(err) {
+                case CL_INVALID_DEVICE:
+                    cerr<<"invalid device"<<endl;
+                    break;
+                case CL_INVALID_VALUE:
+                    cerr<<"invalid value"<<endl;
+                    break;
+                case CL_INVALID_PROGRAM:
+                    cerr<<"invalid program"<<endl;
+                    break;
+                case CL_SUCCESS:
+                    cerr<<buffer<<endl;
+                    break;
+            }
         }
         debug_print("program new(%p)\n",this);
     }
