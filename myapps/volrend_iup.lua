@@ -1,5 +1,8 @@
 dofile("modules.lua")
-require("win")
+require("iuplua")
+require("iupluagl")
+require("luagl")
+require("luaglu")
 require("cl")
 require("gl2")
 require("array")
@@ -25,49 +28,25 @@ CLK_ADDRESS_REPEAT         |
 CLK_FILTER_LINEAR;
 
 float density(float3 p) {
-    float x=p.x*p.x;
-    float y=p.y*p.y;
-    return (x*x+y*y)/2.0f;
+  float x=p.x*p.x;
+  float y=p.y*p.y;
+  return x*x+y*y/2.0f;
 }
 
 float3 grad_density(float3 p) {
-    return (float3)(2.0f*p.x*p.x*p.x,2.0f*p.y*p.y*p.y,0.0f);
+  return (float3)(2.0f*p.x*p.x*p.x,2.0f*p.y*p.y*p.y,0.0f);
 }
-
-float3 twist_inv(float3 p, float k) {
-    float3 result;
-    float theta=k*p.z;
-    float C=cos(theta);
-    float S=sin(theta);
-    result.x=p.x*C+p.y*S;
-    result.y=-p.x*S+p.y*C;
-    result.z=p.z;
-    return result;
-}
-
-float3 twist_normal(float3 p, float3 n, float k) {
-    float3 result;
-    float theta=k*p.z;
-    float C=cos(theta);
-    float S=sin(theta);
-    result.x=n.x*C-n.y*S;
-    result.y=n.x*S+n.y*C;
-    result.z=p.y*k*n.x-p.x*k*n.y+n.z;
-    return result;
-}
-
 
 __kernel void kern(__read_only image2d_t entry,
-__read_only image2d_t exit,  __write_only image2d_t tex)
+    __read_only image2d_t exit,  __write_only image2d_t tex)
 {
+    const float Samplings = 25.0;
+
     int x = get_global_id(0);
     int y = get_global_id(1);
 
     int2 coords = (int2)(x,y);
     float2 tcoords = (float2)(x,y)/512.0f;
-
-    const float Samplings = 250.0f;
-    const float k = 3.0f;
 
     float3 a=read_imagef(entry,samplersrc,tcoords).xyz;
     float3 b=read_imagef(exit,samplersrc,tcoords).xyz;
@@ -75,47 +54,46 @@ __read_only image2d_t exit,  __write_only image2d_t tex)
     float3 dir=b-a;
     int steps = (int)(floor(Samplings * length(dir)));
     float3 diff1 = dir / (float)(steps);
-
+    
     float4 result = (float4)(0.0);
 
     for (int i=0; i<steps; i++) {
         float3 p=2.0f*a-1.0f;
-
-        p=twist_inv(p,k);
-
-        float value=density(p);
-
+		
+		p=transform(p);
+		
+   		float value=density(p);
+		
         if(value<0.005) {
-            float3 n=grad_density(p);
-
-            n=twist_normal(p,n,k);
-
-            n=n*(1.0f/length(n));
-
-            dir=-dir*(1.0f/length(dir));
-            result=dot(n,dir)*(float4)(0.5f,0.3f,0.1f,0.0f);
+			float3 n=grad_density(p);
+			n=n*(1.0f/length(n));
+			
+			n=transform_normal(n);			
+			
+			dir=-dir*(1.0f/length(dir));
+			result=(float4)(dot(n,dir),0.0f,0.0f,0.0f);
             break;
         }
         a+=diff1;
     }
 
     write_imagef(tex, coords, result);
-
 };
-
 ]]
 
-ctrl_win=win.New("volrend")
+ctrl_win = iup.glcanvas { buffer="DOUBLE", rastersize = "480x480" }
+dlg = iup.dialog { iup.vbox {ctrl_win} ; title="volrend"}
 
-function ctrl_win:Reshape(width, height)
+function ctrl_win:resize_cb(width, height)
+	iup.GLMakeCurrent(self)
     gl.Viewport(0, 0, width, height) -- coloca o viewport ocupando toda a janela
 
-    self.width=width
-    self.height=height
+    self.width = width
+    self.height = height
 
     gl.MatrixMode('MODELVIEW')       -- seleciona matriz de modelagem
     gl.LoadIdentity()                -- carrega a matriz identidade
-    self.radius=0.705
+    self.radius = 0.705
     glu.LookAt(0,0,4*self.radius,0,0,0,0,1,0)
     self.model_track:resize(self.radius)
     self.light_track:resize(self.radius)
@@ -265,7 +243,9 @@ function ctrl_win:run_kernel()
 end
 
 -- chamada quando a janela OpenGL necessita ser desenhada
-function ctrl_win:Display()
+function ctrl_win:action(x, y)
+	iup.GLMakeCurrent(self)
+	
     gl.ClearColor(0.0,0.0,0.0,0.0)                  -- cor de fundo preta
     -- limpa a tela e o z-buffer
     gl.Clear('COLOR_BUFFER_BIT,DEPTH_BUFFER_BIT')
@@ -275,7 +255,23 @@ function ctrl_win:Display()
     gl.MatrixMode('MODELVIEW')       -- seleciona matriz de modelagem
     gl.LoadIdentity()
     glu.LookAt(0,0,4*self.radius,0,0,0,0,1,0)
-
+	
+	-- Adcionado - Begin
+	if self.dragging then
+		gl.PushMatrix()
+		self.model_track:rotate()
+		gl.Color(1,1,1)
+		self:draw_ball(self.radius)
+		gl.PopMatrix()
+	end
+	if self.light_dragging then
+		gl.PushMatrix()
+		self.light_track:rotate()
+		gl.Color(1,1,0)
+		self:draw_rays()
+		gl.PopMatrix()
+	end
+	-- Adicionado - End
 
     gl.PushMatrix()
     self.light_track:transform()
@@ -311,26 +307,15 @@ function ctrl_win:Display()
     self.tex:unbind()
     gl.Disable('TEXTURE_2D')
     gl.Enable('LIGHTING')
-    --[[
-    if self.dragging then
-        gl.PushMatrix()
-        self.model_track:rotate()
-        gl.Color(1,1,1)
-        self:draw_ball(self.radius)
-        gl.PopMatrix()
-    end
-    if self.light_dragging then
-        gl.PushMatrix()
-        self.light_track:rotate()
-        gl.Color(1,1,0)
-        self:draw_rays()
-        gl.PopMatrix()
-    end
-    ]]
+	
+	-- troca buffers
+    iup.GLSwapBuffers(self)
 end
 
 -- chamada quando a janela OpenGL é criada
-function ctrl_win:Init()
+function ctrl_win:map_cb()
+	iup.GLMakeCurrent(self)
+	
     print("Iniciando GLEW")
     gl2.init()
 
@@ -339,9 +324,7 @@ function ctrl_win:Init()
     self.ctx:initGL()
     self.cmd=cl.command_queue(self.ctx,0,0)
     self.prg=cl.program(self.ctx,kernel_src)
-    print(cl.host_get_error())
     self.krn=cl.kernel(self.prg, "kern")
-    print(cl.host_get_error())
 
     print("Configurando OpenGL")
     gl.ClearDepth(1.0)                              -- valor do z-buffer
@@ -385,45 +368,53 @@ function ctrl_win:Init()
 end
 
 -- chamada quando uma tecla é pressionada
-function ctrl_win:Keyboard(key,x,y)
-    if key==27 then
-        os.exit()
+function ctrl_win:k_any(c)
+    if c == iup.K_ESC then
+		iup.ExitLoop()
+        --os.exit()
     end
+	ctrl_win:action(0,0)
 end
 
-function ctrl_win:Mouse(button,state,x,y)
-    if button==glut.LEFT_BUTTON and
-        state==glut.DOWN then
+function ctrl_win:button_cb(but,pressed,x,y,status)
+	iup.GLMakeCurrent(self)
+    if pressed == 1 then
         self.model_track:start_motion(x,y)
         self.light_track:start_motion(x,y)
-        self.pressed=true
-        self.mod_status=self:GetModifiers()
+        self.pressed = true
     else
-        self.pressed=false
+        self.pressed = false
     end
-    self.dragging=false
-    self.light_dragging=false
+    self.dragging = false
+    self.light_dragging = false
+	ctrl_win:action(0,0)
 end
 
-function ctrl_win:Motion(x,y)
+function ctrl_win:motion_cb(x,y,status)
+	iup.GLMakeCurrent(self)
     if self.pressed then
-        if self:ActiveShift(self.mod_status) and self:ActiveCtrl(self.mod_status) then
+        if iup.isshift(status) and iup.iscontrol(status) then
             self.light_track:move_rotation(x,y)
-            self.light_dragging=true
-        elseif self:ActiveShift(self.mod_status) then
+            self.light_dragging = true
+        elseif iup.isshift(status) then
             self.model_track:move_scaling(x,y)
-            self.dragging=true
-        elseif self:ActiveCtrl(self.mod_status) then
+            self.dragging = true
+        elseif iup.iscontrol(status) then
             self.model_track:move_pan(x,y)
-            self.dragging=true
-        elseif self:ActiveAlt(self.mod_status) then
+            self.dragging = true
+        elseif iup.isalt(status) then
             self.model_track:move_zoom(x,y)
-            self.dragging=true
+            self.dragging = true
         else
             self.model_track:move_rotation(x,y)
-            self.dragging=true
+            self.dragging = true
         end
+		ctrl_win:action(0,0)
     end
 end
 
-win.Loop()
+-- exibe a janela
+dlg:show()
+--filter_dlg:show()
+-- entra no loop de eventos
+iup.MainLoop()

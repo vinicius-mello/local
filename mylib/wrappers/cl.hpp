@@ -327,7 +327,8 @@ class program {
         prg_=clCreateProgramWithSource(ctx.ctx_,1,(const char **)&src,0,&host::code_);
         if(clBuildProgram(prg_,0,0,0,0,0)!=CL_SUCCESS) {
             char buffer[1024];
-            clGetProgramBuildInfo(prg_, host::device(0,0), CL_PROGRAM_BUILD_LOG, 1024,buffer,0);
+            clGetProgramBuildInfo(prg_,
+                ctx.dev_ids_[0], CL_PROGRAM_BUILD_LOG, 1024,buffer,0);
             cerr<<buffer<<endl;
         }
         debug_print("program new(%p)\n",this);
