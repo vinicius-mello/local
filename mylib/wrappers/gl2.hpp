@@ -63,6 +63,13 @@ inline void vertex_buffer(int n, unsigned type, size_t stride=0, size_t offset=0
     glVertexPointer(n,type,stride,(void *)offset);
 }
 
+inline void vertex_attrib_buffer(int i, int n, unsigned type, size_t stride=0, size_t offset=0) {
+    if(type==GL_DOUBLE)
+        glVertexAttribLPointer(i,n,type,stride,(void *)offset);
+    else
+        glVertexAttribPointer(i,n,type,GL_TRUE,stride,(void *)offset);
+}
+
 inline void texcoord_buffer(int n, unsigned type, size_t stride=0, size_t offset=0) {
     glTexCoordPointer(n,type,stride,(void *)offset);
 }

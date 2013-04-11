@@ -130,6 +130,7 @@ void texcoord_array(const array<double>& b, int n=0, int stride=0);
 void normal_array(const array<double>& b, int stride=0);
 void color_array(const array<double>& b, int n=0, int stride=0);
 void vertex_buffer(int n, unsigned type, size_t stride=0, size_t offset=0);
+void vertex_attrib_buffer(int i, int n, unsigned type, size_t stride=0, size_t offset=0);
 void texcoord_buffer(int n, unsigned type, size_t stride=0, size_t offset=0);
 void draw_triangles(const array<uint>& b);
 void draw_quads(const array<uint>& b);
