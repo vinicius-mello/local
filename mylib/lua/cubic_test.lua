@@ -23,5 +23,21 @@ print(cubic.evald(x,1.0))
 
 print((cubic.eval(x,0.500001)-cubic.eval(x,0.5))/0.000001)
 
+local g=array.double(50000)
+for i=1,50000 do
+    local t=(i-1)/50000
+    g:set(i-1,math.exp(-t^2))
+end
+cubic.convert(g)
+maxerr=0
+for i=1,50000 do
+    local t=(i-1)/50000
+    local dg=cubic.evald(g,t)
+    local err=math.abs(dg-math.exp(-t^2)*(-2*t))
+    if err>maxerr then maxerr=err end
+    print(t,err)
+end
+print(maxerr)
+
 
 

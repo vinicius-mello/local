@@ -24,6 +24,7 @@ Numeric
 # Logs and databases #
 ######################
 *.log
+*.dat
 *.sql
 *.sqlite
 

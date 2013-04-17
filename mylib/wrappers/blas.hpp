@@ -82,18 +82,26 @@ void axpy(float a, const array<float>& x, array<float>& y) {
     saxpy_(&n,&a,x.data(),&incx,y.data(),&incy);
 }
 
-void copy(const array<double>& x, array<double>& y) {
+void copy(int n, const array<double>& x, array<double>& y) {
     int incx=1;
     int incy=1;
-    int n=x.size();
     dcopy_(&n,x.data(),&incx,y.data(),&incy);
 }
 
-void copy(const array<float>& x, array<float>& y) {
+void copy(const array<double>& x, array<double>& y) {
+    int n=x.size();
+    copy(n,x,y);
+}
+
+void copy(int n, const array<float>& x, array<float>& y) {
     int incx=1;
     int incy=1;
-    int n=x.size();
     scopy_(&n,x.data(),&incx,y.data(),&incy);
+}
+
+void copy(const array<float>& x, array<float>& y) {
+    int n=x.size();
+    copy(n,x,y);
 }
 
 void swap(array<double>& x, array<double>& y) {

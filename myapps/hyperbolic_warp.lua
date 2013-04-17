@@ -21,7 +21,6 @@ print("  extensions:",cl.host_get_device_info(0,gpu_id,cl.DEVICE_EXTENSIONS))
 
 kernel_src= [[
 
-
 __kernel void init_vtx(int gr, __global double2 * vtx)
 {
    int i = get_global_id(0);
@@ -31,11 +30,6 @@ __kernel void init_vtx(int gr, __global double2 * vtx)
    double y=2.0*((double)j)/grd-1.0;
    double2 c=(double2)(x,y);
    vtx[i*(gr+1)+j]=c;
-   /*
-   c=vtx[i*(gr+1)+j];
-   vtx[i*(gr+1)+j]=c;
-   vtx[i*(gr+1)+j].x=x;
-   vtx[i*(gr+1)+j].y=y;*/
 };
 
 ]]
@@ -102,25 +96,9 @@ function ctrl_win:Display()
     end
     gl.Enable('TEXTURE_2D')
     self.texsrc:bind()
-    --[[
-    gl.Begin('QUADS')
-    gl.TexCoord(0,0)
-    gl.Vertex(-1,-1)
-    gl.TexCoord(1,0)
-    gl.Vertex(1,-1)
-    gl.TexCoord(1,1)
-    gl.Vertex(1,1)
-    gl.TexCoord(0,1)
-    gl.Vertex(-1,1)
-    gl.End()
-    ]]
     gl.EnableClientState('VERTEX_ARRAY')
     gl.EnableClientState('TEXTURE_COORD_ARRAY')
-    --self.vtx_bo:bind()
-    --gl2.vertex_buffer(2,gl.DOUBLE)
-    --gl2.vertex_array(self.mesh_vtx)
     gl2.draw_quads(self.mesh_idx)
-    --self.vtx_bo:unbind()
     gl.DisableClientState('VERTEX_ARRAY')
     gl.DisableClientState('TEXTURE_COORD_ARRAY')
     gl.Disable('TEXTURE_2D')
@@ -260,34 +238,18 @@ end
 function ctrl_win:reset_mesh()
     local gr=self.mesh_gr
     gl.Flush()
---    self.cmd:add_object(self.mem_vtx_bo)
---    self.cmd:aquire_globject()
---    print(cl.host_get_error())
---    self.cmd:finish()
     self.cmd:write_buffer(self.mem_vtx, true, 0,
         self.mesh_vtx:size_of(), self.mesh_vtx:data())
     self.cmd:finish()
     self.krn_init_vtx:arg(0,gr)
-    --self.krn_init_vtx:arg(1,self.mem_vtx_bo)
     self.krn_init_vtx:arg(1,self.mem_vtx)
     self.cmd:range_kernel2d(self.krn_init_vtx,0,0,gr+1,gr+1,1,1)
     print(cl.host_get_error())
     self.cmd:finish()
     print(cl.host_get_error())
-    --self.cmd:add_object(self.mem_vtx_bo)
-    --self.cmd:aquire_globject()
-    --self.cmd:copy_buffer(self.mem_vtx, self.mem_vtx_bo, 0, 0,
-    --    self.mesh_vtx:size_of())
-    --self.cmd:add_object(self.mem_vtx_bo)
-    --self.cmd:release_globject()
-    --print(cl.host_get_error())
-    --self.cmd:finish()
     self.cmd:read_buffer(self.mem_vtx, true, 0,
         self.mesh_vtx:size_of(), self.mesh_vtx:data())
     self.cmd:finish()
-    --self.cmd:add_object(self.mem_vtx_bo)
-    --self.cmd:release_globject()
-    --self.cmd:finish()
     print(cl.host_get_error())
 end
 
@@ -309,14 +271,8 @@ function ctrl_win:Init()
     gl.Disable('CULL_FACE')
     gl.ShadeModel('FLAT')
     self:build_mesh()
-    --self.vtx_bo=gl2.buffer_object()
-    --self.vtx_bo:set(gl2.ARRAY_BUFFER,(self.mesh_gr+1)^2*16,gl2.DYNAMIC_DRAW,self.mesh_vtx:data())
-    --self.vtx_bo:set(gl2.ARRAY_BUFFER,(self.mesh_gr+1)^2*16,gl2.DYNAMIC_DRAW)
     gl.EnableClientState('VERTEX_ARRAY')
     gl2.vertex_array(self.mesh_vtx)
-    --self.vtx_bo:bind()
-    --gl2.vertex_buffer(2,gl.DOUBLE)
-    --self.vtx_bo:unbind()
     gl.DisableClientState('VERTEX_ARRAY')
     gl.EnableClientState('TEXTURE_COORD_ARRAY')
     gl2.texcoord_array(self.mesh_tex)
@@ -327,8 +283,6 @@ function ctrl_win:Init()
     self.texsrc:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,self.image:data())
     self.pars=bar.new("Parameters")
     self.pars.a={type=tw.TYPE_DOUBLE,properties="help='a'"}
-    --self.mem_vtx_bo=cl.gl_buffer(self.ctx,
-    --    cl.MEM_READ_WRITE,self.vtx_bo:object_id())
     self.mem_vtx=cl.mem(self.ctx,
         cl.MEM_READ_WRITE,self.mesh_vtx:size_of())
     self.prg=cl.program(self.ctx,kernel_src)

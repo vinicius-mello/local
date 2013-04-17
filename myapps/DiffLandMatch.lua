@@ -23,7 +23,8 @@ function distE(x,y,work)
 end
 
 function deltaH(x,y,work)
-    return 2*distE2(x,y,work)/((1-normE2(x))*(1-normE2(y)))
+    return math.abs(2*distE2(x,y,work)/((1-normE2(x))*(1-normE2(y))))
+    -- o valor absoluto eh necessario para erros numericos
 end
 
 function distH(x,y,work)
@@ -100,8 +101,9 @@ function kernel_grad_matrix(pts,dist,kernel_dfunc,
     end
 end
 
-function S(q,env,ws)
+function S(data,env,ws)
     -- q=array.double((m+1),n,N)
+    local q=data.q
     local m=q:depth()-1
     local n=q:height()
     local N=q:width()
@@ -141,8 +143,10 @@ function S(q,env,ws)
     return f/(2*h)
 end
 
-function gradS(q,env,grad,ws)
+function gradS(data,env,ws)
     -- q=array.double((m+1),n,N)
+    local q=data.q
+    local grad=data.grad
     local m=q:depth()-1
     local n=q:height()
     local N=q:width()
@@ -208,6 +212,55 @@ function gradS(q,env,grad,ws)
     return f/(2*h)
 end
 
+function to_cubic(cq)
+    local N=cq:depth()
+    local n=cq:height()
+    local i,d
+    for i=0,N-1 do
+        for d=0,n-1 do
+            local row=cq:row(i,d)
+            cubic.convert(row)
+        end
+    end
+end
+
+function solve_alpha(data,env,ws)
+    local q=data.q
+    local m=q:depth()-1
+    local n=q:height()
+    local N=q:width()
+    local alpha=data.alpha
+    local cq=data.cq
+    local calpha=data.calpha
+    local dist=ws.dist
+    local K=ws.K
+    local Pk=ws.mid
+    local workn=ws.workn
+    local k,d,t
+    local h=1/m
+
+    q:rearrange("210",cq)
+    to_cubic(cq)
+    for k=0,m do
+        t=h*k
+        local PkT=q:plane(k)
+        PkT:rearrange("021",Pk)
+        distance_matrix(Pk,dist,env.dist_func,workn)
+        kernel_matrix(N,dist,env.mu,env.kernel_func,K)
+        lapack.pptrf(N,K)
+        for d=0,n-1 do
+            local alphakd=alpha:row(k,d)
+            for i=0,N-1 do
+                local row=cq:row(i,d)
+                alphakd:set(i,cubic.evald(row,t))
+            end
+            lapack.pptrs(N,K,alphakd)
+        end
+    end
+    alpha:rearrange("210",calpha)
+    to_cubic(calpha)
+end
+
 function alloc_workspace(N,n)
     local ws={
         workn=array.double(n),
@@ -218,9 +271,22 @@ function alloc_workspace(N,n)
         dist=array.double(N*(N+1)/2),
         K=array.double(N*(N+1)/2),
         gradKx=array.double(N,N,n),
-        gradKy=array.double(N,N,n),
+        gradKy=array.double(N,N,n)
     }
     return ws
+end
+
+function alloc_data(n,N,m)
+    local data={
+        q=array.double(m+1,n,N),
+        alpha=array.double(m+1,n,N),
+        cq=array.double(N,n,m+1),
+        calpha=array.double(N,n,m+1),
+        grad=array.double(m+1,n,N),
+        src=array.double(N,n),
+        dst=array.double(N,n)
+    }
+    return data
 end
 
 function euclidean_heat_kernel(tau,mu,n)
@@ -234,7 +300,49 @@ function euclidean_heat_kernel(tau,mu,n)
         end,
         gradx_dist_func=gradx_distE,
         grady_dist_func=grady_distE,
+        mu=mu
+    }
+    return env
+end
+
+function euclidean_heat_kernel_lut(tau,mu,n,step,max_lut_size)
+
+    local buf=array.double(max_lut_size)
+    local i=0
+    local rho=0
+    repeat
+        local result= 1/(4*math.pi*tau)^(n/2)*math.exp(-rho*rho/(4*tau))
+        buf:set(i,result)
+        i=i+1
+        rho=rho+step
+    until result<1e-10 or i==max_lut_size
+    rho=rho-step
+    print(rho,i)
+    local lut=array.double(i)
+    blas.copy(i,buf,lut)
+    cubic.convert(lut)
+
+    local env={
+        dist_func=distE,
+        kernel_func=function(r)
+            if r>rho then
+                return 0
+            else
+                return cubic.eval(lut,r/rho)
+            end
+        end,
+        kernel_dfunc=function(r)
+            if r>rho then
+                return 0
+            else
+                return 1/rho*cubic.evald(lut,r/rho)
+            end
+        end,
+        gradx_dist_func=gradx_distE,
+        grady_dist_func=grady_distE,
         mu=mu,
+        lut=lut,
+        max_r=rho
     }
     return env
 end
@@ -261,7 +369,7 @@ function hyperbolic_heat_kernel(tau,mu,step,max_lut_size)
     rho=rho-step
     print(rho,i)
     local lut=array.double(i)
-    lut:copy(buf)
+    blas.copy(i,buf,lut)
     cubic.convert(lut)
 
     local env={
@@ -289,12 +397,46 @@ function hyperbolic_heat_kernel(tau,mu,step,max_lut_size)
     return env
 end
 
-function gen_q(pts0, pts1, m)
-    local n=#pts0[1]
-    local N=#pts0
-    local q=array.double((m+1),n,N)
-    local src=array.double(N,n)
-    local dst=array.double(N,n)
+function alloc_solver(data,env,ws)
+    local l=20
+    local q=data.q
+    local grad=data.grad
+    local m=q:depth()-1
+    local n=q:height()
+    local N=q:width()
+    local opt=lbfgsb.lbfgsb((m-1)*n*N,l)
+    opt:n_set((m-1)*n*N)
+    opt:m_set(l)
+    opt:factr_set(100000)
+    opt:pgtol_set(0.0005)
+    opt:print_set(true)
+    opt:grad_set(grad:data(1,0,0))
+    local solver={
+        q=q,
+        grad=grad,
+        opt=opt,
+        task="start",
+        iterate=function(self)
+            if self.task=="start" then
+                self.task=opt:start(q:data(1,0,0))
+            elseif self.task=="fg" then
+                opt:f_set(gradS(data,env,ws))
+                self.task=opt:call()
+            elseif self.task=="new_x" then
+                self.task=opt:call()
+            end
+        end
+    }
+    return solver
+end
+
+function init_data(data,pts0,pts1)
+    local q=data.q
+    local m=q:depth()-1
+    local n=q:height()
+    local N=q:width()
+    local src=data.src
+    local dst=data.dst
     local k,d,i
     for i=0,N-1 do
         for d=0,n-1 do
@@ -310,28 +452,27 @@ function gen_q(pts0, pts1, m)
             end
         end
     end
-    return q,src,dst
 end
 
+--[[
 m=100
-q,src,dst=gen_q(
+n=2
+N=3
+
+data=alloc_data(n,N,m)
+init_data(data,
     {{-0.5,0.0},{0.0,-0.5},{0.1,0.0}},
-    {{0.0,0.4},{-0.4,0.1},{0.3,0.0}},
-    m)
-n=q:height()
-N=q:width()
+    {{0.0,0.4},{-0.4,0.1},{0.3,0.0}} )
 
 env=hyperbolic_heat_kernel(1,0.05,0.001,16536)
-eps=0.00000001
-print((env.kernel_func(0.001+eps)-env.kernel_func(0.001))/eps)
-print(env.kernel_dfunc(0.001))
-
+--env=euclidean_heat_kernel_lut(1,0.05,n,0.001,16536)
 --env=euclidean_heat_kernel(1,0.05,n)
 ws=alloc_workspace(N,n)
-grad=array.double(m+1,n,N)
-
-f=gradS(q,env,grad,ws)
-print(f)
-
+solver=alloc_solver(data,env,ws)
+repeat
+    solver:iterate()
+until solver.task=="conv"
+solve_alpha(data,env,ws)
+]]
 
 

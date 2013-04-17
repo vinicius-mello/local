@@ -52,6 +52,10 @@ function mt.__pow(a,b)
     return vec.new(r)
 end
 
+function mt.__tostring(a)
+    return a[1].." "..a[2].." "..a[3]
+end
+
 function vec.new(t)
     setmetatable(t,mt)
     return t

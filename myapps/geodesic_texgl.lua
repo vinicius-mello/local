@@ -161,6 +161,7 @@ function geodesic_fdf(G,n,N,m,q,grad,work)
             end
         end
     end
+    print(f)
     return f
 end
 
