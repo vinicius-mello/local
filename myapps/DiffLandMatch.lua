@@ -27,8 +27,15 @@ function deltaH(x,y,work)
     -- o valor absoluto eh necessario para erros numericos
 end
 
-function distH(x,y,work)
+function distH(x,y,work) -- Poincare model
     return math.acosh(1+deltaH(x,y,work))
+end
+
+function distBK(x,y,work) -- Beltrami-Klein model
+    local nx=math.sqrt(math.abs(1-normE2(x)))
+    local ny=math.sqrt(math.abs(1-normE2(y)))
+    local xy=blas.dot(x,y)
+    return math.acosh(math.abs((1-xy)/(nx*ny)))
 end
 
 function gradx_distE(x,y,grad,work)
@@ -59,6 +66,28 @@ function grady_distH(x,y,grad,work)
     blas.axpy(-1,x,grad)
     blas.scal(f/normE2(grad),grad)
     blas.axpy(f/(1-normE2(y)),y,grad)
+end
+
+function gradx_distBK(x,y,grad,work)
+    local nx=1-normE2(x)
+    local ny=1-normE2(y)
+    local xy=1-blas.dot(x,y)
+    local f=1/math.sqrt(math.abs(xy*xy-nx*ny))
+    blas.copy(x,grad)
+    blas.scal(xy/nx,grad)
+    blas.axpy(-1,y,grad)
+    blas.scal(f,grad)
+end
+
+function grady_distBK(x,y,grad,work)
+    local nx=1-normE2(x)
+    local ny=1-normE2(y)
+    local xy=1-blas.dot(x,y)
+    local f=1/math.sqrt(math.abs(xy*xy-nx*ny))
+    blas.copy(y,grad)
+    blas.scal(xy/ny,grad)
+    blas.axpy(-1,x,grad)
+    blas.scal(f,grad)
 end
 
 function distance_matrix(pts,dist,dist_func,work)
@@ -261,9 +290,33 @@ function solve_alpha(data,env,ws)
     to_cubic(calpha)
 end
 
+function v(x,t,vxt,data,env,ws)
+    local cq=data.cq
+    local calpha=data.calpha
+    local N=cq:depth()
+    local n=cq:height()
+    local qt=ws.workn
+    local alphat=ws.workn2
+    local workn=ws.workn3
+    local i,d
+    vxt:zero()
+    for i=0,N-1 do
+        for d=0,n-1 do
+            local cqid=cq:row(i,d)
+            local calphaid=calpha:row(i,d)
+            qt:set(d,cubic.eval(cqid,t))
+            alphat:set(d,cubic.eval(calphaid,t))
+        end
+        local dist=env.dist_func(x,qt,workn)
+        blas.axpy(env.kernel_func(dist),alphat,vxt)
+    end
+end
+
 function alloc_workspace(N,n)
     local ws={
         workn=array.double(n),
+        workn2=array.double(n),
+        workn3=array.double(n),
         workN=array.double(N),
         workN2=array.double(N),
         midT=array.double(n,N),
@@ -298,6 +351,7 @@ function euclidean_heat_kernel(tau,mu,n)
         kernel_dfunc=function(r)
             return -2*r/((4*tau)*(4*math.pi*tau)^(n/2))*math.exp(-r*r/(4*tau))
         end,
+        in_domain=function(x) return true end,
         gradx_dist_func=gradx_distE,
         grady_dist_func=grady_distE,
         mu=mu
@@ -338,6 +392,7 @@ function euclidean_heat_kernel_lut(tau,mu,n,step,max_lut_size)
                 return 1/rho*cubic.evald(lut,r/rho)
             end
         end,
+        in_domain=function(x) return normE2(x)<1 end,
         gradx_dist_func=gradx_distE,
         grady_dist_func=grady_distE,
         mu=mu,
@@ -388,8 +443,60 @@ function hyperbolic_heat_kernel(tau,mu,step,max_lut_size)
                 return 1/rho*cubic.evald(lut,r/rho)
             end
         end,
+        in_domain=function(x) return normE2(x)<1 end,
         gradx_dist_func=gradx_distH,
         grady_dist_func=grady_distH,
+        mu=mu,
+        lut=lut,
+        max_r=rho
+    }
+    return env
+end
+
+function hyperbolicBK_heat_kernel(tau,mu,step,max_lut_size)
+
+    function f(r)
+        return
+        function(s)
+            return math.sqrt(2)*math.exp(-tau/4)/(4*math.pi*tau)^(3/2)*
+            s*math.exp(-s^2/(4*tau))/math.sqrt(math.cosh(s)-math.cosh(r))
+        end
+    end
+
+    local buf=array.double(max_lut_size)
+    local i=0
+    local rho=0
+    repeat
+        local result=gsl.integrate {f=f(rho),a=rho,algorithm="qagiu"}
+        buf:set(i,result)
+        i=i+1
+        rho=rho+step
+    until result<1e-10 or i==max_lut_size
+    rho=rho-step
+    print(rho,i)
+    local lut=array.double(i)
+    blas.copy(i,buf,lut)
+    cubic.convert(lut)
+
+    local env={
+        dist_func=distBK,
+        kernel_func=function(r)
+            if r>rho then
+                return 0
+            else
+                return cubic.eval(lut,r/rho)
+            end
+        end,
+        kernel_dfunc=function(r)
+            if r>rho then
+                return 0
+            else
+                return 1/rho*cubic.evald(lut,r/rho)
+            end
+        end,
+        in_domain=function(x) return normE2(x)<1 end,
+        gradx_dist_func=gradx_distBK,
+        grady_dist_func=grady_distBK,
         mu=mu,
         lut=lut,
         max_r=rho
