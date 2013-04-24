@@ -6,6 +6,7 @@ require("bar")
 glut.Init()
 glut.InitDisplayMode(glut.RGBA+glut.DEPTH+glut.DOUBLE)
 tw.Init(tw.OPENGL)
+tw.ModifiersFunc()
 
 glut.InitWindowSize(512,512)
 
@@ -80,6 +81,16 @@ function win.New(title)
         glut.PostRedisplay()
     end
 
+    function t.glutwin:Special(key,x,y)
+        tw.SetCurrentWindow(t.glutwin.id)
+        if tw.EventSpecialGLUT(key,x,y)==0 then
+            if t.Special then
+                t:Special(key,x,y)
+            end
+        end
+        glut.PostRedisplay()
+    end
+
     function t.glutwin:Mouse(button,state,x,y)
         tw.SetCurrentWindow(t.glutwin.id)
         if tw.EventMouseButtonGLUT(button,state,x,y)==0 then
@@ -105,16 +116,6 @@ function win.New(title)
         if tw.EventMouseMotionGLUT(x,y)==0 then
             if t.PassiveMotion then
                 t:PassiveMotion(x,y)
-            end
-        end
-        glut.PostRedisplay()
-    end
-
-    function t.glutwin:Special(key,x,y)
-        tw.SetCurrentWindow(t.glutwin.id)
-        if tw.EventSpecialGLUT(x,y)==0 then
-            if t.Special then
-                t:Special(key,x,y)
             end
         end
         glut.PostRedisplay()

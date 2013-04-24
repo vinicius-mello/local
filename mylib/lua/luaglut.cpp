@@ -8,7 +8,6 @@ struct params {
 
 params windows[256];
 
-
 void idle_cb() {
     lua_rawgeti(windows[0].L,LUA_REGISTRYINDEX,windows[0].t_index);
     lua_pcall(windows[0].L, 0, 0, 0);

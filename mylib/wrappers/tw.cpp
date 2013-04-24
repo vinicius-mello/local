@@ -155,6 +155,18 @@ TwType TwGetVarType(const char * bar_name, const char * var_name) {
     return vars[full_name].type;
 }
 
+int TwGetIntVarByName(const char * bar_name, const char * var_name) {
+    string full_name=string(bar_name)+"/"+var_name;
+    int * value=(int *)vars[full_name].data;
+    return (int)*value;
+}
+
+void TwSetIntVarByName(const char * bar_name, const char * var_name, int v) {
+    string full_name=string(bar_name)+"/"+var_name;
+    int * value=(int *)vars[full_name].data;
+    *value=v;
+}
+
 bool TwGetBoolVarByName(const char * bar_name, const char * var_name) {
     string full_name=string(bar_name)+"/"+var_name;
     int * value=(int *)vars[full_name].data;
@@ -215,3 +227,11 @@ void TwSetArrayFloatVarByName(const char * bar_name, const char * var_name, cons
     value->copy(v);
 }
 
+void TwAddSeparatorByName(const char * bar_name, const char * sp_name) {
+    TwAddSeparator(TwGetBarByName(bar_name),sp_name,0);
+}
+
+void TwAddButtonByName(const char * bar_name, const char * button_name,
+        TwButtonCallback callback, void *clientData) {
+    TwAddButton(TwGetBarByName(bar_name),button_name,callback,clientData,0);
+}

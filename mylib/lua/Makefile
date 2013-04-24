@@ -115,7 +115,7 @@ glut_wrap.cxx: $(MYLIB)/lua/glut.i $(MYLIB)/swig/glut.i $(MYLIB)/mytl/glut.hpp l
 tw$(EXT): tw_wrap.cxx $(MYLIB)/wrappers/tw.cpp
 	g++ -o $@ $(SHARED) $< $(MYLIB)/wrappers/tw.cpp $(LUA_INC) $(TW_INC) $(LUA_LIB) $(TW_LIB)  -I $(MYLIB)
 
-tw_wrap.cxx: $(MYLIB)/swig/tw.i $(MYLIB)/wrappers/tw.hpp
+tw_wrap.cxx: $(MYLIB)/lua/tw.i $(MYLIB)/swig/tw.i $(MYLIB)/wrappers/tw.hpp luatw.cpp
 	swig -o $@ -c++ -lua $<
 
 

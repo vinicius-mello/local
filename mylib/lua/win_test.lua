@@ -109,7 +109,7 @@ function test_win:Mouse(button,state,x,y)
                 self.drag="new"
             else
                 local i,j=self:find(x,y)
-                if i~=0 then 
+                if i~=0 then
                     self.drag="ctrl"
                     self.ctrl_i=i
                     self.ctrl_j=j
@@ -164,8 +164,8 @@ function test_win:Init()
     gl.Disable('DEPTH_TEST')                         -- habilita teste z-buffer
     gl.Enable('CULL_FACE')
     gl.ShadeModel('FLAT')
-    self.pars=bar.new("Parameters")
-    self.pars.a={type=tw.TYPE_DOUBLE,properties="help='a'"}
+    --self.pars=bar.new("Parameters")
+    --self.pars.a={type=tw.TYPE_DOUBLE,properties="help='a'"}
 end
 
 win.Loop()

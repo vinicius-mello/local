@@ -44,12 +44,6 @@ function gradx_distE(x,y,grad,work)
     blas.scal(1/distE(x,y,work),grad)
 end
 
-function grady_distE(x,y,grad,work)
-    blas.copy(y,grad)
-    blas.axpy(-1,x,grad)
-    blas.scal(1/distE(x,y,work),grad)
-end
-
 function gradx_distH(x,y,grad,work)
     local del=deltaH(x,y,work)
     local f=2*del/math.sqrt(2*del+del*del)
@@ -57,15 +51,6 @@ function gradx_distH(x,y,grad,work)
     blas.axpy(-1,y,grad)
     blas.scal(f/normE2(grad),grad)
     blas.axpy(f/(1-normE2(x)),x,grad)
-end
-
-function grady_distH(x,y,grad,work)
-    local del=deltaH(x,y,work)
-    local f=2*del/math.sqrt(2*del+del*del)
-    blas.copy(y,grad)
-    blas.axpy(-1,x,grad)
-    blas.scal(f/normE2(grad),grad)
-    blas.axpy(f/(1-normE2(y)),y,grad)
 end
 
 function gradx_distBK(x,y,grad,work)
@@ -76,17 +61,6 @@ function gradx_distBK(x,y,grad,work)
     blas.copy(x,grad)
     blas.scal(xy/nx,grad)
     blas.axpy(-1,y,grad)
-    blas.scal(f,grad)
-end
-
-function grady_distBK(x,y,grad,work)
-    local nx=1-normE2(x)
-    local ny=1-normE2(y)
-    local xy=1-blas.dot(x,y)
-    local f=1/math.sqrt(math.abs(xy*xy-nx*ny))
-    blas.copy(y,grad)
-    blas.scal(xy/ny,grad)
-    blas.axpy(-1,x,grad)
     blas.scal(f,grad)
 end
 
@@ -101,7 +75,7 @@ function distance_matrix(pts,dist,dist_func,work)
     end
 end
 
-function kernel_matrix(N,dist,mu,kernel_func,K)
+function kernel_matrix_radial(N,dist,mu,kernel_func,K)
     local i,j
     for i=0,N-1 do
         for j=i,N-1 do
@@ -111,8 +85,19 @@ function kernel_matrix(N,dist,mu,kernel_func,K)
     end
 end
 
-function kernel_grad_matrix(pts,dist,kernel_dfunc,
-    gradx_dist_func, grady_dist_func,gradKx,gradKy,work)
+function kernel_matrix(pts,mu,kernel_func,K,work)
+    local N=pts:rows()
+    local i,j
+    for i=0,N-1 do
+        for j=i,N-1 do
+            K:sym_set(i,j,kernel_func(pts:row(i),pts:row(j),work))
+        end
+        K:sym_set(i,i,K:sym_get(i,i)+mu)
+    end
+end
+
+function kernel_grad_matrix_radial(pts,dist,kernel_dfunc,
+    gradx_dist_func,gradKx,gradKy,work)
     local N=pts:rows()
     local i,j
     for i=0,N-1 do
@@ -123,15 +108,33 @@ function kernel_grad_matrix(pts,dist,kernel_dfunc,
             local gx=gradKx:row(i,j)
             local gy=gradKy:row(i,j)
             gradx_dist_func(x,y,gx,work)
-            grady_dist_func(x,y,gy,work)
+            gradx_dist_func(y,x,gy,work)
             blas.scal(dk,gx)
             blas.scal(dk,gy)
         end
     end
 end
 
+function kernel_grad_matrix(pts,K,
+    grad_kernel_func,gradKx,gradKy,work)
+    local N=pts:rows()
+    local i,j
+    for i=0,N-1 do
+        for j=0,N-1 do
+            local vk=K:sym_get(i,j)
+            local x=pts:row(i)
+            local y=pts:row(j)
+            local gx=gradKx:row(i,j)
+            local gy=gradKy:row(i,j)
+            grad_kernel_func(vk,x,y,gx,work)
+            grad_kernel_func(vk,y,x,gy,work)
+        end
+    end
+end
+
 function S(data,env,ws)
     -- q=array.double((m+1),n,N)
+    local radial=env.radial
     local q=data.q
     local m=q:depth()-1
     local n=q:height()
@@ -158,8 +161,14 @@ function S(data,env,ws)
             blas.axpy(0.5,Pk1[d],t)
         end
         midT:rearrange("021",mid)
-        distance_matrix(mid,dist,env.dist_func,workn)
-        kernel_matrix(N,dist,env.mu,env.kernel_func,K)
+        if radial then
+            distance_matrix(mid,dist,env.dist_func,workn)
+            kernel_matrix_radial(N,dist,env.mu,env.kernel_func,K)
+        else
+            kernel_matrix(mid,env.mu,env.kernel_func,K,workn)
+            for ii=0,N-1 do for jj=0,N-1 do print(K:sym_get(ii,jj)) end end
+            print("----")
+        end
         lapack.pptrf(N,K)
         for d=1,n do
             blas.copy(Pk[d],workN)
@@ -174,6 +183,7 @@ end
 
 function gradS(data,env,ws)
     -- q=array.double((m+1),n,N)
+    local radial=env.radial
     local q=data.q
     local grad=data.grad
     local m=q:depth()-1
@@ -205,11 +215,18 @@ function gradS(data,env,ws)
             blas.axpy(0.5,Pk1[d],t)
         end
         midT:rearrange("021",mid)
-        distance_matrix(mid,dist,env.dist_func,workn)
-        kernel_matrix(N,dist,env.mu,env.kernel_func,K)
-        kernel_grad_matrix(mid,dist,env.kernel_dfunc,
-            env.gradx_dist_func, env.grady_dist_func,
-            gradKx,gradKy,workn)
+        if radial then
+            distance_matrix(mid,dist,env.dist_func,workn)
+            kernel_matrix_radial(N,dist,env.mu,env.kernel_func,K)
+            kernel_grad_matrix_radial(mid,dist,env.kernel_dfunc,
+                env.gradx_dist_func,
+                gradKx,gradKy,workn)
+        else
+            kernel_matrix(mid,env.mu,env.kernel_func,K,workn)
+            kernel_grad_matrix(mid,K,
+                env.grad_kernel_func,
+                gradKx,gradKy,workn)
+        end
         lapack.pptrf(N,K)
         for d=1,n do
             blas.copy(Pk[d],workN)
@@ -274,8 +291,12 @@ function solve_alpha(data,env,ws)
         t=h*k
         local PkT=q:plane(k)
         PkT:rearrange("021",Pk)
-        distance_matrix(Pk,dist,env.dist_func,workn)
-        kernel_matrix(N,dist,env.mu,env.kernel_func,K)
+        if env.radial then
+            distance_matrix(Pk,dist,env.dist_func,workn)
+            kernel_matrix_radial(N,dist,env.mu,env.kernel_func,K)
+        else
+            kernel_matrix(Pk,env.mu,env.kernel_func,K,workn)
+        end
         lapack.pptrf(N,K)
         for d=0,n-1 do
             local alphakd=alpha:row(k,d)
@@ -291,6 +312,7 @@ function solve_alpha(data,env,ws)
 end
 
 function v(x,t,vxt,data,env,ws)
+    local radial=env.radial
     local cq=data.cq
     local calpha=data.calpha
     local N=cq:depth()
@@ -307,8 +329,12 @@ function v(x,t,vxt,data,env,ws)
             qt:set(d,cubic.eval(cqid,t))
             alphat:set(d,cubic.eval(calphaid,t))
         end
-        local dist=env.dist_func(x,qt,workn)
-        blas.axpy(env.kernel_func(dist),alphat,vxt)
+        if radial then
+            local dist=env.dist_func(x,qt,workn)
+            blas.axpy(env.kernel_func(dist),alphat,vxt)
+        else
+            blas.axpy(env.kernel_func(x,qt,workn),alphat,vxt)
+        end
     end
 end
 
@@ -342,6 +368,43 @@ function alloc_data(n,N,m)
     return data
 end
 
+function clamped_thin_plate_spline(mu)
+    local env={
+        kernel_func=function(x,y,work)
+            local r2=distE2(x,y,work)
+            local nx=1-normE2(x)
+            local ny=1-normE2(y)
+            if r2>0 then
+                return nx*ny/2-r2/2*math.log(math.abs(nx*ny/r2+1))
+            else
+                return nx*ny/2
+            end
+        end,
+        grad_kernel_func=function(vk,x,y,gradx,work)
+            local r2=distE2(x,y,work)
+            if r2>0 then
+                local nx=1-normE2(x)
+                local ny=1-normE2(y)
+                blas.copy(x,gradx)
+                blas.axpy(-1,y,gradx)
+                local f=1/(nx*ny+r2)
+                local f1=-math.log(math.abs(nx*ny/r2+1))+f*nx*ny
+                blas.scal(f1,gradx)
+                f1=ny/2+r2*ny*f
+                blas.axpy(f1,x,gradx)
+            else
+                local ny=1-normE2(y)
+                blas.copy(x,gradx)
+                blas.scal(0.5*ny,gradx)
+            end
+        end,
+        in_domain=function(x) return normE2(x)<1 end,
+        radial=false,
+        mu=mu
+    }
+    return env
+end
+
 function euclidean_heat_kernel(tau,mu,n)
     local env={
         dist_func=distE,
@@ -353,7 +416,146 @@ function euclidean_heat_kernel(tau,mu,n)
         end,
         in_domain=function(x) return true end,
         gradx_dist_func=gradx_distE,
-        grady_dist_func=grady_distE,
+        radial=true,
+        mu=mu
+    }
+    return env
+end
+
+function shifted_laplacian(tau,mu)
+    local env={
+        dist_func=distE,
+        kernel_func=function(r)
+            return (1+r/tau)*math.exp(-r/tau)
+        end,
+        kernel_dfunc=function(r)
+            return -r/(tau*tau)*math.exp(-r/tau)
+        end,
+        in_domain=function(x) return true end,
+        gradx_dist_func=gradx_distE,
+        radial=true,
+        mu=mu
+    }
+    return env
+end
+
+function hyperbolic_shifted_laplacian(tau,mu)
+    local env={
+        dist_func=distH,
+        kernel_func=function(r)
+            return (1+r/tau)*math.exp(-r/tau)
+        end,
+        kernel_dfunc=function(r)
+            return -r/(tau*tau)*math.exp(-r/tau)
+        end,
+        in_domain=function(x) return normE2(x)<1 end,
+        gradx_dist_func=gradx_distH,
+        radial=true,
+        mu=mu
+    }
+    return env
+end
+
+function euclidean_radial_characteristics(tau,beta,mu)
+    --beta>=(n+1)/2
+    local env={
+        dist_func=distE,
+        kernel_func=function(r)
+            if r<tau then
+                return (1-r*r/tau*tau)^beta
+            else
+                return 0
+            end
+        end,
+        kernel_dfunc=function(r)
+            if r<tau then
+                local v=-2*r*beta/(tau*tau)*(1-r*r/tau*tau)^(beta-1)
+                return v
+            else
+                return 0
+            end
+        end,
+        in_domain=function(x) return true end,
+        gradx_dist_func=gradx_distE,
+        radial=true,
+        mu=mu
+    }
+    return env
+end
+
+function hyperbolic_radial_characteristics(tau,beta,mu)
+    --beta>=(n+1)/2
+    local env={
+        dist_func=distH,
+        kernel_func=function(r)
+            if r<tau then
+                return (1-r*r/tau*tau)^beta
+            else
+                return 0
+            end
+        end,
+        kernel_dfunc=function(r)
+            if r<tau then
+                local v=-2*r*beta/(tau*tau)*(1-r*r/tau*tau)^(beta-1)
+                return v
+            else
+                return 0
+            end
+        end,
+        in_domain=function(x) return normE2(x)<1 end,
+        gradx_dist_func=gradx_distH,
+        radial=true,
+        mu=mu
+    }
+    return env
+end
+
+function euclidean_inverse_multiquadrics(tau,mu)
+    local env={
+        dist_func=distE,
+        kernel_func=function(r)
+            return 1/math.sqrt(r*r+tau*tau)
+        end,
+        kernel_dfunc=function(r)
+            return -r/math.sqrt(r*r+tau*tau)^3
+        end,
+        in_domain=function(x) return true end,
+        gradx_dist_func=gradx_distE,
+        radial=true,
+        mu=mu
+    }
+    return env
+end
+
+function hyperbolic_inverse_multiquadrics(tau,mu)
+    local env={
+        dist_func=distH,
+        kernel_func=function(r)
+            return 1/math.sqrt(r*r+tau*tau)
+        end,
+        kernel_dfunc=function(r)
+            return -r/math.sqrt(r*r+tau*tau)^3
+        end,
+        in_domain=function(x) return normE2(x)<1 end,
+        gradx_dist_func=gradx_distH,
+        radial=true,
+        mu=mu
+    }
+    return env
+end
+
+function hyperbolic_gaussian(tau,mu,n)
+    local env={
+        dist_func=distH,
+        kernel_func=function(r)
+            return 1/(4*math.pi*tau)^(n/2)*math.exp(-r*r/(4*tau))
+        end,
+        kernel_dfunc=function(r)
+            return -2*r/((4*tau)*(4*math.pi*tau)^(n/2))*math.exp(-r*r/(4*tau))
+        end,
+        in_domain=function(x) return normE2(x)<1 end,
+        gradx_dist_func=gradx_distH,
+        radial=true,
         mu=mu
     }
     return env
@@ -394,7 +596,7 @@ function euclidean_heat_kernel_lut(tau,mu,n,step,max_lut_size)
         end,
         in_domain=function(x) return normE2(x)<1 end,
         gradx_dist_func=gradx_distE,
-        grady_dist_func=grady_distE,
+        radial=true,
         mu=mu,
         lut=lut,
         max_r=rho
@@ -445,7 +647,7 @@ function hyperbolic_heat_kernel(tau,mu,step,max_lut_size)
         end,
         in_domain=function(x) return normE2(x)<1 end,
         gradx_dist_func=gradx_distH,
-        grady_dist_func=grady_distH,
+        radial=true,
         mu=mu,
         lut=lut,
         max_r=rho
@@ -496,7 +698,7 @@ function hyperbolicBK_heat_kernel(tau,mu,step,max_lut_size)
         end,
         in_domain=function(x) return normE2(x)<1 end,
         gradx_dist_func=gradx_distBK,
-        grady_dist_func=grady_distBK,
+        radial=true,
         mu=mu,
         lut=lut,
         max_r=rho

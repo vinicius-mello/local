@@ -48,6 +48,8 @@
 void TwNewVar(const char * bar_name, const char * var_name, TwType type, const char * prop=0, bool ro=false);
 void TwNewEnum(const char * bar_name, const char * var_name, const char * enum_name, const char * enum_values, const char * prop=0);
 TwType TwGetVarType(const char * bar_name, const char * var_name);
+int TwGetIntVarByName(const char * bar_name, const char * var_name);
+void TwSetIntVarByName(const char * bar_name, const char * var_name, int value);
 bool TwGetBoolVarByName(const char * bar_name, const char * var_name);
 void TwSetBoolVarByName(const char * bar_name, const char * var_name, bool value);
 char * TwGetStringVarByName(const char * bar_name, const char * var_name);
@@ -58,6 +60,10 @@ array<double> TwGetArrayDoubleVarByName(const char * bar_name, const char * var_
 void TwSetArrayDoubleVarByName(const char * bar_name, const char * var_name, const array<double>& value);
 array<float> TwGetArrayFloatVarByName(const char * bar_name, const char * var_name);
 void TwSetArrayFloatVarByName(const char * bar_name, const char * var_name, const array<float>& value);
+void TwAddSeparatorByName(const char * bar_name, const char * sp_name);
+void TwAddButtonByName(const char * bar_name, const char * button_name,
+        TwButtonCallback callback, void *clientData);
+
 %rename("%(strip:[TW_])s") "";
 
 

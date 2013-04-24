@@ -7,10 +7,15 @@ require("bar")
 glut.Init()
 glut.InitDisplayMode(glut.RGBA+glut.DEPTH+glut.DOUBLE)
 tw.Init(tw.OPENGL)
-teste=bar.new("teste")
-teste.a={type=tw.TYPE_DOUBLE,properties=""}
-teste.b={type={name="B", enum="B1,B2,B3"},properties=""}
+tw.ModifiersFunc()
+teste=bar.New("teste")
+teste:NewVar {name="a", type=tw.TYPE_DOUBLE, properties=""}
+teste:AddSeparator("sep")
+teste:NewVar {name="b", type={name="B", enum="B1,B2,B3"}, properties=""}
 teste.a=5
+teste:AddButton( "Ok", function() print("Ok") end)
+teste:Define(" teste iconified=true")
+teste:Define(" GLOBAL help='help!'")
 
 cb=glut.NewWindow("teste")
 
@@ -62,8 +67,9 @@ function cb:PassiveMotion(x,y)
 end
 
 function cb:Special(key,x,y)
-  print("Special",tw.EventSpecialGLUT(key,x,y))
+  print("Special",key,tw.EventSpecialGLUT(key,x,y))
   --  print("Special",self.id,key)
+    glut.PostRedisplay()
 end
 
 

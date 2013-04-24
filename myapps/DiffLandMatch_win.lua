@@ -2,6 +2,7 @@ dofile("modules.lua")
 dofile("DiffLandMatch.lua")
 require("win")
 require("gl2")
+require("colormap")
 
 test_win=win.New("test")
 
@@ -25,6 +26,7 @@ function test_win:Display()
     local i
     gl.Clear('COLOR_BUFFER_BIT,DEPTH_BUFFER_BIT')
     gl.PointSize(5.0)
+    gl.LineWidth(3.0)
     gl.Begin('POINTS')
     gl.Color(1,0,0)
     for i=1,#self.lmk_src do
@@ -58,9 +60,10 @@ function test_win:Display()
     end
     gl.End()
     gl.Color(1,0,1)
-    if self.data then
+    if self.solved then
         local cq=self.data.cq
-        for i=1,#self.lmk_src do
+        local N=cq:depth()
+        for i=1,N do
             local j
             gl.Begin('LINE_STRIP')
             for j=0,64 do
@@ -72,15 +75,93 @@ function test_win:Display()
             gl.End()
         end
     end
-    gl.Enable('TEXTURE_2D')
-    self.texsrc:bind()
-    gl.TexEnv('TEXTURE_ENV_MODE','REPLACE')
-    gl.EnableClientState('VERTEX_ARRAY')
-    gl.EnableClientState('TEXTURE_COORD_ARRAY')
-    gl2.draw_quads(self.mesh_idx)
-    gl.DisableClientState('VERTEX_ARRAY')
-    gl.DisableClientState('TEXTURE_COORD_ARRAY')
-    gl.Disable('TEXTURE_2D')
+    if self.viewmode==0 then
+        gl.Enable('TEXTURE_2D')
+        self.texsrc:bind()
+        gl.TexEnv('TEXTURE_ENV_MODE','REPLACE')
+        gl.EnableClientState('VERTEX_ARRAY')
+        gl.EnableClientState('TEXTURE_COORD_ARRAY')
+        gl2.draw_quads(self.mesh_idx)
+        gl.DisableClientState('VERTEX_ARRAY')
+        gl.DisableClientState('TEXTURE_COORD_ARRAY')
+        gl.Disable('TEXTURE_2D')
+    elseif self.viewmode==1 then
+        local i,j
+        local gr=self.mesh_gr
+        for i=0,gr do
+            gl.Color(0,0,0)
+            gl.LineWidth(1.0)
+            gl.Begin('LINE_STRIP')
+            for j=0,gr do
+                local x=self.mesh_vtx:get(i,j,0)
+                local y=self.mesh_vtx:get(i,j,1)
+                gl.Vertex(x,y)
+            end
+            gl.End()
+            gl.Begin('LINE_STRIP')
+            for j=0,gr do
+                local x=self.mesh_vtx:get(j,i,0)
+                local y=self.mesh_vtx:get(j,i,1)
+                gl.Vertex(x,y)
+            end
+            gl.End()
+        end
+        local k
+        for k=1,#self.lmk_src do
+            local r,g,b
+            gl.LineWidth(2.0)
+            gl.Begin('LINE_STRIP')
+            i=math.floor(self.lmk_src[k][1]*gr/2+gr/2)
+            r=self.colormap:get(i,0)
+            g=self.colormap:get(i,1)
+            b=self.colormap:get(i,2)
+            gl.Color(r,g,b)
+            for j=0,gr do
+                local x=self.mesh_vtx:get(i,j,0)
+                local y=self.mesh_vtx:get(i,j,1)
+                gl.Vertex(x,y)
+            end
+            gl.End()
+            gl.Begin('LINE_STRIP')
+            i=math.floor(self.lmk_src[k][2]*gr/2+gr/2)
+            r=self.colormap:get(i,0)
+            g=self.colormap:get(i,1)
+            b=self.colormap:get(i,2)
+            gl.Color(r,g,b)
+            for j=0,gr do
+                local x=self.mesh_vtx:get(j,i,0)
+                local y=self.mesh_vtx:get(j,i,1)
+                gl.Vertex(x,y)
+            end
+            gl.End()
+        end
+    elseif self.viewmode==2 then
+        local i,j
+        local gr=self.mesh_gr
+        for i=0,gr do
+            --[[local r,g,b
+            r=self.colormap:get(i,0)
+            g=self.colormap:get(i,1)
+            b=self.colormap:get(i,2)
+            gl.Color(r,g,b)]]
+            gl.Color(0,0,0)
+            gl.LineWidth(1.0)
+            gl.Begin('LINE_STRIP')
+            for j=0,gr do
+                local x=i/gr*2-1
+                local y=j/gr*2-1
+                gl.Vertex(x,y)
+            end
+            gl.End()
+            gl.Begin('LINE_STRIP')
+            for j=0,gr do
+                local x=j/gr*2-1
+                local y=i/gr*2-1
+                gl.Vertex(x,y)
+            end
+            gl.End()
+        end
+    end
 end
 
 function test_win:new_line()
@@ -117,6 +198,9 @@ function test_win:normalize(x,y)
         x=0.95*x/norm
         y=0.95*y/norm
     end
+    local gr2=self.mesh_gr/2
+    x=math.floor(x*gr2)/gr2
+    y=math.floor(y*gr2)/gr2
     return x,y
 end
 
@@ -156,47 +240,107 @@ function test_win:Motion(x,y)
     if self.drag=="new" then
         self.target_x=x
         self.target_y=y
+        self.solved=false
     elseif self.drag=="ctrl" then
         self.ctrl_t[self.ctrl_i][1]=x
         self.ctrl_t[self.ctrl_i][2]=y
+        self.solved=false
     end
 end
 
 function test_win:PassiveMotion(x,y)
 end
 
+function test_win:solve()
+    print("Solving")
+    local m=self.pars.m
+    local n=2
+    local N=#self.lmk_src
+    local tau=self.pars.tau
+    local mu=self.pars.mu
+    local beta=self.pars.beta
+    print("m",m)
+    print("n",n)
+    print("N",N)
+    print("tau",tau)
+    print("mu",mu)
+    print("beta",beta)
+    local env=self.list_envs[self.pars.environment+1]
+    print(env)
+    self.data=alloc_data(n,N,m)
+    init_data(self.data,self.lmk_src,self.lmk_dst)
+    if env=="euclidean_heat_kernel" then
+        self.env=euclidean_heat_kernel(tau,mu,n)
+    elseif env=="euclidean_heat_kernel_lut" then
+        self.env=euclidean_heat_kernel_lut(tau,mu,n,0.001,16536)
+    elseif env=="shifted_laplacian" then
+        self.env=shifted_laplacian(tau,mu)
+    elseif env=="hyperbolic_gaussian" then
+        self.env=hyperbolic_gaussian(tau,mu,n)
+    elseif env=="hyperbolic_heat_kernel" then
+        self.env=hyperbolic_heat_kernel(tau,mu,0.001,16536)
+    elseif env=="hyperbolicBK_heat_kernel" then
+        self.env=hyperbolicBK_heat_kernel(tau,mu,0.001,16536)
+    elseif env=="hyperbolic_shifted_laplacian" then
+        self.env=hyperbolic_shifted_laplacian(tau,mu)
+    elseif env=="hyperbolic_inverse_multiquadrics" then
+        self.env=hyperbolic_inverse_multiquadrics(tau,mu)
+    elseif env=="euclidean_inverse_multiquadrics" then
+        self.env=euclidean_inverse_multiquadrics(tau,mu)
+    elseif env=="hyperbolic_radial_characteristics" then
+        self.env=hyperbolic_radial_characteristics(tau,beta,mu)
+    elseif env=="euclidean_radial_characteristics" then
+        self.env=euclidean_radial_characteristics(tau,beta,mu)
+    elseif env=="clamped_thin_plate_spline" then
+        self.env=clamped_thin_plate_spline(mu)
+    end
+
+    self.ws=alloc_workspace(N,n)
+    print("eval",S(self.data,self.env,self.ws))
+    self.solver=alloc_solver(self.data,self.env,self.ws)
+    self.solver.opt:pgtol_set(10^self.pars.pgtol)
+    self.solver.opt:factr_set(10^self.pars.factr)
+    repeat
+        self.solver:iterate()
+    until self.solver.task=="conv"
+    solve_alpha(self.data,self.env,self.ws)
+    self.solved=true
+    self.t=0
+    collectgarbage()
+end
+
 function test_win:Keyboard(key,x,y)
     if key==27 then
         os.exit()
-    elseif key==32 then
-        if not self.solved then
-            local m=50
-            local n=2
-            local N=#self.lmk_src
-            self.data=alloc_data(n,N,m)
-            init_data(self.data,self.lmk_src,self.lmk_dst)
-            self.env=hyperbolic_heat_kernel(0.25,0.00,0.001,16536)
-            --self.env=hyperbolicBK_heat_kernel(0.25,0.00,0.001,16536)
-            --self.env=euclidean_heat_kernel_lut(0.25,0.0,n,0.001,16536)
-            --self.env=euclidean_heat_kernel(0.25,0.00,n)
-            self.ws=alloc_workspace(N,n)
-            self.solver=alloc_solver(self.data,self.env,self.ws)
-            repeat
-                self.solver:iterate()
-            until self.solver.task=="conv"
-            solve_alpha(self.data,self.env,self.ws)
-            self.solved=true
-        else
-            print(self.t)
-            if self.t<1 then
-                self:euler_step(self.t,0.01)
-                self.t=self.t+0.01
-            end
-        end
     end
 end
 
 function test_win:Special(key,x,y)
+    if key==glut.KEY_LEFT then
+        self.viewmode=(self.viewmode-1)%3
+    elseif key==glut.KEY_RIGHT then
+        self.viewmode=(self.viewmode+1)%3
+    end
+    print(self.viewmode)
+end
+
+function test_win:euler_iterate()
+    print("Iterate",self.t)
+    if not self.solved then
+        return
+    end
+    local iterations=10^self.pars.iterations
+    local dt=10^self.pars.euler_step
+    print("iterations",iterations)
+    print("dt",dt)
+    for i=1,iterations do
+        if self.t<1 then
+            self:euler_step(self.t,dt)
+            self.t=self.t+dt
+        else
+            break
+        end
+    end
 end
 
 function test_win:euler_step(t,dt)
@@ -216,6 +360,20 @@ function test_win:euler_step(t,dt)
     end
 end
 
+function test_win:reset_mesh()
+    local i,j
+    local gr=self.mesh_gr
+    for i=0,gr do
+        local x=i/gr*2-1
+        for j=0,gr do
+            local y=j/gr*2-1
+            self.mesh_vtx:set(i,j,0,x)
+            self.mesh_vtx:set(i,j,1,y)
+        end
+    end
+    self.t=0
+end
+
 function test_win:build_mesh()
     local i,j
     local gr=self.mesh_gr
@@ -229,7 +387,7 @@ function test_win:build_mesh()
             self.mesh_vtx:set(i,j,0,x)
             self.mesh_vtx:set(i,j,1,y)
             self.mesh_tex:set(i,j,0,i/gr)
-            self.mesh_tex:set(i,j,1,j/gr)
+            self.mesh_tex:set(i,j,1,1.0-j/gr)
         end
     end
 
@@ -255,6 +413,8 @@ function test_win:Init()
 
     self.solved=false
     self.mesh_gr=64
+    self.colormap=array.double(self.mesh_gr+1,3)
+    colormap.rgbmap(self.colormap,{t={0,0.5,1},r={0,0.06,.71},g={.25,0.71,.18},b={.90,0.4,0.06}})
     self:build_mesh()
     gl.EnableClientState('VERTEX_ARRAY')
     gl2.vertex_array(self.mesh_vtx)
@@ -263,14 +423,71 @@ function test_win:Init()
     gl2.texcoord_array(self.mesh_tex)
     gl.DisableClientState('TEXTURE_COORD_ARRAY')
     self.image=array.byte(512,512,4)
-    self.image:read("tiling_3_5.512x512.rgba")
-    --self.image:read("grid.512x512.rgba")
+    --self.image:read("tiling_3_5.512x512.rgba")
+    self.image:read("grid.512x512.rgba")
     --self.image:read("brain.512x512.rgba")
+    --self.image:read("mandril.512x512.rgba")
     self.texsrc=gl2.color_texture2d()
     self.texsrc:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,self.image:data())
-    self.pars=bar.new("Parameters")
-    self.pars.a={type=tw.TYPE_DOUBLE,properties="help='a'"}
+
+    self.pars=bar.New("Parameters")
+    self.pars:NewVar {name="m", type=tw.TYPE_DOUBLE, properties="min=8 max=100"}
+    self.pars.m=10
+    self.pars:NewVar {name="tau", type=tw.TYPE_DOUBLE, properties="min=0.01 max=2 step=0.01"}
+    self.pars.tau=0.25
+    self.pars:NewVar {name="mu", type=tw.TYPE_DOUBLE, properties="min=0.0 max=1 step=0.05"}
+    self.pars.mu=0.0
+    self.pars:NewVar {name="beta", type=tw.TYPE_DOUBLE, properties="min=1.5 max=4 step=0.1"}
+    self.pars.beta=2
+    self.list_envs={
+                "euclidean_heat_kernel",
+                "euclidean_heat_kernel_lut",
+                "hyperbolic_heat_kernel",
+                "hyperbolicBK_heat_kernel",
+                "clamped_thin_plate_spline",
+                "euclidean_inverse_multiquadrics",
+                "euclidean_radial_characteristics",
+                "hyperbolic_gaussian",
+                "hyperbolic_inverse_multiquadrics",
+                "hyperbolic_radial_characteristics",
+                "hyperbolic_shifted_laplacian"
+            }
+    local envs_str=""
+    local i
+    for i=1,#self.list_envs-1 do envs_str=envs_str..self.list_envs[i].."," end
+    envs_str=envs_str..self.list_envs[#self.list_envs]
+    self.pars:NewVar {name="environment",
+        type={name="Environments",
+                enum=envs_str }
+    }
+    self.pars:AddSeparator("numeric")
+    self.pars:NewVar {name="pgtol", type=tw.TYPE_DOUBLE, properties="min=-6 max=1 step=1"}
+    self.pars.pgtol=-3
+
+    self.pars:NewVar {name="factr", type=tw.TYPE_DOUBLE, properties="min=1 max=8 step=1"}
+    self.pars.factr=5
+
+    self.pars:AddButton( "Solve", function() self:solve() end)
+    self.pars:AddSeparator("euler")
+    
+    self.pars:NewVar {name="euler_step", type=tw.TYPE_DOUBLE, properties="min=-5 max=-1 step=1"}
+    self.pars.euler_step=-2
+
+    self.pars:NewVar {name="iterations", type=tw.TYPE_DOUBLE, properties="min=0 max=3 step=1"}
+    self.pars.iterations=1
+
+    self.pars:AddButton( "Iterate", function() self:euler_iterate() end)
+
+    self.pars:AddSeparator("mesh")
+    self.pars:AddButton( "Reset Mesh", function() self:reset_mesh() end)
+    
+    self.pars:Define(" Parameters iconified=false")
+    self.pars:Define(" GLOBAL help='help!'")
+    self.pars:Define(" Parameters size='300 400'")
+    self.pars:Define(" Parameters valueswidth=170")
+
     self.t=0
+    self.viewmode=0
 end
 
 win.Loop()
