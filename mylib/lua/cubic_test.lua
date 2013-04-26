@@ -13,31 +13,21 @@ end
 local x=vec {5,7,1,4,3,6,4,1,2,4,9,11,14,9,8,11,9}
 
 cubic.convert(x)
-print(cubic.eval(x,0.0))
-print(cubic.eval(x,0.5))
-print(cubic.eval(x,1.0))
 
-print(cubic.evald(x,0.0))
-print(cubic.evald(x,0.5))
-print(cubic.evald(x,1.0))
+y=vec {5,7,1,4,3,6,4,1,2,4,9,11,14,9,8,11,9}
+y2=array.double(y:size())
+work=array.double(y:size())
+cubic.natural_spline(y,y2,work)
 
-print((cubic.eval(x,0.500001)-cubic.eval(x,0.5))/0.000001)
-
-local g=array.double(50000)
-for i=1,50000 do
-    local t=(i-1)/50000
-    g:set(i-1,math.exp(-t^2))
+gnuplot=io.popen("gnuplot -p","w")
+gnuplot:write("plot '-', '-' with lines \n")
+for t=0,1,0.01 do
+    gnuplot:write(t.." "..cubic.eval(x,t).."\n")
 end
-cubic.convert(g)
-maxerr=0
-for i=1,50000 do
-    local t=(i-1)/50000
-    local dg=cubic.evald(g,t)
-    local err=math.abs(dg-math.exp(-t^2)*(-2*t))
-    if err>maxerr then maxerr=err end
-    print(t,err)
+gnuplot:write("e\n")
+for t=0,1,0.01 do
+    gnuplot:write(t.." "..cubic.natural_spline_eval(y,y2,t).."\n")
 end
-print(maxerr)
-
-
+gnuplot:write("e\n")
+gnuplot:flush()
 

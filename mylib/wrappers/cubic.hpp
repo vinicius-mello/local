@@ -152,4 +152,119 @@ T cubic_evald(const array<T>& c, T t) {
     return cubic_evald(c.size(),c.data(),t);
 }
 
+
+template <class T>
+void natural_spline(size_t n, const T * x, const T * y, T * y2, T * u) {
+    size_t i,k;
+    T p,qn,sig,un;
+    y2[0]=u[0]=0.0;
+    for (i=1;i<n-1;i++) {
+        sig=(x[i]-x[i-1])/(x[i+1]-x[i-1]);
+        p=sig*y2[i-1]+2.0;
+        y2[i]=(sig-1.0)/p;
+        u[i]=(y[i+1]-y[i])/(x[i+1]-x[i]) - (y[i]-y[i-1])/(x[i]-x[i-1]);
+        u[i]=(6.0*u[i]/(x[i+1]-x[i-1])-sig*u[i-1])/p;
+    }
+    qn=un=0.0;
+    y2[n-1]=(un-qn*u[n-2])/(qn*y2[n-2]+1.0);
+    for (k=n-1;k>=1;k--)
+        y2[k-1]=y2[k-1]*y2[k]+u[k-1];
+}
+
+template <class T>
+void natural_spline(size_t n, const T * y, T * y2, T * u) {
+    size_t i,k;
+    T p,qn,un,h;
+    h=1.0/n;
+    y2[0]=u[0]=0.0;
+    for (i=1;i<n-1;i++) {
+        p=0.5*y2[i-1]+2.0;
+        y2[i]=-0.5/p;
+        u[i]=(y[i+1]-y[i])/h - (y[i]-y[i-1])/h;
+        u[i]=(6.0*u[i]/(2*h)-0.5*u[i-1])/p;
+    }
+    qn=un=0.0;
+    y2[n-1]=(un-qn*u[n-2])/(qn*y2[n-2]+1.0);
+    for (k=n-1;k>=1;k--)
+        y2[k-1]=y2[k-1]*y2[k]+u[k-1];
+}
+
+template <class T>
+void natural_spline(const array<T>& x, const array<T>& y, array<T>& y2, array<T>& work) {
+    natural_spline(y.size(),x.data(),y.data(),y2.data(),work.data());
+}
+
+template <class T>
+void natural_spline(const array<T>& y, array<T>& y2, array<T>& work) {
+    natural_spline(y.size(),y.data(),y2.data(),work.data());
+}
+
+template <class T>
+T natural_spline_eval(size_t n, const T * xa, const T * ya, const T * y2a,
+        T x)
+{
+    size_t klo,khi,k;
+    T h,b,a;
+    klo=0;
+    khi=n-1;
+    while (khi-klo > 1) {
+        k=(khi+klo) >> 1;
+        if (xa[k] > x) khi=k;
+        else klo=k;
+    }
+    h=xa[khi]-xa[klo];
+    a=(xa[khi]-x)/h;
+    b=(x-xa[klo])/h;
+    return a*ya[klo]+b*ya[khi]+((a*a*a-a)*y2a[klo]+(b*b*b-b)*y2a[khi])*(h*h)/6.0;
+}
+
+template <class T>
+T natural_spline_eval(size_t n, const T * ya, const T * y2a, T x)
+{
+    size_t klo,khi,k;
+    T h,b,a;
+    x=(x>=1)?0.9999999:x;
+    h=1.0/(n-1);
+    klo=floor(x*(n-1));
+    khi=klo+1;
+    a=(khi*h-x)/h;
+    b=(x-klo*h)/h;
+    return a*ya[klo]+b*ya[khi]+((a*a*a-a)*y2a[klo]+(b*b*b-b)*y2a[khi])*(h*h)/6.0;
+}
+
+template <class T>
+T natural_spline_evald(size_t n, const T * ya, const T * y2a, T x)
+{
+    size_t klo,khi,k;
+    T h,b,a;
+    x=(x>=1)?0.9999999:x;
+    h=1.0/(n-1);
+    klo=floor(x*(n-1));
+    khi=klo+1;
+    a=(khi*h-x)/h;
+    b=(x-klo*h)/h;
+    return -ya[klo]/h+ya[khi]/h+((-3.0*a*a+1.0)*y2a[klo]+(3.0*b*b-1.0)*y2a[khi])*h/6.0;
+}
+
+template <class T>
+T natural_spline_eval(const array<T>& xa, const array<T>& ya, const array<T>& y2a, T x) {
+    return natural_spline_eval(xa.size(),xa.data(),ya.data(),y2a.data(),x);
+}
+/*
+template <class T>
+T natural_spline_evald(const array<T>& xa, const array<T>& ya, const array<T>& y2a, T x) {
+    return natural_spline_evald(xa.size(),xa.data(),ya.data(),y2a.data(),x);
+}*/
+
+
+template <class T>
+T natural_spline_eval(const array<T>& ya, const array<T>& y2a, T x) {
+    return natural_spline_eval(ya.size(),ya.data(),y2a.data(),x);
+}
+
+template <class T>
+T natural_spline_evald(const array<T>& ya, const array<T>& y2a, T x) {
+    return natural_spline_evald(ya.size(),ya.data(),y2a.data(),x);
+}
+
 #endif // WRAP_CUBIC_HPP

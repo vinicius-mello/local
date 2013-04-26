@@ -270,6 +270,19 @@ function to_cubic(cq)
     end
 end
 
+function to_natural(cq,cq2,work)
+    local N=cq:depth()
+    local n=cq:height()
+    local i,d
+    for i=0,N-1 do
+        for d=0,n-1 do
+            local row=cq:row(i,d)
+            local row2=cq2:row(i,d)
+            cubic.natural_spline(row,row2,work)
+        end
+    end
+end
+
 function solve_alpha(data,env,ws)
     local q=data.q
     local m=q:depth()-1
@@ -277,16 +290,20 @@ function solve_alpha(data,env,ws)
     local N=q:width()
     local alpha=data.alpha
     local cq=data.cq
+    local cq2=data.cq2
     local calpha=data.calpha
+    local calpha2=data.calpha2
     local dist=ws.dist
     local K=ws.K
     local Pk=ws.mid
     local workn=ws.workn
+    local workm=ws.workm
     local k,d,t
     local h=1/m
 
     q:rearrange("210",cq)
-    to_cubic(cq)
+    --to_cubic(cq)
+    to_natural(cq,cq2,workm)
     for k=0,m do
         t=h*k
         local PkT=q:plane(k)
@@ -302,19 +319,47 @@ function solve_alpha(data,env,ws)
             local alphakd=alpha:row(k,d)
             for i=0,N-1 do
                 local row=cq:row(i,d)
-                alphakd:set(i,cubic.evald(row,t))
+                local row2=cq2:row(i,d)
+                --alphakd:set(i,cubic.evald(row,t))
+                alphakd:set(i,cubic.natural_spline_evald(row,row2,t))
             end
             lapack.pptrs(N,K,alphakd)
         end
     end
     alpha:rearrange("210",calpha)
-    to_cubic(calpha)
+    --to_cubic(calpha)
+    to_natural(calpha,calpha2,workm)
+end
+
+function v_norm2(t,data)
+    local cq=data.cq
+    local cq2=data.cq2
+    local calpha=data.calpha
+    local calpha2=data.calpha2
+    local N=cq:depth()
+    local n=cq:height()
+    local result=0
+    local i,d
+    for i=0,N-1 do
+        for d=0,n-1 do
+            local cqid=cq:row(i,d)
+            local cqid2=cq2:row(i,d)
+            local calphaid=calpha:row(i,d)
+            local calphaid2=calpha2:row(i,d)
+            --result=result+cubic.evald(cqid,t)*cubic.eval(calphaid,t)
+            result=result+cubic.natural_spline_evald(cqid,cqid2,t)*
+                cubic.natural_spline_eval(calphaid,calphaid2,t)
+        end
+    end
+    return result
 end
 
 function v(x,t,vxt,data,env,ws)
     local radial=env.radial
     local cq=data.cq
+    local cq2=data.cq2
     local calpha=data.calpha
+    local calpha2=data.calpha2
     local N=cq:depth()
     local n=cq:height()
     local qt=ws.workn
@@ -325,9 +370,13 @@ function v(x,t,vxt,data,env,ws)
     for i=0,N-1 do
         for d=0,n-1 do
             local cqid=cq:row(i,d)
+            local cqid2=cq2:row(i,d)
             local calphaid=calpha:row(i,d)
-            qt:set(d,cubic.eval(cqid,t))
-            alphat:set(d,cubic.eval(calphaid,t))
+            local calphaid2=calpha2:row(i,d)
+            --qt:set(d,cubic.eval(cqid,t))
+            qt:set(d,cubic.natural_spline_eval(cqid,cqid2,t))
+            --alphat:set(d,cubic.eval(calphaid,t))
+            alphat:set(d,cubic.natural_spline_eval(calphaid,calphaid2,t))
         end
         if radial then
             local dist=env.dist_func(x,qt,workn)
@@ -338,13 +387,14 @@ function v(x,t,vxt,data,env,ws)
     end
 end
 
-function alloc_workspace(N,n)
+function alloc_workspace(n,N,m)
     local ws={
         workn=array.double(n),
         workn2=array.double(n),
         workn3=array.double(n),
         workN=array.double(N),
         workN2=array.double(N),
+        workm=array.double(m+1),
         midT=array.double(n,N),
         mid=array.double(N,n),
         dist=array.double(N*(N+1)/2),
@@ -360,7 +410,9 @@ function alloc_data(n,N,m)
         q=array.double(m+1,n,N),
         alpha=array.double(m+1,n,N),
         cq=array.double(N,n,m+1),
+        cq2=array.double(N,n,m+1),
         calpha=array.double(N,n,m+1),
+        calpha2=array.double(N,n,m+1),
         grad=array.double(m+1,n,N),
         src=array.double(N,n),
         dst=array.double(N,n)
