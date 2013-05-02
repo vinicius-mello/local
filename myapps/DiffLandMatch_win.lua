@@ -209,7 +209,6 @@ function test_win:save_eps()
     local ps=[[
 %!PS-Adobe-3.0 EPSF-3.0
 %%BoundingBox: -2 -2 515 515
-
 /m {newpath moveto} bind def
 /l {lineto} bind def
 /cp {closepath} bind def
@@ -217,7 +216,7 @@ function test_win:save_eps()
 /f {fill} bind def
 /sg {setgray} bind def
 /sc {setrgbcolor} bind def
-/dot {0 360 arc closepath} 
+/dot {0 360 arc closepath} def
 matrix currentmatrix /originmat exch def
 %/umatrix {originmat matrix concatmatrix setmatrix} def
 %[28.3465 0 0 28.3465 10.5 100.0] umatrix
@@ -291,7 +290,6 @@ matrix currentmatrix /originmat exch def
             end
             ps=ps..' '..r..' '..g..' '..b..' sc s\n'
         end
-        ps=ps..'showpage'
     elseif self.pars.viewmode==3 then
         local i,j
         local gr=self.pars.grid
@@ -359,9 +357,71 @@ matrix currentmatrix /originmat exch def
             end
             ps=ps..' '..r..' '..g..' '..b..' sc s\n'
         end
-        ps=ps..'showpage'
     end
 
+    if self.pars.showpoints then
+        ps=ps.." 1 1 0 sc\n"
+        ps=ps..'2 setlinewidth\n'
+        for i=1,#self.lmk_src do
+            local xs=self.lmk_src[i][1]
+            local ys=self.lmk_src[i][2]
+            local xd=self.lmk_dst[i][1]
+            local yd=self.lmk_dst[i][2]
+            xs=math.floor(xs*25600+25600)/100
+            ys=math.floor(ys*25600+25600)/100
+            xd=math.floor(xd*25600+25600)/100
+            yd=math.floor(yd*25600+25600)/100
+            ps=ps.." "..xs.." "..ys.." m"
+            ps=ps.." "..xd.." "..yd.." l s\n"
+        end
+        ps=ps.." 1 0 0 sc\n"
+        for i=1,#self.lmk_src do
+            local x=self.lmk_src[i][1]
+            local y=self.lmk_src[i][2]
+            x=math.floor(x*25600+25600)/100
+            y=math.floor(y*25600+25600)/100
+            ps=ps.." "..x.." "..y.." 5 dot f\n"
+        end
+        ps=ps.." 0 0 1 sc\n"
+        for i=1,#self.lmk_dst do
+            local x=self.lmk_dst[i][1]
+            local y=self.lmk_dst[i][2]
+            x=math.floor(x*25600+25600)/100
+            y=math.floor(y*25600+25600)/100
+            ps=ps.." "..x.." "..y.." 5 dot f\n"
+        end
+    end
+    if self.pars.showsolution then
+        ps=ps.." 1 0 1 sc\n"
+        ps=ps..'2 setlinewidth\n'
+        if self.solved then
+            local cq=self.data.cq
+            local N=cq:depth()
+            for i=1,N do
+                local j
+                for j=0,64 do
+                    local t=j/64
+                    local x=cubic.eval(cq:row(i-1,0),t)
+                    local y=cubic.eval(cq:row(i-1,1),t)
+                    x=math.floor(x*25600+25600)/100
+                    y=math.floor(y*25600+25600)/100
+                    if j==0 then
+                        ps=ps.." "..x.." "..y.." m"
+                    else
+                        ps=ps.." "..x.." "..y.." l"
+                    end
+                end
+                ps=ps..' s\n'
+            end
+        end
+    end
+
+    ps=ps..'showpage'
+    local info=""
+    info=info.."% environment: "..self.list_envs[self.pars.environment+1]
+    info=info.."% t:           "..self.t
+    info=info.."% tau:         "..self.pars.tau
+    ps=ps..info
     local filename=os.date("result%Y%m%d%H%M%S.eps")
     local file = io.open(filename, "w")
     file:write(ps)
@@ -472,18 +532,22 @@ end
 
 function test_win:energy_graph()
     --local filename=os.date("energy%Y%m%d%H%M%S.dat")
+    local v=array.double(101,2)
+    local i,j
+    local vmax=-1
+    for i=0,100 do
+        local t=i/100
+        v:set(i,0,t)
+        local val=v_norm2(t,self.data)/2
+        v:set(i,1,val)
+        if val>vmax then vmax=val end
+    end
+    self.pars.yrange=vmax*3/2
     self.gnuplot:write("set yrange [0:"..self.pars.yrange.."]\n")
     self.gnuplot:write("set xlabel 't'\n")
     self.gnuplot:write("set ylabel 'Energy'\n")
     self.gnuplot:write("set style fill transparent solid 0.5 \n")
     self.gnuplot:write("plot '-' lc rgb 'gold' notitle with filledcurves x1, '-' u 1:2 lc rgb 'black' with lines  notitle \n")
-    local v=array.double(101,2)
-    local i,j
-    for i=0,100 do
-        local t=i/100
-        v:set(i,0,t)
-        v:set(i,1,v_norm2(t,self.data)/2)
-    end
     for j=1,2 do
         for i=0,100 do
         local t=v:get(i,0)
@@ -541,7 +605,6 @@ function test_win:solve()
     end
 
     self.ws=alloc_workspace(n,N,m)
-    print("eval",S(self.data,self.env,self.ws))
     self.solver=alloc_solver(self.data,self.env,self.ws)
     self.solver.opt:pgtol_set(10^self.pars.pgtol)
     self.solver.opt:factr_set(10^self.pars.factr)
@@ -550,12 +613,13 @@ function test_win:solve()
         repeat
             self.solver:iterate()
             count=count+1
-        until self.solver.task=="conv" or count>=5000
+        until self.solver.task=="conv" or count>=1000
     end
     solve_alpha(self.data,self.env,self.ws)
     self.solved=true
     self.t=0
     collectgarbage()
+    test_win:reset_mesh()
 end
 
 function test_win:finish()
@@ -584,14 +648,11 @@ function test_win:Special(key,x,y)
 end
 
 function test_win:euler_iterate()
-    print("Iterate",self.t)
     if not self.solved then
         return
     end
-    local iterations=10^self.pars.iterations
-    local dt=10^self.pars.euler_step
-    print("iterations",iterations)
-    print("dt",dt)
+    local iterations=2^self.pars.iterations
+    local dt=2^self.pars.euler_step
     for i=1,iterations do
         if self.t<1 then
             self:euler_step(self.t,dt)
@@ -600,6 +661,7 @@ function test_win:euler_iterate()
             break
         end
     end
+    print("Iterate: ",self.t)
 end
 
 function test_win:euler_step(t,dt)
@@ -685,7 +747,7 @@ function test_win:Init()
     gl.ShadeModel('FLAT')
 
     self.gnuplot = io.popen("gnuplot -persist", "w")
-    self.gnuplot:write("set terminal aqua enhanced font ',24'\n")
+    self.gnuplot:write("set terminal aqua enhanced font ',40'\n")
     self.gnuplot:write("set key left top \n")
 
     self.solved=false
@@ -733,17 +795,17 @@ function test_win:Init()
     self.pars.yrange=5
     self.pars:AddSeparator("euler")
 
-    self.pars:NewVar {name="euler_step", type=tw.TYPE_DOUBLE, properties="min=-5 max=-1 step=1"}
-    self.pars.euler_step=-2
+    self.pars:NewVar {name="euler_step", type=tw.TYPE_DOUBLE, properties="min=-17 max=-3 step=1"}
+    self.pars.euler_step=-7
 
-    self.pars:NewVar {name="iterations", type=tw.TYPE_DOUBLE, properties="min=0 max=3 step=1"}
-    self.pars.iterations=1
+    self.pars:NewVar {name="iterations", type=tw.TYPE_DOUBLE, properties="min=0 max=6 step=1"}
+    self.pars.iterations=5
 
     self.pars:AddButton( "Iterate", function() self:euler_iterate() end)
 
     self.pars:AddSeparator("mesh")
     self.pars:NewVar {name="grid", type=tw.TYPE_DOUBLE, properties="min=16 max=128 step=1"}
-    self.pars.grid=50
+    self.pars.grid=40
     self.pars:AddButton( "Build Mesh", function() self:build_mesh() end)
     self:build_mesh()
     self.pars:NewVar {name="viewmode",

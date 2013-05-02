@@ -6,8 +6,8 @@ require("lbfgsb")
 require("cubic")
 require("gsl")
 
-math.acosh = function (x) return math.log(x + math.sqrt(x * x - 1)); end
-
+math.acosh = function (x) return math.log(x + math.sqrt(math.abs(x * x - 1))); end
+    -- o valor absoluto eh necessario para erros numericos
 function normE2(x)
     return blas.dot(x,x)
 end
@@ -32,8 +32,10 @@ function distH(x,y,work) -- Poincare model
 end
 
 function distBK(x,y,work) -- Beltrami-Klein model
-    local nx=math.sqrt(math.abs(1-normE2(x)))
-    local ny=math.sqrt(math.abs(1-normE2(y)))
+    local nx2=normE2(x)
+    local ny2=normE2(y)
+    local nx=math.sqrt(math.abs(1-nx2))
+    local ny=math.sqrt(math.abs(1-ny2))
     local xy=blas.dot(x,y)
     return math.acosh(math.abs((1-xy)/(nx*ny)))
 end
@@ -166,8 +168,8 @@ function S(data,env,ws)
             kernel_matrix_radial(N,dist,env.mu,env.kernel_func,K)
         else
             kernel_matrix(mid,env.mu,env.kernel_func,K,workn)
-            for ii=0,N-1 do for jj=0,N-1 do print(K:sym_get(ii,jj)) end end
-            print("----")
+            --for ii=0,N-1 do for jj=0,N-1 do print(K:sym_get(ii,jj)) end end
+            --print("----")
         end
         lapack.pptrf(N,K)
         for d=1,n do
