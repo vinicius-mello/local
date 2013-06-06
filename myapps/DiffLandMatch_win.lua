@@ -3,6 +3,7 @@ dofile("DiffLandMatch.lua")
 require("win")
 require("gl2")
 require("colormap")
+require("ps")
 
 test_win=win.New("test")
 
@@ -206,55 +207,43 @@ function test_win:Display()
 end
 
 function test_win:save_eps()
-    local ps=[[
-%!PS-Adobe-3.0 EPSF-3.0
-%%BoundingBox: -2 -2 515 515
-/m {newpath moveto} bind def
-/l {lineto} bind def
-/cp {closepath} bind def
-/s {stroke} bind def
-/f {fill} bind def
-/sg {setgray} bind def
-/sc {setrgbcolor} bind def
-/dot {0 360 arc closepath} def
-matrix currentmatrix /originmat exch def
-%/umatrix {originmat matrix concatmatrix setmatrix} def
-%[28.3465 0 0 28.3465 10.5 100.0] umatrix
-]]
+    local filename=os.date("result%Y%m%d%H%M%S.eps")
+    local eps=ps.new(filename)
+    eps:BoundingBox(0,0,512,512)
     if self.pars.viewmode==0 then
     elseif self.pars.viewmode==1 then
     elseif self.pars.viewmode==2 then
         local i,j
         local gr=self.pars.grid
-        ps=ps..'0.5 setlinewidth\n'
+        eps:setlinewidth(0.5)
         for i=0,gr do
             for j=0,gr do
                 local x=self.mesh_vtx:get(i,j,0)
                 local y=self.mesh_vtx:get(i,j,1)
-                x=math.floor(x*25600+25600)/100
-                y=math.floor(y*25600+25600)/100
                 if j==0 then
-                    ps=ps.." "..x.." "..y.." m"
+                    eps:newpath()
+                    eps:moveto(x,y)
                 else
-                    ps=ps.." "..x.." "..y.." l"
+                    eps:lineto(x,y)
                 end
             end
-            ps=ps..' 0 sg s\n'
+            eps:setgray(0)
+            eps:stroke()
             for j=0,gr do
                 local x=self.mesh_vtx:get(j,i,0)
                 local y=self.mesh_vtx:get(j,i,1)
-                x=math.floor(x*25600+25600)/100
-                y=math.floor(y*25600+25600)/100
                 if j==0 then
-                    ps=ps.." "..x.." "..y.." m"
+                    eps:newpath()
+                    eps:moveto(x,y)
                 else
-                    ps=ps.." "..x.." "..y.." l"
+                    eps:lineto(x,y)
                 end
             end
-            ps=ps..' 0 sg s\n'
+            eps:setgray(0)
+            eps:stroke()
         end
         local k
-        ps=ps..'2 setlinewidth\n'
+        eps:setlinewidth(2)
         for k=1,#self.lmk_src do
             local r,g,b
             i=math.floor(self.lmk_src[k][1]*gr/2+gr/2)
@@ -264,15 +253,15 @@ matrix currentmatrix /originmat exch def
             for j=0,gr do
                 local x=self.mesh_vtx:get(i,j,0)
                 local y=self.mesh_vtx:get(i,j,1)
-                x=math.floor(x*25600+25600)/100
-                y=math.floor(y*25600+25600)/100
                 if j==0 then
-                    ps=ps.." "..x.." "..y.." m"
+                    eps:newpath()
+                    eps:moveto(x,y)
                 else
-                    ps=ps.." "..x.." "..y.." l"
+                    eps:lineto(x,y)
                 end
             end
-            ps=ps..' '..r..' '..g..' '..b..' sc s\n'
+            eps:setrgb(r,g,b)
+            eps:stroke()
             i=math.floor(self.lmk_src[k][2]*gr/2+gr/2)
             r=self.colormap:get(i,0)
             g=self.colormap:get(i,1)
@@ -280,47 +269,46 @@ matrix currentmatrix /originmat exch def
             for j=0,gr do
                 local x=self.mesh_vtx:get(j,i,0)
                 local y=self.mesh_vtx:get(j,i,1)
-                x=math.floor(x*25600+25600)/100
-                y=math.floor(y*25600+25600)/100
                 if j==0 then
-                    ps=ps.." "..x.." "..y.." m"
+                    eps:newpath()
+                    eps:moveto(x,y)
                 else
-                    ps=ps.." "..x.." "..y.." l"
+                    eps:lineto(x,y)
                 end
             end
-            ps=ps..' '..r..' '..g..' '..b..' sc s\n'
+            eps:setrgb(r,g,b)
+            eps:stroke()
         end
     elseif self.pars.viewmode==3 then
         local i,j
         local gr=self.pars.grid
-        ps=ps..'0.5 setlinewidth\n'
+        eps:setlinewidth(0.5)
         for i=0,gr do
             for j=0,gr do
                 local x=i/gr*2-1
                 local y=j/gr*2-1
-                x=math.floor(x*25600+25600)/100
-                y=math.floor(y*25600+25600)/100
                 if j==0 then
-                    ps=ps.." "..x.." "..y.." m"
+                    eps:newpath()
+                    eps:moveto(x,y)
                 else
-                    ps=ps.." "..x.." "..y.." l"
+                    eps:lineto(x,y)
                 end
             end
             for j=0,gr do
                 local x=j/gr*2-1
                 local y=i/gr*2-1
-                x=math.floor(x*25600+25600)/100
-                y=math.floor(y*25600+25600)/100
                 if j==0 then
-                    ps=ps.." "..x.." "..y.." m"
+                    eps:newpath()
+                    eps:moveto(x,y)
                 else
-                    ps=ps.." "..x.." "..y.." l"
+                    eps:lineto(x,y)
                 end
             end
-            ps=ps..' 0 sg s\n'
+            eps:setgray(0)
+            eps:stroke()
         end
         local k
-        ps=ps..'2 setlinewidth\n'
+        eps:setlinewidth(2)
         for k=1,#self.lmk_src do
             local r,g,b
             local x,y
@@ -329,71 +317,67 @@ matrix currentmatrix /originmat exch def
             r=self.colormap:get(i,0)
             g=self.colormap:get(i,1)
             b=self.colormap:get(i,2)
-            x=math.floor(x*25600+25600)/100
             for j=0,gr do
                 y=j/gr*2-1
-                y=math.floor(y*25600+25600)/100
                 if j==0 then
-                    ps=ps.." "..x.." "..y.." m"
+                    eps:newpath()
+                    eps:moveto(x,y)
                 else
-                    ps=ps.." "..x.." "..y.." l"
+                    eps:lineto(x,y)
                 end
             end
-            ps=ps..' '..r..' '..g..' '..b..' sc s\n'
+            eps:setrgb(r,g,b)
+            eps:stroke()
             y=self.lmk_src[k][2]
             i=math.floor(y*gr/2+gr/2)
             r=self.colormap:get(i,0)
             g=self.colormap:get(i,1)
             b=self.colormap:get(i,2)
-            y=math.floor(y*25600+25600)/100
             for j=0,gr do
                 x=j/gr*2-1
-                x=math.floor(x*25600+25600)/100
                 if j==0 then
-                    ps=ps.." "..x.." "..y.." m"
+                    eps:newpath()
+                    eps:moveto(x,y)
                 else
-                    ps=ps.." "..x.." "..y.." l"
+                    eps:lineto(x,y)
                 end
             end
-            ps=ps..' '..r..' '..g..' '..b..' sc s\n'
+            eps:setrgb(r,g,b)
+            eps:stroke()
         end
     end
 
     if self.pars.showpoints then
-        ps=ps.." 1 1 0 sc\n"
-        ps=ps..'2 setlinewidth\n'
+        eps:setrgb(1,1,0)
+        eps:setlinewidth(2)
         for i=1,#self.lmk_src do
             local xs=self.lmk_src[i][1]
             local ys=self.lmk_src[i][2]
             local xd=self.lmk_dst[i][1]
             local yd=self.lmk_dst[i][2]
-            xs=math.floor(xs*25600+25600)/100
-            ys=math.floor(ys*25600+25600)/100
-            xd=math.floor(xd*25600+25600)/100
-            yd=math.floor(yd*25600+25600)/100
-            ps=ps.." "..xs.." "..ys.." m"
-            ps=ps.." "..xd.." "..yd.." l s\n"
+            eps:newpath()
+            eps:moveto(xs,ys)
+            eps:lineto(xd,yd)
+            eps:stroke()
         end
-        ps=ps.." 1 0 0 sc\n"
+        eps:setrgb(1,0,0)
         for i=1,#self.lmk_src do
             local x=self.lmk_src[i][1]
             local y=self.lmk_src[i][2]
-            x=math.floor(x*25600+25600)/100
-            y=math.floor(y*25600+25600)/100
-            ps=ps.." "..x.." "..y.." 5 dot f\n"
+            eps:dot(x,y,5)
+            eps:fill()
         end
-        ps=ps.." 0 0 1 sc\n"
+        eps:setrgb(0,0,1)
         for i=1,#self.lmk_dst do
             local x=self.lmk_dst[i][1]
             local y=self.lmk_dst[i][2]
-            x=math.floor(x*25600+25600)/100
-            y=math.floor(y*25600+25600)/100
-            ps=ps.." "..x.." "..y.." 5 dot f\n"
+            eps:dot(x,y,5)
+            eps:fill()
         end
     end
     if self.pars.showsolution then
-        ps=ps.." 1 0 1 sc\n"
-        ps=ps..'2 setlinewidth\n'
+        eps:setrgb(1,0,1)
+        eps:setlinewidth(2)
         if self.solved then
             local cq=self.data.cq
             local N=cq:depth()
@@ -403,29 +387,24 @@ matrix currentmatrix /originmat exch def
                     local t=j/64
                     local x=cubic.eval(cq:row(i-1,0),t)
                     local y=cubic.eval(cq:row(i-1,1),t)
-                    x=math.floor(x*25600+25600)/100
-                    y=math.floor(y*25600+25600)/100
                     if j==0 then
-                        ps=ps.." "..x.." "..y.." m"
+                        eps:newpath()
+                        eps:moveto(x,y)
                     else
-                        ps=ps.." "..x.." "..y.." l"
+                        eps:lineto(x,y)
                     end
                 end
-                ps=ps..' s\n'
+                eps:stroke()
             end
         end
     end
 
-    ps=ps..'showpage'
     local info=""
     info=info.."% environment: "..self.list_envs[self.pars.environment+1]
     info=info.."% t:           "..self.t
     info=info.."% tau:         "..self.pars.tau
-    ps=ps..info
-    local filename=os.date("result%Y%m%d%H%M%S.eps")
-    local file = io.open(filename, "w")
-    file:write(ps)
-    file:close()
+    eps:write(info)
+    eps:close()
 end
 
 function test_win:snap(x,y)

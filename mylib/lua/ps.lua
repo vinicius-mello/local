@@ -37,6 +37,10 @@ function ps:fill()
     self.file:write("f\n")
 end
 
+function ps:newpath()
+    self.file:write("np ")
+end
+
 function ps:closepath()
     self.file:write("cp ")
 end
@@ -57,6 +61,10 @@ function ps:setlinewidth(w)
     self.file:write(w.." ".."setlinewidth ")
 end
 
+function ps:write(str)
+    self.file:write(str)
+end
+
 ps.__index=ps
 
 function ps:BoundingBox(xa,ya,xb,yb)
@@ -66,7 +74,8 @@ function ps:BoundingBox(xa,ya,xb,yb)
     self.yb=yb
     local bb="%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: "..xa.." "..ya.." "..xb.." "..yb.."\n"
     local preamble=[[
-/m {newpath moveto} bind def
+/np {newpath} bind def
+/m {moveto} bind def
 /l {lineto} bind def
 /cp {closepath} bind def
 /s {stroke} bind def
