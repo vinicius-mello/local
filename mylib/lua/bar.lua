@@ -18,7 +18,9 @@ function bar.__index(table,key)
         elseif type==tw.TYPE_BOOL32 then
             return tw.GetBoolVarByName(table.bar,key)
         elseif type==tw.TYPE_DIR3F then
-            return tw.GetArrayVarByName(table.bar,key)
+            return tw.GetArrayFloatVarByName(table.bar,key)
+        elseif type==tw.TYPE_COLOR3F then
+            return tw.GetArrayFloatVarByName(table.bar,key)
         else
             return tw.GetIntVarByName(table.bar,key)
         end
@@ -37,7 +39,9 @@ function bar.__newindex(table,key,value)
         elseif type==tw.TYPE_BOOL32 then
             tw.SetBoolVarByName(table.bar,key,value)
         elseif type==tw.TYPE_DIR3F then
-            tw.SetArrayVarByName(table.bar,key,value)
+            tw.SetArrayFloatVarByName(table.bar,key,value)
+        elseif type==tw.TYPE_COLOR3F then
+            tw.SetArrayFloatVarByName(table.bar,key,value)
         else
             tw.SetIntVarByName(table.bar,key,value)
         end
@@ -61,6 +65,7 @@ end
 function bar:NewVar(value)
     if type(value.type)=="table" then
         local str=""
+        local i
         for i=1,#value.type.enum-1 do str=str..value.type.enum[i].."," end
         str=str..value.type.enum[#value.type.enum]
         tw.NewEnum(self.bar,value.name,value.type.name,str,

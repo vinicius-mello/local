@@ -2,12 +2,14 @@
 %{
 #include <wrappers/cl.hpp>
 typedef unsigned bitfield;
+typedef unsigned int uint;
 %}
 
 %include "std_string.i"
 %include cl.inc
 
 typedef unsigned bitfield;
+typedef unsigned int uint;
 
 class host {
     public:
@@ -36,7 +38,36 @@ class mem {
         mem();
         mem(const context& ctx, bitfield flags, size_t size=0, void * ptr=0);
         mem(const mem& mo);
+        cl_mem ptr() const;
         ~mem();
+};
+
+struct cl_image_format {
+    bitfield image_channel_order;
+    bitfield image_channel_data_type;
+};
+
+struct cl_image_desc {
+          uint image_type;
+          size_t image_width;
+          size_t image_height;
+          size_t image_depth;
+          size_t image_array_size;
+          size_t image_row_pitch;
+          size_t image_slice_pitch;
+          uint num_mip_levels;
+          uint num_samples;
+          cl_mem buffer;
+};
+
+class image : public mem {
+    public:
+    image() : mem();
+    image(const context& ctx, bitfield flags, const cl_image_format& ifmt,
+            const cl_image_desc& idesc,
+            void *host_ptr=0);
+    image(const image& im);
+    ~image();
 };
 
 class image2d : public mem {
@@ -124,6 +155,18 @@ class command_queue {
                 void * ptr) ;
         void copy_buffer(const mem& mo_src, const mem& mo_dst,
             size_t offset_src, size_t offset_dst, size_t count) ;
+        void write_image(const mem& mo, bool block,
+            size_t ox, size_t oy, size_t oz,
+            size_t cx, size_t cy, size_t cz,
+            size_t row_pitch,
+            size_t slice_pitch,
+            void * ptr) ;
+        void read_image(const mem& mo, bool block,
+            size_t ox, size_t oy, size_t oz,
+            size_t cx, size_t cy, size_t cz,
+            size_t row_pitch,
+            size_t slice_pitch,
+            void * ptr) ;
         void range_kernel1d(const kernel& ker,size_t offset, size_t global, size_t local) ;
         void range_kernel2d(const kernel& ker,size_t offset_x, size_t offset_y,
                 size_t global_x, size_t global_y, size_t local_x, size_t local_y);

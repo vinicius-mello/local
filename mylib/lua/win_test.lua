@@ -1,6 +1,6 @@
 package.cpath=package.cpath..";/usr/lib/lib?51.so;../mylib/lua/?.dll;../mylib/lua/?.so"
-require("win")
 require("array")
+require("win")
 require("cubic")
 
 test_win=win.New("test")
@@ -154,6 +154,7 @@ function test_win:Keyboard(key,x,y)
 end
 
 function test_win:Special(key,x,y)
+    print(key)
 end
 
 
@@ -164,8 +165,11 @@ function test_win:Init()
     gl.Disable('DEPTH_TEST')                         -- habilita teste z-buffer
     gl.Enable('CULL_FACE')
     gl.ShadeModel('FLAT')
-    --self.pars=bar.new("Parameters")
-    --self.pars.a={type=tw.TYPE_DOUBLE,properties="help='a'"}
+    self.pars=bar.New("Parameters")
+    self.pars:NewVar {name="a", type=tw.TYPE_COLOR3F, properties=""}
+    self.pars.a:set(0,0.8)
+    self.pars.a:set(1,0.1)
+    self.pars.a:set(2,0.6)
 end
 
 win.Loop()

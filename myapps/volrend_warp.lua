@@ -3,7 +3,6 @@ require("win")
 require("cl")
 require("gl2")
 require("array")
-require("colormap")
 
 cl.host_init()
 print("platform 0 info:",cl.host_get_platform_info(0,cl.PLATFORM_NAME))
@@ -26,28 +25,41 @@ const sampler_t samplersrc = CLK_NORMALIZED_COORDS_TRUE |
 CLK_ADDRESS_REPEAT         |
 CLK_FILTER_LINEAR;
 
-float f_cube(float3 w) {
-    float v=w.x*w.x+w.y*w.y+w.z*w.z-w.x*w.x*w.x*w.x-w.y*w.y*w.y*w.y-w.z*w.z*w.z*w.z;
-    float max_v=0.749173;
-    float min_v=0.0;
-    return (v-min_v)/(max_v-min_v);
+float density(float3 p) {
+    float x=p.x*p.x;
+    float y=p.y*p.y;
+    return (x*x+y*y)/2.0f;
 }
 
-float3 f_cube_grad(float3 p) {
-    float3 grad=(float3)(
-        2.0f*p.x-4.0f*p.x*p.x*p.x,
-        2.0f*p.y-4.0f*p.y*p.y*p.y,
-        2.0f*p.z-4.0f*p.z*p.z*p.z
-    );
-    return 1.0f/0.749173f*grad;
+float3 grad_density(float3 p) {
+    return (float3)(2.0f*p.x*p.x*p.x,2.0f*p.y*p.y*p.y,0.0f);
 }
 
-__kernel void kern(
-    __read_only image2d_t entry,
-    __read_only image2d_t exit,
-    __write_only image2d_t tex,
-    __read_only image1d_t transfer
-    )
+float3 twist_inv(float3 p, float k) {
+    float3 result;
+    float theta=k*p.z;
+    float C=cos(theta);
+    float S=sin(theta);
+    result.x=p.x*C+p.y*S;
+    result.y=-p.x*S+p.y*C;
+    result.z=p.z;
+    return result;
+}
+
+float3 twist_normal(float3 p, float3 n, float k) {
+    float3 result;
+    float theta=k*p.z;
+    float C=cos(theta);
+    float S=sin(theta);
+    result.x=n.x*C-n.y*S;
+    result.y=n.x*S+n.y*C;
+    result.z=p.y*k*n.x-p.x*k*n.y+n.z;
+    return result;
+}
+
+
+__kernel void kern(__read_only image2d_t entry,
+__read_only image2d_t exit,  __write_only image2d_t tex)
 {
     int x = get_global_id(0);
     int y = get_global_id(1);
@@ -55,7 +67,7 @@ __kernel void kern(
     int2 coords = (int2)(x,y);
     float2 tcoords = (float2)(x,y)/512.0f;
 
-    const float Samplings = 100.0f;
+    const float Samplings = 25.0f;
     const float k = 3.0f;
 
     float3 a=read_imagef(entry,samplersrc,tcoords).xyz;
@@ -70,20 +82,20 @@ __kernel void kern(
     for (int i=0; i<steps; i++) {
         float3 p=2.0f*a-1.0f;
 
-        float value=1.0f-f_cube(p);
+        p=twist_inv(p,k);
 
-        float3 n=-f_cube_grad(p);
+        float value=density(p);
 
-        n=n*(1.0f/length(n));
+        if(value<0.005) {
+            float3 n=grad_density(p);
 
-        dir=-dir*(1.0f/length(dir));
-        float4 color=read_imagef(transfer,samplersrc,value);
-        //color.rgb=dot(n,dir)*color.rgb;
-        result.rgb+=(1.0f-result.a)*color.a*color.rgb;
-        result.a+=(1.0f-result.a)*color.a;
-        if(result.a>=0.9) {
-            i=steps;
-            result.a=1.0;
+            n=twist_normal(p,n,k);
+
+            n=n*(1.0f/length(n));
+
+            dir=-dir*(1.0f/length(dir));
+            result=dot(n,dir)*(float4)(0.5f,0.3f,0.1f,0.0f);
+            break;
         }
         a+=diff1;
     }
@@ -241,20 +253,9 @@ function ctrl_win:run_kernel()
     self.cmd:add_object(self.cltex)
     self.cmd:aquire_globject()
     self.cmd:finish()
-    colormap.rgbamap(self.transfer_array, {
-        r={0,0,1,0,0},
-        g={0,0,0,0,0},
-        b={0,0,0,0,0},
-        a={0,1,1,0,0},
-        t={0,0.4,0.5,0.6,1}
-    })
-    self.cmd:write_image(self.transfer, true, 0,0,0,1024,1,1,0,0,
-        self.transfer_array:data())
     self.krn:arg(0,self.cltex_entry)
     self.krn:arg(1,self.cltex_exit)
     self.krn:arg(2,self.cltex)
-    self.krn:arg(3,self.transfer)
-
     self.cmd:range_kernel2d(self.krn,0,0,512,512,1,1)
     self.cmd:finish()
     self.cmd:add_object(self.cltex_entry)
@@ -382,35 +383,6 @@ function ctrl_win:Init()
     self.rb=gl2.render_buffer()
     self.rb:set(gl.DEPTH_COMPONENT,512,512)
     self.fbo=gl2.frame_buffer()
-
-    self.transfer_array=array.float(1024,4)
-    colormap.rgbamap(self.transfer_array, {
-        r={0,0,1,0,0},
-        g={0,0,1,0,0},
-        b={0,0,0,0,0},
-        a={0,1,1,0,0},
-        t={0,0.4,0.5,0.6,1}
-    })
-    local ifmt=cl.cl_image_format()
-    ifmt.image_channel_order=cl.RGBA
-    ifmt.image_channel_data_type=cl.FLOAT
-    local idesc=cl.cl_image_desc()
-    idesc.image_type=cl.MEM_OBJECT_IMAGE1D
-    --print(cl.host_get_device_info(0,gpu_id,cl.DEVICE_IMAGE2D_MAX_WIDTH))
-    idesc.image_width=1024
-    idesc.image_height=0
-    idesc.image_depth=0
-    idesc.image_array_size=0
-    idesc.image_row_pitch=0
-    idesc.image_slice_pitch=0
-    idesc.num_mip_levels=0
-    idesc.num_samples=0
-    --idesc.buffer=null:ptr()
-    print(cl.host_get_error())
-    self.transfer=cl.image(self.ctx,
-        cl.MEM_READ_ONLY+cl.MEM_COPY_HOST_PTR,
-        ifmt,idesc, self.transfer_array:data())
-    print(cl.host_get_error())
 end
 
 -- chamada quando uma tecla é pressionada

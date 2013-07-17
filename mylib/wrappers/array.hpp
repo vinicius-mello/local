@@ -207,6 +207,9 @@ class array {
     array<T> row(size_t i) {
         return array<T>(width_,data(offset(0,i,0)));
     }
+    array<T> row(size_t i) const {
+        return array<T>(width_,(void *)data(offset(0,i,0)));
+    }
     array<T> plane(size_t k) {
         return array<T>(height_,width_,data(offset(k,0,0)));
     }
@@ -218,6 +221,9 @@ class array {
     }
     T * data(size_t i, size_t j) {
         return data_+offset(i,j);
+    }
+    void * ptr() {
+        return (void *)data_;
     }
     const T * data(size_t i, size_t j) const {
         return data_+offset(i,j);

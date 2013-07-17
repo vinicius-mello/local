@@ -102,3 +102,15 @@ result,abserr=gsl.integrate {
 }
 
 print(result,abserr)
+
+a=vec {0,0,0,0,1,0,0,0}
+haar=gsl.dwt(gsl.haar,2)
+haar:inverse(a)
+for i=0,7 do print(a:get(i)) end
+
+b=vec {1,2,3,4,5,6,7,8}
+a=vec {0,0,0,0,0,0,0,0}
+dct8=gsl.dct(8)
+dct8:forward(b,a)
+for i=0,7 do print(a:get(i)) end
+

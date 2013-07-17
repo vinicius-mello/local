@@ -1,3 +1,6 @@
+#ifndef WRAP_GSL_HPP
+#define WRAP_GSL_HPP
+
 #include <iostream>
 #include "array.hpp"
 #include <gsl/gsl_blas.h>
@@ -9,6 +12,12 @@
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_sort_vector.h>
 #include <gsl/gsl_multiroots.h>
+#define GSL_DISABLE_DEPRECATED 1
+#include <gsl/gsl_wavelet.h>
+#include <gsl/gsl_wavelet2d.h>
+#include <gsl/gsl_complex.h>
+#include <gsl/gsl_complex_math.h>
+#include <gsl/gsl_fft_complex.h>
 
 using namespace std;
 
@@ -437,4 +446,228 @@ namespace gsl {
         return result;
     }
 
+
+    enum wavelet_type {
+        daubechies,
+        daubechies_centered,
+        haar,
+        haar_centered,
+        bspline,
+        bspline_centered
+    };
+
+    class dwt {
+        gsl_wavelet * w;
+        gsl_wavelet_workspace * work;
+        size_t n;
+        public:
+        dwt(wavelet_type t, size_t k) {
+            const gsl_wavelet_type * T;
+            switch(t) {
+                case daubechies:
+                    T=gsl_wavelet_daubechies;
+                    break;
+                case daubechies_centered:
+                    T=gsl_wavelet_daubechies_centered;
+                    break;
+                case haar:
+                    T=gsl_wavelet_haar;
+                    break;
+                case haar_centered:
+                    T=gsl_wavelet_haar_centered;
+                    break;
+                case bspline:
+                    T=gsl_wavelet_bspline;
+                    break;
+                case bspline_centered:
+                    T=gsl_wavelet_bspline_centered;
+                    break;
+            }
+            w=gsl_wavelet_alloc(T,k);
+            work=0;
+            n=0;
+        }
+        ~dwt() {
+            if(n) gsl_wavelet_workspace_free(work);
+            gsl_wavelet_free(w);
+        }
+        int forward(array<double>& a) {
+            size_t n_=a.size();
+            if(n_!=n) {
+                if(n) gsl_wavelet_workspace_free(work);
+                n=n_;
+                work=gsl_wavelet_workspace_alloc(n);
+            }
+            return gsl_wavelet_transform_forward(w,a.data(),1,n,work);
+        }
+        int inverse(array<double>& a) {
+            size_t n_=a.size();
+            if(n_!=n) {
+                if(n) gsl_wavelet_workspace_free(work);
+                n=n_;
+                work=gsl_wavelet_workspace_alloc(n);
+            }
+            return gsl_wavelet_transform_inverse(w,a.data(),1,n,work);
+        }
+        int forward2d(array<double>& a) {
+            size_t n_=a.width();
+            if(n_!=n) {
+                if(n) gsl_wavelet_workspace_free(work);
+                n=n_;
+                work=gsl_wavelet_workspace_alloc(n);
+            }
+            return gsl_wavelet2d_transform_forward(w,a.data(),n,n,n,work);
+        }
+        int inverse2d(array<double>& a) {
+            size_t n_=a.width();
+            if(n_!=n) {
+                if(n) gsl_wavelet_workspace_free(work);
+                n=n_;
+                work=gsl_wavelet_workspace_alloc(n);
+            }
+            return gsl_wavelet2d_transform_inverse(w,a.data(),n,n,n,work);
+        }
+    };
+
+
+    class dct {
+        size_t length;
+        double * signal_workspace;
+        gsl_complex *forward_weights;
+        gsl_complex *inverse_weights;
+        gsl_fft_complex_wavetable *wavetable;
+        gsl_fft_complex_workspace *workspace;
+        public:
+        dct(size_t l) : length(l) {
+            forward_weights=new gsl_complex[length];
+            inverse_weights=new gsl_complex[length];
+
+            for (int n = 0; n < length; n++)
+                forward_weights[n] =
+                    gsl_complex_div_real(
+                            gsl_complex_exp(gsl_complex_rect(0, (-n)*M_PI/2/length)),
+                            sqrt(2.0 * length));
+            forward_weights[0] =
+                gsl_complex_div_real(forward_weights[0], M_SQRT2);
+
+            for (int n = 0; n < length; n++)
+                inverse_weights[n] =
+                    gsl_complex_mul_real(gsl_complex_exp(gsl_complex_rect(0,
+                                    n*M_PI/2/length)),
+                            sqrt(2.0 * length));
+            inverse_weights[0] =
+                gsl_complex_div_real(inverse_weights[0], M_SQRT2);
+
+            signal_workspace = new double[length * 4];
+            wavetable = gsl_fft_complex_wavetable_alloc(length * 2);
+            workspace = gsl_fft_complex_workspace_alloc(length * 2);
+        }
+        ~dct() {
+            delete [] signal_workspace;
+            delete [] forward_weights;
+            delete [] inverse_weights;
+            gsl_fft_complex_wavetable_free(wavetable);
+            gsl_fft_complex_workspace_free(workspace);
+        }
+        int forward(const array<double>& input, array<double>& output) {
+            int ret;
+            for(size_t i=0;i<4*length;++i) signal_workspace[i]=0;
+            for (size_t index = 0; index < length; index++)
+            {
+                signal_workspace[2 * index] = input.get(index);
+                signal_workspace[2 * index + length * 2] =
+                    input.get(length - index - 1);
+            }
+
+            ret= gsl_fft_complex_forward((gsl_complex_packed_array)
+                    signal_workspace,
+                    1,
+                    length * 2,
+                    wavetable,
+                    workspace);
+            for (size_t index = 0; index < length; index++)
+                output.set(index,
+                        GSL_REAL(gsl_complex_mul(
+                                gsl_complex_rect(signal_workspace [2 * index],
+                                    signal_workspace [2 * index + 1]),
+                                forward_weights[index])));
+            return ret;
+        }
+        int inverse(const array<double>& input, array<double>& output) {
+            int ret;
+            gsl_complex temp_value;
+            for(size_t i=0;i<4*length;++i) signal_workspace[i]=0;
+            for (size_t index = 0; index < length; index++)
+            {
+                temp_value =
+                    gsl_complex_mul(gsl_complex_rect(input.get(index), 0),
+                            inverse_weights[index]);
+                signal_workspace[2 * index] = GSL_REAL(temp_value);
+                signal_workspace[2 * index + 1] = GSL_IMAG(temp_value);
+            }
+            signal_workspace[0] *= 2;
+            signal_workspace[1] *= 2;
+
+            for (size_t index = 0; index < length - 1; index++)
+            {
+                temp_value =
+                    gsl_complex_mul(gsl_complex_rect(0,
+                                -input.get(length -
+                                    index - 1) ),
+                            inverse_weights[index + 1]);
+                signal_workspace[2 * (index + length) + 2] =
+                    GSL_REAL(temp_value);
+                signal_workspace[2 * (index + length) + 3] =
+                    GSL_IMAG(temp_value);
+            }
+
+            ret=gsl_fft_complex_inverse((gsl_complex_packed_array)
+                    signal_workspace,
+                    1,
+                    length * 2,
+                    wavetable,
+                    workspace);
+
+            for (size_t index = 0; index < length; index ++)
+                output.set(index, signal_workspace[2 * index]);
+            return ret;
+        }
+        int forward2d(const array<double>& input, array<double>& output) {
+            array<double> temp(length);
+            array<double> temp2(length);
+            for(int i=0;i<length;++i) {
+                array<double> out(output.row(i));
+                array<double> in(input.row(i));
+                forward(in,out);
+            }
+            for(int j=0;j<length;++j) {
+                for(int i=0;i<length;++i)
+                    temp.set(i,output.get(i,j));
+                forward(temp,temp2);
+                for(int i=0;i<length;++i)
+                    output.set(i,j,temp2.get(i));
+            }
+            return GSL_SUCCESS;
+        }
+        int inverse2d(const array<double>& input, array<double>& output) {
+            array<double> temp(length);
+            array<double> temp2(length);
+            for(int i=0;i<length;++i) {
+                array<double> out(output.row(i));
+                array<double> in(input.row(i));
+                inverse(in,out);
+            }
+            for(int j=0;j<length;++j) {
+                for(int i=0;i<length;++i)
+                    temp.set(i,output.get(i,j));
+                inverse(temp,temp2);
+                for(int i=0;i<length;++i)
+                    output.set(i,j,temp2.get(i));
+            }
+            return GSL_SUCCESS;
+        }
+    };
+
 };
+
+#endif // WRAP_GSL_HPP

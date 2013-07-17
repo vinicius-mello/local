@@ -44,6 +44,7 @@ class array {
         T * data(size_t offset=0);
         T * data(size_t i, size_t j);
         T * data(size_t k, size_t i, size_t j);
+        void * ptr();
         void copy(const array& b, size_t offset=0);
         void zero();
         void set_all(T v);

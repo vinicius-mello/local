@@ -11,7 +11,7 @@ tw.ModifiersFunc()
 teste=bar.New("teste")
 teste:NewVar {name="a", type=tw.TYPE_DOUBLE, properties=""}
 teste:AddSeparator("sep")
-teste:NewVar {name="b", type={name="B", enum="B1,B2,B3"}, properties=""}
+teste:NewVar {name="b", type={name="B", enum={ "B1","B2","B3"} }, properties=""}
 teste.a=5
 teste:AddButton( "Ok", function() print("Ok") end)
 teste:Define(" teste iconified=true")

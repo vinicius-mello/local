@@ -94,6 +94,7 @@ class context {
     friend class command_queue;
     friend class mem;
     friend class image2d;
+    friend class image;
     friend class gl_texture2d;
     friend class gl_buffer;
     friend class gl_render_buffer;
@@ -193,12 +194,64 @@ class mem {
             debug_print("null mem copy_cons(%p)\n",this);
         }
     }
+    cl_mem ptr() const { return mo_;}
     virtual ~mem() {
         if(CL_SUCCESS==clReleaseMemObject(mo_)) {
             debug_print("~mem(%p)\n",this);
         } else {
             debug_print("error ~mem(%p)\n",this);
         }
+    }
+};
+
+#ifndef CL_VERSION_1_2
+struct cl_image_desc {
+          cl_mem_object_type image_type;
+          size_t image_width;
+          size_t image_height;
+          size_t image_depth;
+          size_t image_array_size;
+          size_t image_row_pitch;
+          size_t image_slice_pitch;
+          cl_uint num_mip_levels;
+          cl_uint num_samples;
+          cl_mem buffer;
+};
+#endif
+
+class image : public mem {
+    friend class kernel;
+    friend class command_queue;
+    public:
+    image() : mem() {
+        debug_print("image default(%p)\n",this);
+    }
+    image(const context& ctx, cl_mem_flags flags, const cl_image_format& ifmt,
+            const cl_image_desc& idesc,
+            void *host_ptr=0) {
+#ifdef CL_VERSION_1_2
+        mo_=clCreateImage(ctx.ctx_,flags,&ifmt,&idesc,host_ptr,&host::code_);
+#else
+        if(idesc.image_type==CL_MEM_OBJECT_IMAGE3D) {
+            mo_=clCreateImage3D(ctx.ctx_,flags,&ifmt,idesc.image_width,idesc.image_height,
+                idesc.image_depth,idesc.image_row_pitch,
+                idesc.image_slice_pitch,host_ptr,&host::code_);
+        } else {
+            mo_=clCreateImage2D(ctx.ctx_,flags,&ifmt,idesc.image_width,idesc.image_height,
+                idesc.image_row_pitch,host_ptr,&host::code_);
+        }
+#endif
+        debug_print("image new(%p)\n",this);
+    }
+    image(const image& im) {
+        mem::mo_=im.mo_;
+        if(mem::mo_) {
+            clRetainMemObject(mem::mo_);
+            debug_print("image copy_cons(%p)\n",this);
+        }
+    }
+    virtual ~image() {
+        debug_print("~image(%p)",this);
     }
 };
 
@@ -210,7 +263,7 @@ class image2d : public mem {
         debug_print("image2d default(%p)\n",this);
     }
     image2d(const context& ctx, cl_mem_flags flags, cl_channel_order order,
-            cl_channel_type type,	size_t image_width,	size_t image_height,
+            cl_channel_type type, size_t image_width, size_t image_height,
             void *host_ptr=0, size_t image_row_pitch=0) {
         cl_image_format ifmt;
         ifmt.image_channel_order=order;
@@ -503,6 +556,32 @@ class command_queue {
             size_t offset_src, size_t offset_dst, size_t count) {
         host::code_=clEnqueueCopyBuffer(que_,mo_src.mo_,
                 mo_dst.mo_,offset_src,offset_dst,count,wait_.size(),&wait_[0],ev_);
+        wait_.clear();ev_=0;
+    }
+    void write_image(const mem& mo, bool block,
+            size_t ox, size_t oy, size_t oz,
+            size_t cx, size_t cy, size_t cz,
+            size_t row_pitch,
+            size_t slice_pitch,
+            void * ptr) {
+        size_t origin[3];
+        size_t region[3];
+        origin[0]=ox;origin[1]=oy;origin[2]=oz;
+        region[0]=cx;region[1]=cy;region[2]=cz;
+        host::code_=clEnqueueWriteImage(que_,mo.mo_,block,origin,region,row_pitch,slice_pitch,ptr,wait_.size(),&wait_[0],ev_);
+        wait_.clear();ev_=0;
+    }
+    void read_image(const mem& mo, bool block,
+            size_t ox, size_t oy, size_t oz,
+            size_t cx, size_t cy, size_t cz,
+            size_t row_pitch,
+            size_t slice_pitch,
+            void * ptr) {
+        size_t origin[3];
+        size_t region[3];
+        origin[0]=ox;origin[1]=oy;origin[2]=oz;
+        region[0]=cx;region[1]=cy;region[2]=cz;
+        host::code_=clEnqueueReadImage(que_,mo.mo_,block,origin,region,row_pitch,slice_pitch,ptr,wait_.size(),&wait_[0],ev_);
         wait_.clear();ev_=0;
     }
     void range_kernel1d(const kernel& ker,size_t offset, size_t global, size_t local) {

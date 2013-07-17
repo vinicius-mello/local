@@ -89,5 +89,37 @@ namespace gsl {
     bool eigen_symm(array<double>& a, array<double>& eval);
     bool eigen_symm(array<double>& a, array<double>& eval, array<double>& evec);
 
+    enum wavelet_type {
+        daubechies,
+        daubechies_centered,
+        haar,
+        haar_centered,
+        bspline,
+        bspline_centered
+    };
+
+    class dwt {
+        public:
+            dwt(wavelet_type t, size_t k);
+            ~dwt();
+            int forward(array<double>& a);
+            int inverse(array<double>& a);
+            int forward2d(array<double>& a);
+            int inverse2d(array<double>& a);
+    };
+
+    class dct {
+        public:
+            dct(size_t l);
+            ~dct();
+            int forward(const array<double>& input,
+                array<double>& output);
+            int inverse(const array<double>& input,
+                array<double>& output);
+            int forward2d(const array<double>& input,
+                array<double>& output);
+            int inverse2d(const array<double>& input,
+                array<double>& output);
+    };
 }
 
