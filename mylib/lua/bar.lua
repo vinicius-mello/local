@@ -1,11 +1,17 @@
 bar={}
 require("tw")
+bar._callbacks={}
 
 function bar.New(name)
     tw.NewBar(name)
     local nbar={}
     nbar.bar=name
     nbar._vars={}
+    tw.UpdateCallback(function(varname)
+        if bar._callbacks[varname] then
+            bar._callbacks[varname]()
+        end
+    end)
     setmetatable(nbar,bar)
     return nbar
 end
@@ -45,6 +51,9 @@ function bar.__newindex(table,key,value)
         else
             tw.SetIntVarByName(table.bar,key,value)
         end
+        if bar._callbacks[table.bar.."/"..key] then
+            bar._callbacks[table.bar.."/"..key]()
+        end
     else
         rawset(table,key,value)
     end
@@ -74,6 +83,9 @@ function bar:NewVar(value)
         tw.NewVar(self.bar,value.name,value.type,value.properties)
     end
     self._vars[value.name]=true
+    if(value.update) then
+        bar._callbacks[self.bar.."/"..value.name]=value.update
+    end
 end
 
 return bar

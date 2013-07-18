@@ -25,6 +25,6 @@ void TwSetArrayFloatVarByName(const char * bar_name, const char * var_name, cons
 void TwAddSeparatorByName(const char * bar_name, const char * sp_name);
 void TwAddButtonByName(const char * bar_name, const char * button_name,
         TwButtonCallback callback, void *clientData);
-
+void TwUpdateCallback(void (*cb)(const char * string));
 
 #endif // WRAP_ANTTWEAKBAR_HPP

@@ -89,12 +89,21 @@ function ctrl_win:Init()
     self.basis=array.double(self.tile,self.tile)
     self.basisrgb=array.float(self.tile,self.tile,4)
     self.pars=bar.New("Parameters")
-    self.pars:NewVar {name="transform",
-        type={name="Transform",
-                enum={ "identity", "dct", "haar", "daubechies4", "bspline (3.3)"} }
+    self.pars:NewVar {
+        name="transform",
+        type={
+            name="Transform",
+            enum={
+                "identity",
+                "dct",
+                "haar",
+                "daubechies4",
+                "bspline (3.3)"
+            }
+        },
+        update=function() print("up") self:settex() end
     }
     self.pars.transform=1
-    self:settex()
 end
 
 function ctrl_win:settex()

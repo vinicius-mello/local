@@ -8,6 +8,7 @@ using std::string;
 using std::vector;
 using std::map;
 
+void (*update_cb)(const char * string)=0;
 
 struct TwVar {
     TwType type;
@@ -62,6 +63,11 @@ void TW_CALL set_cb(const void *value, void *clientData) {
             *ti=*((int *)value);
             break;
     }
+    if(update_cb) update_cb(names[id].c_str());
+}
+
+void TwUpdateCallback(void (*cb)(const char * string)) {
+    update_cb=cb;
 }
 
 void TW_CALL get_cb(void *value, void *clientData) {
