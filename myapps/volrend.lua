@@ -4,6 +4,7 @@ require("cl")
 require("gl2")
 require("array")
 require("colormap")
+require("transfer")
 
 cl.host_init()
 print("platform 0 info:",cl.host_get_platform_info(0,cl.PLATFORM_NAME))
@@ -64,26 +65,27 @@ __kernel void kern(
     float3 dir=b-a;
     int steps = (int)(floor(Samplings * length(dir)));
     float3 diff1 = dir / (float)(steps);
+    float delta=1.0f/Samplings;
 
-    float4 result = (float4)(0.0);
+    float4 result = (float4)(0.0,0.0,0.0,1.0);
 
     for (int i=0; i<steps; i++) {
         float3 p=2.0f*a-1.0f;
 
-        float value=1.0f-f_cube(p);
+        float value=f_cube(p);
 
-        float3 n=-f_cube_grad(p);
+        float3 n=f_cube_grad(p);
 
         n=n*(1.0f/length(n));
 
         dir=-dir*(1.0f/length(dir));
         float4 color=read_imagef(transfer,samplersrc,value);
-        //color.rgb=dot(n,dir)*color.rgb;
-        result.rgb+=(1.0f-result.a)*color.a*color.rgb;
-        result.a+=(1.0f-result.a)*color.a;
-        if(result.a>=0.9) {
+        //color.xyz=dot(-n,dir)*color.xyz;
+        result.w*=pow(color.w,delta);
+        result.xyz+=result.w*color.xyz*delta;
+        if(result.w<0.05f) {
             i=steps;
-            result.a=1.0;
+            result.w=0.0f;
         }
         a+=diff1;
     }
@@ -241,13 +243,18 @@ function ctrl_win:run_kernel()
     self.cmd:add_object(self.cltex)
     self.cmd:aquire_globject()
     self.cmd:finish()
+    --[[
     colormap.rgbamap(self.transfer_array, {
-        r={0,0,0,0,0},
+        r={0,0,0,1,0},
         g={0,0,0,0,0},
-        b={0,0,1,0,0},
-        a={0,1,1,0,0},
+        b={0,1,0,0,0},
+        a={0,.3,0,.5,0},
         t={0,0.4,0.5,0.6,1}
     })
+    ]]
+    if self.transfer_win and self.transfer_win.buildColorMap then
+        self.transfer_win:buildColorMap(self.transfer_array)
+    end
     self.cmd:write_image(self.transfer, true, 0,0,0,1024,1,1,0,0,
         self.transfer_array:data())
     self.krn:arg(0,self.cltex_entry)
@@ -384,6 +391,7 @@ function ctrl_win:Init()
     self.fbo=gl2.frame_buffer()
 
     self.transfer_array=array.float(1024,4)
+    --[[
     colormap.rgbamap(self.transfer_array, {
         r={0,0,1,0,0},
         g={0,0,1,0,0},
@@ -391,6 +399,7 @@ function ctrl_win:Init()
         a={0,1,1,0,0},
         t={0,0.4,0.5,0.6,1}
     })
+    ]]
     local ifmt=cl.cl_image_format()
     ifmt.image_channel_order=cl.RGBA
     ifmt.image_channel_data_type=cl.FLOAT
@@ -411,6 +420,9 @@ function ctrl_win:Init()
         cl.MEM_READ_ONLY+cl.MEM_COPY_HOST_PTR,
         ifmt,idesc, self.transfer_array:data())
     print(cl.host_get_error())
+    self.transfer_win=transfer.New("transfer",function()
+        ctrl_win:PostRedisplay()
+    end)
 end
 
 -- chamada quando uma tecla é pressionada

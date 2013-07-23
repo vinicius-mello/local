@@ -35,6 +35,7 @@ T initial_anti_causal_coefficient( size_t l, const T* c)
 template <class T>
 void convert_to_cubic( size_t l, T* c)
 {
+    if(l<=1) return;
     const T pole=(T)(sqrt(3.0)-2.0);
     // compute the overall gain
     const T lambda =(T)((1.0 - pole) * (1.0 - 1.0 / pole));
@@ -139,7 +140,42 @@ T cubic_evald(
 
 template <class T>
 void convert_to_cubic(array<T>& c) {
-    return convert_to_cubic(c.size(),c.data());
+    for(size_t i=0;i<c.rows();++i) {
+        for(size_t j=0;j<c.columns();++j) {
+            array<T> temp(c.depth());
+            for(size_t k=0;k<c.depth();++k) {
+                temp.set(k,c.get(k,i,j));
+            }
+            convert_to_cubic(temp.size(),temp.data());
+            for(size_t k=0;k<c.depth();++k) {
+                c.set(k,i,j,temp.get(k));
+            }
+        }
+    }
+    for(size_t i=0;i<c.rows();++i) {
+        for(size_t k=0;k<c.depth();++k) {
+            array<T> temp(c.columns());
+            for(size_t j=0;j<c.columns();++j) {
+                temp.set(j,c.get(k,i,j));
+            }
+            convert_to_cubic(temp.size(),temp.data());
+            for(size_t j=0;j<c.columns();++j) {
+                c.set(k,i,j,temp.get(j));
+            }
+        }
+    }
+    for(size_t j=0;j<c.columns();++j) {
+        for(size_t k=0;k<c.depth();++k) {
+            array<T> temp(c.rows());
+            for(size_t i=0;i<c.rows();++i) {
+                temp.set(i,c.get(k,i,j));
+            }
+            convert_to_cubic(temp.size(),temp.data());
+            for(size_t i=0;i<c.rows();++i) {
+                c.set(k,i,j,temp.get(i));
+            }
+        }
+    }
 }
 
 template <class T>

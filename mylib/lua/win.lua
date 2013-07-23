@@ -13,8 +13,14 @@ glut.InitWindowSize(512,512)
 win={}
 
 function win:PostRedisplay()
+    local id=glut.GetWindow()
     glut.SetWindow(self.glutwin.id)
     glut.PostRedisplay()
+    glut.SetWindow(id)
+end
+
+function win:PostRedisplayOthers()
+    glut.PostRedisplayOthers()
 end
 
 function win:MakeCurrent()
