@@ -27,6 +27,123 @@ const sampler_t samplersrc = CLK_NORMALIZED_COORDS_TRUE |
 CLK_ADDRESS_REPEAT         |
 CLK_FILTER_LINEAR;
 
+
+size_t offset(size_t k, size_t i, size_t j, size_t width_, size_t height_) {
+    return k*width_*height_+i*width_+j;
+}
+
+float get(float* data_, size_t k, size_t i, size_t j, size_t width_, size_t height_){
+    return data_[offset(k,i,j,width_,height_)];
+}
+
+float set(float* data_, size_t k, size_t i, size_t j, float v, size_t width_, size_t height_) {
+    data_[offset(k,i,j,width_,height_)]=v;
+    return v;
+}
+
+float bspline(float t)
+{
+    t = fabs(t);
+    float a = 2.0f - t;
+
+    if (t < 1.0f)
+        return 2.0f/3.0f - 0.5f*t*t*a;
+    else if (t < 2.0f)
+        return a*a*a / 6.0f;
+    else
+        return 0.0f;
+}
+
+float bsplined(float t)
+{
+
+    float c=sign(t); //sgn
+    t = fabs(t);
+    float a = 2.0f - t;
+
+    if (t < 1.0f)
+        return c*t*(3.0f*t-4) / 2.0f;
+    else if (t < 2.0f)
+        return -c*a*a / 2.0f;
+    else
+        return 0.0f;
+}
+
+float eval(float* data_, float tx, float ty, float tz, size_t width_, size_t height_, size_t depth_){
+    float ttx=tx*(width_-1);
+    float bx=floor(ttx);
+    float deltax=ttx-bx;
+    int bix=(int)bx;
+
+    float tty=ty*(height_-1);
+    float by=floor(tty);
+    float deltay=tty-by;
+    int biy=(int)by;
+
+    float ttz=tz*(depth_-1);
+    float bz=floor(ttz);
+    float deltaz=ttz-bz;
+    int biz=(int)bz;
+
+    float v=0.0f;
+    for(int i=-1;i<=2;++i) {
+        int indexx=bix+i;
+        if(indexx<0) indexx=-indexx;
+        else if(indexx>=width_) indexx=2*width_-indexx-2;
+        for(int j=-1;j<=2;++j) {
+            int indexy=biy+j;
+            if(indexy<0) indexy=-indexy;
+            else if(indexy>=height_) indexy=2*height_-indexy-2;
+            for(int k=-1;k<=2;++k) {
+                int indexz=biz+k;
+                if(indexz<0) indexz=-indexz;
+                else if(indexz>=depth_) indexz=2*depth_-indexz-2;
+                v+=get(data_, k, i, j, width_, height_)*bspline(deltax-(float)i)*bspline(deltay-(float)j)*bspline(deltaz-(float)k);
+            }
+        }
+    }
+    return v;
+}
+
+float3 evald(float* data_, float tx, float ty, float tz, size_t width_, size_t height_, size_t depth_){
+    float ttx=tx*(width_-1);
+    float bx=floor(ttx);
+    float deltax=ttx-bx;
+    int bix=(int)bx;
+
+    float tty=ty*(height_-1);
+    float by=floor(tty);
+    float deltay=tty-by;
+    int biy=(int)by;
+
+    float ttz=tz*(depth_-1);
+    float bz=floor(ttz);
+    float deltaz=ttz-bz;
+    int biz=(int)bz;
+
+    float3 v=0.0f;
+    for(int i=-1;i<=2;++i) {
+        int indexx=bix+i;
+        if(indexx<0) indexx=-indexx;
+        else if(indexx>=width_) indexx=2*width_-indexx-2;
+        for(int j=-1;j<=2;++j) {
+            int indexy=biy+j;
+            if(indexy<0) indexy=-indexy;
+            else if(indexy>=height_) indexy=2*height_-indexy-2;
+            for(int k=-1;k<=2;++k) {
+                int indexz=biz+k;
+                if(indexz<0) indexz=-indexz;
+                else if(indexz>=depth_) indexz=2*depth_-indexz-2;
+                v.x+=get(data_, k, i, j, width_, height_)*bsplined(deltax-(float)i)*bspline(deltay-(float)j)*bspline(deltaz-(float)k);
+                v.y+=get(data_, k, i, j, width_, height_)*bspline(deltax-(float)i)*bsplined(deltay-(float)j)*bspline(deltaz-(float)k);
+                v.z+=get(data_, k, i, j, width_, height_)*bspline(deltax-(float)i)*bspline(deltay-(float)j)*bsplined(deltaz-(float)k);
+            }
+        }
+    }
+    return v;
+}
+
+
 float f_cube(float3 w) {
     float v=w.x*w.x+w.y*w.y+w.z*w.z-w.x*w.x*w.x*w.x-w.y*w.y*w.y*w.y-w.z*w.z*w.z*w.z;
     float max_v=0.749173;
@@ -419,10 +536,20 @@ function ctrl_win:Init()
     self.transfer=cl.image(self.ctx,
         cl.MEM_READ_ONLY+cl.MEM_COPY_HOST_PTR,
         ifmt,idesc, self.transfer_array:data())
+    self.volume_array=array.float(32,32,32)
+    self:fill_volume()
     print(cl.host_get_error())
     self.transfer_win=transfer.New("transfer",function()
         ctrl_win:PostRedisplay()
     end)
+end
+
+function ctrl_win:fill_volume()
+    local i,j,k
+    local x,y,z
+    for i=0,self.volume_array:width()
+    for j=0,self.volume_array:width()
+    for k=0,self.volume_array:width()
 end
 
 -- chamada quando uma tecla é pressionada

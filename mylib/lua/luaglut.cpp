@@ -140,7 +140,9 @@ void special_cb(int key, int x, int y) {
 
 int lua_Init(lua_State * L) {
     int argc=0;
-    glutInit(&argc,0);
+    char argv;
+    char * argv_ptr=&argv;
+    glutInit(&argc,&argv_ptr);
     for(int i=0;i<256;++i) windows[i].L=0;
     windows[0].t_index=-1; //idle;
     return 0;
