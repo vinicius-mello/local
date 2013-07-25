@@ -3,6 +3,7 @@ require("win")
 require("cl")
 require("gl2")
 require("array")
+require("cubic")
 require("colormap")
 require("transfer")
 
@@ -32,11 +33,11 @@ size_t offset(size_t k, size_t i, size_t j, size_t width_, size_t height_) {
     return k*width_*height_+i*width_+j;
 }
 
-float get(float* data_, size_t k, size_t i, size_t j, size_t width_, size_t height_){
+float get(__global float* data_, size_t k, size_t i, size_t j, size_t width_, size_t height_){
     return data_[offset(k,i,j,width_,height_)];
 }
 
-float set(float* data_, size_t k, size_t i, size_t j, float v, size_t width_, size_t height_) {
+float set(__global float* data_, size_t k, size_t i, size_t j, float v, size_t width_, size_t height_) {
     data_[offset(k,i,j,width_,height_)]=v;
     return v;
 }
@@ -69,7 +70,7 @@ float bsplined(float t)
         return 0.0f;
 }
 
-float eval(float* data_, float tx, float ty, float tz, size_t width_, size_t height_, size_t depth_){
+float eval(__global float* data_, float tx, float ty, float tz, size_t width_, size_t height_, size_t depth_){
     float ttx=tx*(width_-1);
     float bx=floor(ttx);
     float deltax=ttx-bx;
@@ -105,7 +106,7 @@ float eval(float* data_, float tx, float ty, float tz, size_t width_, size_t hei
     return v;
 }
 
-float3 evald(float* data_, float tx, float ty, float tz, size_t width_, size_t height_, size_t depth_){
+float3 evald(__global float* data_, float tx, float ty, float tz, size_t width_, size_t height_, size_t depth_){
     float ttx=tx*(width_-1);
     float bx=floor(ttx);
     float deltax=ttx-bx;
@@ -164,7 +165,11 @@ __kernel void kern(
     __read_only image2d_t entry,
     __read_only image2d_t exit,
     __write_only image2d_t tex,
-    __read_only image1d_t transfer
+    __read_only image1d_t transfer,
+    __global float * data,
+    int width,
+    int height,
+    int depth
     )
 {
     int x = get_global_id(0);
@@ -188,10 +193,15 @@ __kernel void kern(
 
     for (int i=0; i<steps; i++) {
         float3 p=2.0f*a-1.0f;
+        //float3 p=a;
 
         float value=f_cube(p);
+        
+        //float value=eval(data,p.x,p.y,p.z,width,height,depth);
 
         float3 n=f_cube_grad(p);
+
+        //float3 n=evald(data,p.x,p.y,p.z,width,height,depth);
 
         n=n*(1.0f/length(n));
 
@@ -374,10 +384,16 @@ function ctrl_win:run_kernel()
     end
     self.cmd:write_image(self.transfer, true, 0,0,0,1024,1,1,0,0,
         self.transfer_array:data())
+    self.cmd:write_buffer(self.volume, true, 0, self.volume_array:size_of(), self.volume_array:data())
     self.krn:arg(0,self.cltex_entry)
     self.krn:arg(1,self.cltex_exit)
     self.krn:arg(2,self.cltex)
     self.krn:arg(3,self.transfer)
+    self.krn:arg(4,self.volume)
+    self.krn:arg(5,self.volume_array:width())
+    self.krn:arg(6,self.volume_array:height())
+    self.krn:arg(7,self.volume_array:depth())
+    
 
     self.cmd:range_kernel2d(self.krn,0,0,512,512,1,1)
     self.cmd:finish()
@@ -538,6 +554,8 @@ function ctrl_win:Init()
         ifmt,idesc, self.transfer_array:data())
     self.volume_array=array.float(32,32,32)
     self:fill_volume()
+    cubic.convert(self.volume_array)
+    self.volume=cl.mem(self.ctx,cl.MEM_READ_ONLY,self.volume_array:size_of())
     print(cl.host_get_error())
     self.transfer_win=transfer.New("transfer",function()
         ctrl_win:PostRedisplay()
