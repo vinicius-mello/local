@@ -547,9 +547,19 @@ end
 function ctrl_win:fill_volume()
     local i,j,k
     local x,y,z
-    for i=0,self.volume_array:width()
-    for j=0,self.volume_array:width()
-    for k=0,self.volume_array:width()
+    local max_v=0.749173;
+    local min_v=0.0;
+    for i=0,self.volume_array:width()-1 do
+        x=i/self.volume_array:width()-1
+        for j=0,self.volume_array:height()-1 do
+            y=j/self.volume_array:height()-1
+            for k=0,self.volume_array:depth()-1 do
+                z=k/self.volume_array:depth()-1
+                local v=x*x+y*y+z*z-x*x*x*x-y*y*y*y-z*z*z*z
+                self.volume_array:set(k,i,j, (v-min_v)/(max_v-min_v))
+            end
+        end
+    end
 end
 
 -- chamada quando uma tecla é pressionada
