@@ -19,6 +19,12 @@ template <class T>
 T cubic_evald(const array<T>& c, T t);
 
 template <class T>
+T cubic_eval(const array<T>& c, T tx, T ty, T tz);
+
+template <class T>
+void cubic_evald(const array<T>& c, T tx, T ty, T tz, array<T>& v);
+
+template <class T>
 void convert_to_cubic(array<T>& c);
 
 template <class T>

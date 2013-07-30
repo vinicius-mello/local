@@ -167,12 +167,12 @@ class command_queue {
             size_t row_pitch,
             size_t slice_pitch,
             void * ptr) ;
-        void range_kernel1d(const kernel& ker,size_t offset, size_t global, size_t local) ;
+        void range_kernel1d(const kernel& ker,size_t offset, size_t global, size_t local=0) ;
         void range_kernel2d(const kernel& ker,size_t offset_x, size_t offset_y,
-                size_t global_x, size_t global_y, size_t local_x, size_t local_y);
+                size_t global_x, size_t global_y, size_t local_x=0, size_t local_y=0);
         void range_kernel3d(const kernel& ker,size_t offset_x, size_t offset_y,
                 size_t offset_z, size_t global_x, size_t global_y, size_t global_z,
-                size_t local_x, size_t local_y, size_t local_z);
+                size_t local_x=0, size_t local_y=0, size_t local_z=0);
         void add_object(const mem& mo);
         void aquire_globject();
         void release_globject();

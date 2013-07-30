@@ -584,29 +584,37 @@ class command_queue {
         host::code_=clEnqueueReadImage(que_,mo.mo_,block,origin,region,row_pitch,slice_pitch,ptr,wait_.size(),&wait_[0],ev_);
         wait_.clear();ev_=0;
     }
-    void range_kernel1d(const kernel& ker,size_t offset, size_t global, size_t local) {
+    void range_kernel1d(const kernel& ker,size_t offset, size_t global, size_t local=0) {
         size_t offset_[1]; offset_[0]=offset;
         size_t global_[1]; global_[0]=global;
         size_t local_[1]; local_[0]=local;
-        host::code_=clEnqueueNDRangeKernel(que_,ker.ker_,1,offset_,global_,local_,wait_.size(),&wait_[0],ev_);
+        if(local==0)
+            host::code_=clEnqueueNDRangeKernel(que_,ker.ker_,1,offset_,global_,0,wait_.size(),&wait_[0],ev_);
+        else
+            host::code_=clEnqueueNDRangeKernel(que_,ker.ker_,1,offset_,global_,local_,wait_.size(),&wait_[0],ev_);
         wait_.clear();ev_=0;
     }
     void range_kernel2d(const kernel& ker,size_t offset_x, size_t offset_y,
-            size_t global_x, size_t global_y, size_t local_x, size_t local_y) {
+            size_t global_x, size_t global_y, size_t local_x=0, size_t local_y=0) {
         size_t offset_[2]; offset_[0]=offset_x; offset_[1]=offset_y;
         size_t global_[2]; global_[0]=global_x; global_[1]=global_y;
         size_t local_[2]; local_[0]=local_x; local_[1]=local_y;
-
-        host::code_=clEnqueueNDRangeKernel(que_,ker.ker_,2,offset_,global_,local_,wait_.size(),&wait_[0],ev_);
+        if(local_x==0 || local_y==0)
+            host::code_=clEnqueueNDRangeKernel(que_,ker.ker_,2,offset_,global_,0,wait_.size(),&wait_[0],ev_);
+        else
+            host::code_=clEnqueueNDRangeKernel(que_,ker.ker_,2,offset_,global_,local_,wait_.size(),&wait_[0],ev_);
         wait_.clear();ev_=0;
     }
     void range_kernel3d(const kernel& ker,size_t offset_x, size_t offset_y,
             size_t offset_z, size_t global_x, size_t global_y, size_t global_z,
-            size_t local_x, size_t local_y, size_t local_z) {
+            size_t local_x=0, size_t local_y=0, size_t local_z=0) {
         size_t offset_[3]; offset_[0]=offset_x; offset_[1]=offset_y; offset_[2]=offset_z;
         size_t global_[3]; global_[0]=global_x; global_[1]=global_y; global_[2]=global_z;
         size_t local_[3]; local_[0]=local_x; local_[1]=local_y; local_[2]=local_z;
-        host::code_=clEnqueueNDRangeKernel(que_,ker.ker_,3,offset_,global_,local_,wait_.size(),&wait_[0],ev_);
+        if(local_x==0 || local_y==0 || local_z==0)
+            host::code_=clEnqueueNDRangeKernel(que_,ker.ker_,3,offset_,global_,0,wait_.size(),&wait_[0],ev_);
+        else
+            host::code_=clEnqueueNDRangeKernel(que_,ker.ker_,3,offset_,global_,local_,wait_.size(),&wait_[0],ev_);
         wait_.clear();ev_=0;
     }
     void add_object(const mem& mo) {

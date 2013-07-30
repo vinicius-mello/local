@@ -31,3 +31,16 @@ end
 gnuplot:write("e\n")
 gnuplot:flush()
 
+c=array.float(17,17,17)
+for i=0,c:width()-1 do
+    for j=0,c:height()-1 do
+        for k=0,c:depth()-1 do
+            c:set(k,i,j,i+j+k)
+        end
+    end
+end
+cubic.convert(c)
+r=array.float(3)
+cubic.evald(c,0.125,0.35,0.3,r)
+print(r:get(0),r:get(1),r:get(2))
+

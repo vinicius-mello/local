@@ -14,6 +14,7 @@ print("#devices in platform 0:",cl.host_ndevices(0))
 gpu_id=nil
 for i=0,cl.host_ndevices(0)-1 do
     local dtype=cl.host_get_device_info(0,i,cl.DEVICE_TYPE)
+    print(i,dtype)
     if string.find(dtype,"gpu") then
         gpu_id=i
     end
@@ -87,19 +88,19 @@ float eval(__global float* data_, float tx, float ty, float tz, size_t width_, s
     int biz=(int)bz;
 
     float v=0.0f;
-    for(int i=-1;i<=2;++i) {
-        int indexx=bix+i;
-        if(indexx<0) indexx=-indexx;
-        else if(indexx>=width_) indexx=2*width_-indexx-2;
+    for(int k=-1;k<=2;++k) {
+        int indexz=biz+k;
+        if(indexz<0) indexz=-indexz;
+        else if(indexz>=depth_) indexz=2*depth_-indexz-2;
         for(int j=-1;j<=2;++j) {
             int indexy=biy+j;
             if(indexy<0) indexy=-indexy;
             else if(indexy>=height_) indexy=2*height_-indexy-2;
-            for(int k=-1;k<=2;++k) {
-                int indexz=biz+k;
-                if(indexz<0) indexz=-indexz;
-                else if(indexz>=depth_) indexz=2*depth_-indexz-2;
-                v+=get(data_, k, i, j, width_, height_)*bspline(deltax-(float)i)*bspline(deltay-(float)j)*bspline(deltaz-(float)k);
+            for(int i=-1;i<=2;++i) {
+                int indexx=bix+i;
+                if(indexx<0) indexx=-indexx;
+                else if(indexx>=width_) indexx=2*width_-indexx-2;
+                v+=get(data_, indexz, indexx, indexy, width_, height_)*bspline(deltax-(float)i)*bspline(deltay-(float)j)*bspline(deltaz-(float)k);
             }
         }
     }
@@ -123,21 +124,21 @@ float3 evald(__global float* data_, float tx, float ty, float tz, size_t width_,
     int biz=(int)bz;
 
     float3 v=0.0f;
-    for(int i=-1;i<=2;++i) {
-        int indexx=bix+i;
-        if(indexx<0) indexx=-indexx;
-        else if(indexx>=width_) indexx=2*width_-indexx-2;
+    for(int k=-1;k<=2;++k) {
+        int indexz=biz+k;
+        if(indexz<0) indexz=-indexz;
+        else if(indexz>=depth_) indexz=2*depth_-indexz-2;
         for(int j=-1;j<=2;++j) {
             int indexy=biy+j;
             if(indexy<0) indexy=-indexy;
             else if(indexy>=height_) indexy=2*height_-indexy-2;
-            for(int k=-1;k<=2;++k) {
-                int indexz=biz+k;
-                if(indexz<0) indexz=-indexz;
-                else if(indexz>=depth_) indexz=2*depth_-indexz-2;
-                v.x+=get(data_, k, i, j, width_, height_)*bsplined(deltax-(float)i)*bspline(deltay-(float)j)*bspline(deltaz-(float)k);
-                v.y+=get(data_, k, i, j, width_, height_)*bspline(deltax-(float)i)*bsplined(deltay-(float)j)*bspline(deltaz-(float)k);
-                v.z+=get(data_, k, i, j, width_, height_)*bspline(deltax-(float)i)*bspline(deltay-(float)j)*bsplined(deltaz-(float)k);
+            for(int i=-1;i<=2;++i) {
+                int indexx=bix+i;
+                if(indexx<0) indexx=-indexx;
+                else if(indexx>=width_) indexx=2*width_-indexx-2;
+                v.x+=get(data_, indexz, indexx, indexy, width_, height_)*bsplined(deltax-(float)i)*bspline(deltay-(float)j)*bspline(deltaz-(float)k);
+                v.y+=get(data_, indexz, indexx, indexy, width_, height_)*bspline(deltax-(float)i)*bsplined(deltay-(float)j)*bspline(deltaz-(float)k);
+                v.z+=get(data_, indexz, indexx, indexy, width_, height_)*bspline(deltax-(float)i)*bspline(deltay-(float)j)*bsplined(deltaz-(float)k);
             }
         }
     }
@@ -187,27 +188,28 @@ __kernel void kern(
     float3 dir=b-a;
     int steps = (int)(floor(Samplings * length(dir)));
     float3 diff1 = dir / (float)(steps);
+    dir=dir*(1.0f/length(dir));
     float delta=1.0f/Samplings;
 
     float4 result = (float4)(0.0,0.0,0.0,1.0);
 
     for (int i=0; i<steps; i++) {
-        float3 p=2.0f*a-1.0f;
-        //float3 p=a;
+        //float3 p=2.0f*a-1.0f;
+        float3 p=a;
 
-        float value=f_cube(p);
+        //float value=f_cube(p);
         
-        //float value=eval(data,p.x,p.y,p.z,width,height,depth);
+        float value=eval(data,p.x,p.y,p.z,width,height,depth);
 
-        float3 n=f_cube_grad(p);
+        float4 color=read_imagef(transfer,samplersrc,value);
+
+        //float3 n=f_cube_grad(p);
 
         //float3 n=evald(data,p.x,p.y,p.z,width,height,depth);
 
-        n=n*(1.0f/length(n));
+        //n=-n*(1.0f/max(0.000001f,length(n)));
+        // color.xyz=max(0.0f,dot(n,dir))*color.xyz;
 
-        dir=-dir*(1.0f/length(dir));
-        float4 color=read_imagef(transfer,samplersrc,value);
-        //color.xyz=dot(-n,dir)*color.xyz;
         result.w*=pow(color.w,delta);
         result.xyz+=result.w*color.xyz*delta;
         if(result.w<0.05f) {
@@ -395,7 +397,7 @@ function ctrl_win:run_kernel()
     self.krn:arg(7,self.volume_array:depth())
     
 
-    self.cmd:range_kernel2d(self.krn,0,0,512,512,1,1)
+    self.cmd:range_kernel2d(self.krn,0,0,512,512)
     self.cmd:finish()
     self.cmd:add_object(self.cltex_entry)
     self.cmd:add_object(self.cltex_exit)
@@ -568,11 +570,11 @@ function ctrl_win:fill_volume()
     local max_v=0.749173;
     local min_v=0.0;
     for i=0,self.volume_array:width()-1 do
-        x=i/self.volume_array:width()-1
+        x=2*i/(self.volume_array:width()-1)-1
         for j=0,self.volume_array:height()-1 do
-            y=j/self.volume_array:height()-1
+            y=2*j/(self.volume_array:height()-1)-1
             for k=0,self.volume_array:depth()-1 do
-                z=k/self.volume_array:depth()-1
+                z=2*k/(self.volume_array:depth()-1)-1
                 local v=x*x+y*y+z*z-x*x*x*x-y*y*y*y-z*z*z*z
                 self.volume_array:set(k,i,j, (v-min_v)/(max_v-min_v))
             end

@@ -188,6 +188,80 @@ T cubic_evald(const array<T>& c, T t) {
     return cubic_evald(c.size(),c.data(),t);
 }
 
+template <class T>
+T cubic_eval(const array<T>& c, T tx, T ty, T tz) {
+    T ttx=tx*(c.width()-1);
+    T bx=floor(ttx);
+    T deltax=ttx-bx;
+    int bix=(int)bx;
+
+    T tty=ty*(c.height()-1);
+    T by=floor(tty);
+    T deltay=tty-by;
+    int biy=(int)by;
+
+    T ttz=tz*(c.depth()-1);
+    T bz=floor(ttz);
+    T deltaz=ttz-bz;
+    int biz=(int)bz;
+
+    T v=0;
+    for(int i=-1;i<=2;++i) {
+        int indexx=bix+i;
+        if(indexx<0) indexx=-indexx;
+        else if(indexx>=c.width()) indexx=2*c.width()-indexx-2;
+        for(int j=-1;j<=2;++j) {
+            int indexy=biy+j;
+            if(indexy<0) indexy=-indexy;
+            else if(indexy>=c.height()) indexy=2*c.height()-indexy-2;
+            for(int k=-1;k<=2;++k) {
+                int indexz=biz+k;
+                if(indexz<0) indexz=-indexz;
+                else if(indexz>=c.depth()) indexz=2*c.depth()-indexz-2;
+                v+=c.get(indexz, indexx, indexy)*bspline(deltax-(T)i)*bspline(deltay-(T)j)*bspline(deltaz-(T)k);
+            }
+        }
+    }
+    return v;
+}
+
+template <class T>
+void cubic_evald(const array<T>& c, T tx, T ty, T tz, array<T>& v) {
+    T ttx=tx*(c.width()-1);
+    T bx=floor(ttx);
+    T deltax=ttx-bx;
+    int bix=(int)bx;
+
+    T tty=ty*(c.height()-1);
+    T by=floor(tty);
+    T deltay=tty-by;
+    int biy=(int)by;
+
+    T ttz=tz*(c.depth()-1);
+    T bz=floor(ttz);
+    T deltaz=ttz-bz;
+    int biz=(int)bz;
+
+    v.zero();
+    for(int i=-1;i<=2;++i) {
+        int indexx=bix+i;
+        if(indexx<0) indexx=-indexx;
+        else if(indexx>=c.width()) indexx=2*c.width()-indexx-2;
+        for(int j=-1;j<=2;++j) {
+            int indexy=biy+j;
+            if(indexy<0) indexy=-indexy;
+            else if(indexy>=c.height()) indexy=2*c.height()-indexy-2;
+            for(int k=-1;k<=2;++k) {
+                int indexz=biz+k;
+                if(indexz<0) indexz=-indexz;
+                else if(indexz>=c.depth()) indexz=2*c.depth()-indexz-2;
+                v.add_to(0,c.get(indexz,indexx,indexy)*bsplined(deltax-(T)i)*bspline(deltay-(T)j)*bspline(deltaz-(T)k));
+                v.add_to(1,c.get(indexz,indexx,indexy)*bspline(deltax-(T)i)*bsplined(deltay-(T)j)*bspline(deltaz-(T)k));
+                v.add_to(2,c.get(indexz,indexx,indexy)*bspline(deltax-(T)i)*bspline(deltay-(T)j)*bsplined(deltaz-(T)k));
+            }
+        }
+    }
+}
 
 template <class T>
 void natural_spline(size_t n, const T * x, const T * y, T * y2, T * u) {
