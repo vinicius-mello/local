@@ -13,26 +13,26 @@ function transfer.New(name,callback)
     transfer_win.b = {}
     transfer_win.callback=callback
 
+    --Ponto Inicial
+    transfer_win.x[1] = -0.9 -- x
+    transfer_win.y[1] = 0    -- y
+    transfer_win.r[1] = 0    -- r
+    transfer_win.g[1] = 0    -- g
+    transfer_win.b[1] = 1    -- b
+
+    --Ponto Final
+    transfer_win.x[2] = 0.9  -- x
+    transfer_win.y[2] = 0    -- y
+    transfer_win.r[2] = 0    -- r
+    transfer_win.g[2] = 1    -- g
+    transfer_win.b[2] = 0    -- b
+
     function transfer_win:Init()
         gl.ClearColor(0.0, 0.0, 0.0, 0.5)                  -- cor de fundo preta
         gl.ClearDepth(1.0)                              -- valor do z-buffer
         gl.Disable('DEPTH_TEST')                         -- habilita teste z-buffer
         gl.Enable('CULL_FACE')
         gl.ShadeModel('FLAT')
-
-        --Ponto Inicial
-        transfer_win.x[1] = -0.9 -- x
-        transfer_win.y[1] = 0    -- y
-        transfer_win.r[1] = 0    -- r
-        transfer_win.g[1] = 0    -- g
-        transfer_win.b[1] = 1    -- b
-
-        --Ponto Final
-        transfer_win.x[2] = 0.9  -- x
-        transfer_win.y[2] = 0    -- y
-        transfer_win.r[2] = 0    -- r
-        transfer_win.g[2] = 1    -- g
-        transfer_win.b[2] = 0    -- b
 
         self.pars = bar.New("Parameters")
         self.pars:NewVar{name = "color", type = tw.TYPE_COLOR3F, properties = "label = 'Color 1'"}

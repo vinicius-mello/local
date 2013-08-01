@@ -228,6 +228,7 @@ __kernel void kern(
 
 ctrl_win=win.New("volrend")
 
+
 function ctrl_win:Reshape(width, height)
     gl.Viewport(0, 0, width, height) -- coloca o viewport ocupando toda a janela
 
@@ -382,9 +383,7 @@ function ctrl_win:run_kernel()
         t={0,0.4,0.5,0.6,1}
     })
     ]]
-    if self.transfer_win and self.transfer_win.buildColorMap then
-        self.transfer_win:buildColorMap(self.transfer_array)
-    end
+    self.transfer_win:buildColorMap(self.transfer_array)
     self.cmd:write_image(self.transfer, true, 0,0,0,1024,1,1,0,0,
         self.transfer_array:data())
     self.cmd:write_buffer(self.volume, true, 0, self.volume_array:size_of(), self.volume_array:data())
@@ -563,8 +562,8 @@ function ctrl_win:Init()
     self.volume=cl.mem(self.ctx,cl.MEM_READ_ONLY,self.volume_array:size_of())
     print(cl.host_get_error())
     self.transfer_win=transfer.New("transfer",function()
-        ctrl_win:PostRedisplay()
-    end)
+            ctrl_win:PostRedisplay()
+            end)
 end
 
 function ctrl_win:fill_volume()
