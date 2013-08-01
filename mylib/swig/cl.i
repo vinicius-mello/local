@@ -130,6 +130,7 @@ class kernel {
         void arg(int i, int p);
         void arg_float(int i, float p);
         void arg(int i, const sampler& s);
+        std::string work_group_info(int platform, int device, unsigned param);
         ~kernel();
 };
 

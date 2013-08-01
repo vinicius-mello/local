@@ -22,6 +22,7 @@ for i=0,cl.host_ndevices(0)-1 do
 end
 print("using device 0,"..gpu_id)
 print("  extensions:",cl.host_get_device_info(0,gpu_id,cl.DEVICE_EXTENSIONS))
+print("  max_work_group_size:",cl.host_get_device_info(0,gpu_id,cl.DEVICE_MAX_WORK_GROUP_SIZE))
 
 kernel_src= [[
 
@@ -397,7 +398,7 @@ function ctrl_win:run_kernel()
     self.krn:arg(7,self.volume_array:depth())
     
 
-    self.cmd:range_kernel2d(self.krn,0,0,512,512)
+    self.cmd:range_kernel2d(self.krn,0,0,512,512,32,32)
     self.cmd:finish()
     self.cmd:add_object(self.cltex_entry)
     self.cmd:add_object(self.cltex_exit)
@@ -484,6 +485,8 @@ function ctrl_win:Init()
     print(cl.host_get_error())
     self.krn=cl.kernel(self.prg, "kern")
     print(cl.host_get_error())
+    print("kernel work group size:",
+        self.krn:work_group_info(0,gpu_id,cl.KERNEL_WORK_GROUP_SIZE))
 
     print("Configurando OpenGL")
     gl.ClearDepth(1.0)                              -- valor do z-buffer

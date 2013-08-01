@@ -473,6 +473,39 @@ class kernel {
     void arg(int i, const sampler& s) {
         host::code_=clSetKernelArg(ker_,i,sizeof(cl_sampler),&s.sam_);
     }
+    string work_group_info(int platform, int device, unsigned param) {
+        stringstream ss;
+        switch(param) {
+            case CL_KERNEL_WORK_GROUP_SIZE:
+                size_t res;
+                clGetKernelWorkGroupInfo(ker_,
+                        host::device(platform, device),
+                        param,
+                        sizeof(size_t),
+                        &res,0);
+                ss<<res;
+                break;
+            case CL_KERNEL_COMPILE_WORK_GROUP_SIZE:
+                size_t res3[3];
+                clGetKernelWorkGroupInfo(ker_,
+                        host::device(platform, device),
+                        param,
+                        3*sizeof(size_t),
+                        &res3[0],0);
+                ss<<res3[0]<<" "<<res3[1]<<" "<<res3[2];
+                break;
+            case CL_KERNEL_LOCAL_MEM_SIZE:
+                cl_ulong resu;
+                clGetKernelWorkGroupInfo(ker_,
+                        host::device(platform, device),
+                        param,
+                        sizeof(cl_ulong),
+                        &resu,0);
+                ss<<resu;
+                break;
+        }
+        return ss.str();
+    }
     ~kernel() {
         if(CL_SUCCESS==clReleaseKernel(ker_)) {
             debug_print("~kernel(%p)\n",this);
