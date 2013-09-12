@@ -104,6 +104,11 @@ namespace mytl {
             glTranslate(trans);
             glScale(_(s,s,s));
         }
+        void inverse_transform() {
+            glScale(_(1.0/s,1.0/s,1.0/s));
+            glTranslate(-trans);
+            glRotate(1.0/qnow);
+        }
         void rotate() {
             glRotate(qnow);
         }

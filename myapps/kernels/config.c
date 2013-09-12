@@ -116,4 +116,5 @@ typedef struct VOLUME_STRUCT {
 
 // configure compositing mode
 #define RC_APPLY_COMPOSITING(result, color, t, tDepth_, Samplings) \
-    compositeDVR(result, &color, t, &tDepth_, Samplings)
+    composite_prod(result, &color, t, &tDepth_, Samplings)
+    //compositeDVR(result, &color, t, &tDepth_, Samplings)

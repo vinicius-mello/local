@@ -6,6 +6,7 @@ require("array")
 require("cubic")
 require("colormap")
 require("transfer")
+require("matrix")
 
 cl.host_init()
 print("platform 0 info:",cl.host_get_platform_info(0,cl.PLATFORM_NAME))
@@ -190,6 +191,9 @@ function ctrl_win:run_kernel()
     self.krn:arg(5,self.volume_array:width())
     self.krn:arg(6,self.volume_array:height())
     self.krn:arg(7,self.volume_array:depth())
+    self.krn:arg_float(8,self.viewpoint:get(0,0))
+    self.krn:arg_float(9,self.viewpoint:get(1,0))
+    self.krn:arg_float(10,self.viewpoint:get(2,0))
     self.cmd:range_kernel2d(self.krn,0,0,512,512)
     self.cmd:finish()
     self.cmd:add_object(self.cltex_entry)
@@ -221,6 +225,21 @@ function ctrl_win:Display()
     gl.Translate(-0.5,-0.5,-0.5)
 
     self:draw_textures()
+    gl.PopMatrix()
+
+    gl.PushMatrix()
+    self.viewpoint:set(0,0,0)
+    self.viewpoint:set(1,0,0)
+    self.viewpoint:set(2,0,1)
+    self.viewpoint:set(3,0,1)
+    gl.Translate(0.5,0.5,0.5)
+    self.model_track:inverse_transform()
+    gl2.GetModelviewMatrix(self.inv.array:data())
+    self.inv=self.inv:transpose()
+    print(self.inv)
+    self.viewpoint=self.inv*self.viewpoint
+    print(self.viewpoint)
+
     gl.PopMatrix()
 
     self:run_kernel()
@@ -299,6 +318,8 @@ function ctrl_win:Init()
     self.pressed=false
     self.dragging=false
     self.light_dragging=false
+    self.viewpoint=matrix.new(4,1)
+    self.inv=matrix.new(4,4)
 
     local null=array.uint()
     self.tex=gl2.color_texture2d()
@@ -306,11 +327,13 @@ function ctrl_win:Init()
     self.cltex=cl.gl_texture2d(self.ctx,cl.MEM_WRITE_ONLY,gl.TEXTURE_2D,0,self.tex:object_id())
 
     self.tex_entry=gl2.color_texture2d()
-    self.tex_entry:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,null:data())
+    --self.tex_entry:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,null:data())
+    self.tex_entry:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.FLOAT,null:data())
     self.cltex_entry=cl.gl_texture2d(self.ctx,cl.MEM_READ_ONLY,gl.TEXTURE_2D,0,self.tex_entry:object_id())
 
     self.tex_exit=gl2.color_texture2d()
-    self.tex_exit:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,null:data())
+    --self.tex_exit:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.UNSIGNED_BYTE,null:data())
+    self.tex_exit:set(0,gl.RGBA,512,512,0,gl.RGBA,gl.FLOAT,null:data())
     self.cltex_exit=cl.gl_texture2d(self.ctx,cl.MEM_READ_ONLY,gl.TEXTURE_2D,0,self.tex_exit:object_id())
 
     self.rb=gl2.render_buffer()

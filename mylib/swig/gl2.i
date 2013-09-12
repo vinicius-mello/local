@@ -141,6 +141,7 @@ void vertex_attrib_array(uint i, const array<float>& b, bool norm=false, int n=0
 void vertex_attrib_array(uint i, const array<double>& b, bool norm=false, int n=0, int stride=0);
 void enable_vertex_attrib_array(uint i);
 void disable_vertex_attrib_array(uint i);
+void GetModelviewMatrix(double * m);
 /* 
 %typemap(in) vec3 {
   for(int i=0;i<3;++i) {
@@ -172,6 +173,7 @@ class trackball {
         void move_zoom(int x, int y);
         void move_scaling(int x, int y);
         void transform();
+        void inverse_transform();
         void rotate();
 };
 

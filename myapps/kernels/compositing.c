@@ -1,5 +1,5 @@
 //constant float SAMPLING_BASE_INTERVAL_RCP = 200.0f;
-constant float SAMPLING_BASE_INTERVAL_RCP = 4.0f;
+constant float SAMPLING_BASE_INTERVAL_RCP = 1.0f;
 constant float SAMPLING_BASE_INTERVAL_SLICE_RCP = 105.0f;
 
 /**
@@ -20,3 +20,19 @@ float4 compositeDVR(float4 curResult, float4 *color, float t, float *tDepth, flo
         (*tDepth) = t;
     return result;
 }
+
+float4 composite_prod(float4 curResult, float4 *color, float t, float *tDepth, float samplingStepSize_) {
+    float4 result = curResult;
+
+    // apply opacity correction to accomodate for variable sampling intervals
+    (*color).w = pow(1.0f-(*color).w, samplingStepSize_ * SAMPLING_BASE_INTERVAL_RCP);
+    result.w=(1.0f-result.w)*(*color).w;
+    result.xyz = result.xyz + result.w * (*color).xyz*samplingStepSize_;
+    result.w=(1.0f-result.w);
+    (*color).w=(1.0f-(*color).w);
+    // save first hit ray parameter for depth value calculation
+    if ((*tDepth) < 0.0f)
+        (*tDepth) = t;
+    return result;
+}
+

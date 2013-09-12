@@ -116,6 +116,11 @@ inline void draw_quads(const array<uint>& b) {
     glDrawElements(GL_QUADS,b.size(),GL_UNSIGNED_INT,b.data());
 }
 
+    inline
+        void GetModelviewMatrix(double * m) {
+            glGetDoublev(GL_MODELVIEW_MATRIX,m);
+        }
+
 
 
 
