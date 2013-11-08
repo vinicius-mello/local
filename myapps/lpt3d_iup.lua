@@ -1,7 +1,8 @@
 dofile("modules.lua")
-require("win")
---require("luagl")
---require("luaglu")
+require("iuplua")
+require("iupluagl")
+require("luagl")
+require("luaglu")
 require("array")
 require("gl2")
 require("queue")
@@ -20,10 +21,13 @@ unprojection=gl2.unprojection()
 tree=lpt.lpt3d_tree()
 
 
-cnv = win.New("lpt3d")
+cnv = iup.glcanvas { buffer="DOUBLE", depth_size="16", rastersize = "480x480" }
+dlg = iup.dialog {cnv; title="lpt3d"}
+
 
 -- chamada quando a janela OpenGL é redimensionada
-function cnv:Reshape(width, height)
+function cnv:resize_cb(width, height)
+  iup.GLMakeCurrent(self)
   gl.Viewport(0, 0, width, height) -- coloca o viewport ocupando toda a janela
 	self.height=height
 	self.width=width
@@ -83,31 +87,6 @@ function draw_face(a,b,c)
  	gl.Vertex(c)
 end
 
-function draw_quad(a,b,c,d)
-  local va=vec.new(a) 
-  local vb=vec.new(b) 
-  local vc=vec.new(c) 
-  local vc=vec.new(d) 
-  gl.Normal((vb-va)^(vc-va))
-  gl.Vertex(a)
-  gl.Vertex(b)
-  gl.Vertex(c)
-  gl.Vertex(d)
-end
-
-function shrink(a,b,c,ratio)
-  local as={(1-2*ratio)*a[1]+ratio*b[1]+ratio*c[1],
-    (1-2*ratio)*a[2]+ratio*b[2]+ratio*c[2],
-    (1-2*ratio)*a[3]+ratio*b[3]+ratio*c[3]}
-  local bs={ratio*a[1]+(1-2*ratio)*b[1]+ratio*c[1],
-    ratio*a[2]+(1-2*ratio)*b[2]+ratio*c[2],
-    ratio*a[3]+(1-2*ratio)*b[3]+ratio*c[3]}
-  local cs={ratio*a[1]+ratio*b[1]+(1-2*ratio)*c[1],
-    ratio*a[2]+ratio*b[2]+(1-2*ratio)*c[2],
-    ratio*a[3]+ratio*b[3]+(1-2*ratio)*c[3]}
-    return as,bs,cs
-end
-
 function draw_tetra(cur,id)
  	cur:simplex(vert:data())
 	local a={vert:get(0),vert:get(1),vert:get(2)}
@@ -144,67 +123,9 @@ function draw_tetra(cur,id)
 	gl.Enable('LIGHTING')
 end
 
-function draw_tetra2(cur,id,ratio)
-  
-  cur:simplex(vert:data())
-  local a={vert:get(0),vert:get(1),vert:get(2)}
-  local b={vert:get(3),vert:get(4),vert:get(5)}
-  local c={vert:get(6),vert:get(7),vert:get(8)}
-  local d={vert:get(9),vert:get(10),vert:get(11)}
-  if cur:orientation()<0 then
-    c,d=d,c
-  end
-  
-  local ac,bc,dc=shrink(a,b,d,ratio)
-  local ba,ca,da=shrink(b,c,d,ratio)
-  local ad,cd,bd=shrink(a,c,b,ratio)
-  local ab,db,cb=shrink(a,d,c,ratio)
-  
-  if selected and tree:id(selected)==id then
-    gl.Material('FRONT','DIFFUSE',{0,0,1})
-  else
-    gl.Material('FRONT','DIFFUSE',{1,0,0})
-  end
-  gl.Enable('POLYGON_OFFSET_FILL')
-  gl.PolygonOffset(1.0,1.0)
-  gl.PolygonMode('FRONT','FILL')
-  gl.Begin('QUADS')
-  draw_quad(ab,db,dc,ac)
-  draw_quad(ab,ad,cd,cb)
-  draw_quad(ad,ac,bc,bd)
-  draw_quad(bd,ba,ca,cd)
-  draw_quad(ba,bc,dc,da)
-  draw_quad(cb,ca,da,db)
-  gl.End()
-  gl.Begin('TRIANGLES')
-  draw_face(ab,ac,ad)
-  draw_face(ba,bd,bc)
-  draw_face(ca,cb,cd)
-  draw_face(da,dc,db)
-  gl.End()
-  gl.Disable('POLYGON_OFFSET_FILL')
-  gl.Disable('LIGHTING')
-  gl.Color(1,1,1)
-  gl.PolygonMode('FRONT','LINE')
-  gl.Begin('QUADS')
-  draw_quad(ab,db,dc,ac)
-  draw_quad(ab,ad,cd,cb)
-  draw_quad(ad,ac,bc,bd)
-  draw_quad(bd,ba,ca,cd)
-  draw_quad(ba,bc,dc,da)
-  draw_quad(cb,ca,da,db)
-  gl.End()
-  gl.Begin('TRIANGLES')
-  draw_face(ab,ac,ad)
-  draw_face(ba,bd,bc)
-  draw_face(ca,cb,cd)
-  draw_face(da,dc,db)
-  gl.End()
-  gl.Enable('LIGHTING')
-end
-
 -- chamada quando a janela OpenGL necessita ser desenhada
-function cnv:Display()
+function cnv:action(x, y)
+  iup.GLMakeCurrent(self)
   -- limpa a tela e o z-buffer
   gl.Clear('COLOR_BUFFER_BIT,DEPTH_BUFFER_BIT')
   gl.MatrixMode('MODELVIEW')       -- seleciona matriz de modelagem
@@ -242,15 +163,18 @@ function cnv:Display()
 			  visible[id]=true
 			end
 			if visible[id] then 
-  		draw_tetra2(cur,id,self.pars.ratio)
+  		draw_tetra(cur,id)
 			end
   	end
   until not tree:node_next()
 
+  -- troca buffers
+  iup.GLSwapBuffers(self)
 end
 
 -- chamada quando a janela OpenGL é criada
-function cnv:Init()
+function cnv:map_cb()
+  iup.GLMakeCurrent(self)
   print("Iniciando GLEW")
   gl2.init()
   print("Configurando OpenGL")
@@ -276,17 +200,15 @@ function cnv:Init()
   self.pressed=false
   self.dragging=false
   self.light_dragging=false
-  self.pars=bar.New("Parameters")
-  self.pars:NewVar {name="ratio", type=tw.TYPE_DOUBLE, properties="min=0 max=1 step=0.02"}
-  self.pars.ratio=0.1
+
 end
 
 -- chamada quando uma tecla é pressionada
-function cnv:Keyboard(c,x,y)
-  if c == 27 then
+function cnv:k_any(c)
+  if c == iup.K_ESC then
   -- sai da aplicação
-    os.exit()
-	elseif c == 115 then
+  iup.ExitLoop()
+	elseif c == iup.K_s then
 	  if selected then
 		  tree:compat_bisect(selected)
 			repeat 
@@ -294,76 +216,86 @@ function cnv:Keyboard(c,x,y)
 				visible[tree:recent_id()]=visible[tree:id(c:parent())]
 			until not tree:recent_next()
 			selected=nil
+			cnv:action(0,0)
 		end
-	elseif c == 104 then
+	elseif c == iup.K_h then
 	  if selected then
 		  visible[tree:id(selected)]=false
 		end
+		cnv:action(0,0)
   end
 end
 
-function cnv:Mouse(button,state,x,y)
-    if button==glut.LEFT_BUTTON and
-        state==glut.DOWN then
-        self.model_track:start_motion(x,y)
-        self.light_track:start_motion(x,y)
-        self.pressed=true
-        self.mod_status=self:GetModifiers()
-    else
-        self.pressed=false
-        if not self.dragging or self.light_dragging then
-          pnt:set(0,x)
-          pnt:set(1,self.height-y)
-          unprojection:reset()
-          local qu=queue.new()
-          for i=0,5 do 
-            qu:pushleft(lpt.lpt3d(i))
-          end
-          local min_t=1.0
-          selected=nil
-          while not qu:empty() do
-            local c=qu:popright()
-            c:simplex(vert:data())
-            local inter=unprojection:to_tetra(pnt:data(),vert:data(),pnt2:data(),temp:data(),c:orientation())
-            if inter then
-              if not tree:is_leaf(c) then
-                qu:pushleft(c:child(0))
-                qu:pushleft(c:child(1))
-              else 
-                if visible[tree:id(c)] then
-                  if temp:get(0)<min_t then
-                    min_t=temp:get(0)
-                    selected=c
-                  end
-                end
-              end
-            end
-          end
-        end    
-    end
-    self.dragging=false
-    self.light_dragging=false
+function cnv:button_cb(but,pressed,x,y,status)
+  iup.GLMakeCurrent(self)
+  if pressed==1 then 
+	  self.model_track:start_motion(x,y)
+	  self.light_track:start_motion(x,y)
+		self.pressed=true
+	else 
+	  self.pressed=false
+		if not self.dragging or self.light_dragging then
+		  pnt:set(0,x)
+		  pnt:set(1,self.height-y)
+			unprojection:reset()
+			local qu=queue.new()
+			for i=0,5 do 
+				qu:pushleft(lpt.lpt3d(i))
+  	  end
+			local min_t=1.0
+			selected=nil
+			while not qu:empty() do
+			  local c=qu:popright()
+  		  c:simplex(vert:data())
+				local inter=unprojection:to_tetra(pnt:data(),vert:data(),pnt2:data(),temp:data(),c:orientation())
+				if inter then
+				  if not tree:is_leaf(c) then
+					  qu:pushleft(c:child(0))
+					  qu:pushleft(c:child(1))
+					else 
+					  if visible[tree:id(c)] then
+				      if temp:get(0)<min_t then
+						    min_t=temp:get(0)
+					      selected=c
+						  end
+						end
+					end
+				end
+			end
+			if selected then
+        cnv:action(0,0)
+			end
+		end
+	end
+	self.dragging=false
+	self.light_dragging=false
+  cnv:action(0,0)
 end
 
-function cnv:Motion(x,y)
-    if self.pressed then
-        if self:ActiveShift(self.mod_status) and self:ActiveCtrl(self.mod_status) then
-            self.light_track:move_rotation(x,y)
-            self.light_dragging=true
-        elseif self:ActiveShift(self.mod_status) then
-            self.model_track:move_scaling(x,y)
-            self.dragging=true
-        elseif self:ActiveCtrl(self.mod_status) then
-            self.model_track:move_pan(x,y)
-            self.dragging=true
-        elseif self:ActiveAlt(self.mod_status) then
-            self.model_track:move_zoom(x,y)
-            self.dragging=true
-        else
-            self.model_track:move_rotation(x,y)
-            self.dragging=true
-        end
-    end
+function cnv:motion_cb(x,y,status)
+  iup.GLMakeCurrent(self)
+  if self.pressed then 
+	  if iup.isshift(status) and iup.iscontrol(status) then
+      self.light_track:move_rotation(x,y)
+		  self.light_dragging=true
+	  elseif iup.isshift(status) then
+      self.model_track:move_scaling(x,y)
+		  self.dragging=true
+		elseif iup.iscontrol(status) then
+      self.model_track:move_pan(x,y)
+		  self.dragging=true
+		elseif iup.isalt(status) then
+      self.model_track:move_zoom(x,y)
+		  self.dragging=true
+		else 
+      self.model_track:move_rotation(x,y)
+		  self.dragging=true
+		end
+  	cnv:action(0,0)
+	end
 end
 
-win.Loop()
+-- exibe a janela
+dlg:show()
+-- entra no loop de eventos
+iup.MainLoop()

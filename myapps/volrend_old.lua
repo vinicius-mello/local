@@ -368,8 +368,6 @@ function ctrl_win:Init()
     self.transfer_win=transfer.New("transfer",function()
         ctrl_win:PostRedisplay()
     end)
-    self.pars=bar.New("teste")
-
 end
 
 function ctrl_win:fill_volume()
