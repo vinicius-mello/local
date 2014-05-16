@@ -12,6 +12,22 @@ function normE2(x)
     return blas.dot(x,x)
 end
 
+function normE4(x)
+    local n=0
+    for i=0,x:size()-1 do
+        n=n+x:get(i)^4
+    end
+    return n
+end
+
+function normE6(x)
+    local n=0
+    for i=0,x:size()-1 do
+        n=n+x:get(i)^6
+    end
+    return n
+end
+
 function distE2(x,y,work)
     blas.copy(x,work)
     blas.axpy(-1,y,work)
@@ -458,6 +474,309 @@ function clamped_thin_plate_spline(mu)
     }
     return env
 end
+
+function superellipse2(mu)
+    local M=4
+    local env={
+        kernel_func=function(x,y,work)
+            local nx=normE2(x)
+            local ny=normE2(y)
+            local A=1-nx
+            local B=1+nx
+            local C=A^2/B
+            local D=1-ny
+            local E=1+ny
+            local F=D^2/E
+            local H=blas.dot(x,y)
+            local I=(1-M*H/(B*E))
+            return C*F/I
+        end,
+        grad_kernel_func=function(vk,x,y,gradx,work)
+            for i=0,gradx:size()-1 do
+                work:set(i,2*x:get(i))                
+            end
+            local nx=normE2(x)
+            local ny=normE2(y)
+            local A=1-nx
+            local B=1+nx
+            local C=A^2/B
+            local D=1-ny
+            local E=1+ny
+            local F=D^2/E
+            local H=blas.dot(x,y)
+            local I=(1-M*H/(B*E))
+            blas.copy(y,gradx)
+            blas.scal(F*C*M/(E*B*I^2),gradx)
+            blas.axpy( F*(1-4/(B^2))/I-F*C*H*M/(E*B^2*I^2) ,work,gradx)
+            return 
+        end,
+        in_domain=function(x) return normE2(x)<1 end,
+        radial=false,
+        mu=mu
+    }
+    return env
+end
+
+
+function superellipse4(mu)
+    local M=16/math.sqrt(54)
+    local env={
+        kernel_func=function(x,y,work)
+            local nx=normE4(x)
+            local ny=normE4(y)
+            local A=1-nx
+            local B=1+nx
+            local C=A^2/B
+            local D=1-ny
+            local E=1+ny
+            local F=D^2/E
+            local H=blas.dot(x,y)
+            local I=(1-M*H/(B*E))
+            return C*F/I
+        end,
+        grad_kernel_func=function(vk,x,y,gradx,work)
+            for i=0,gradx:size()-1 do
+                work:set(i,4*x:get(i)^3)                
+            end
+            local nx=normE4(x)
+            local ny=normE4(y)
+            local A=1-nx
+            local B=1+nx
+            local C=A^2/B
+            local D=1-ny
+            local E=1+ny
+            local F=D^2/E
+            local H=blas.dot(x,y)
+            local I=(1-M*H/(B*E))
+            blas.copy(y,gradx)
+            blas.scal(F*C*M/(E*B*I^2),gradx)
+            blas.axpy( F*(1-4/(B^2))/I-F*C*H*M/(E*B^2*I^2) ,work,gradx)
+            return 
+        end,
+        in_domain=function(x) return normE4(x)<1 end,
+        radial=false,
+        mu=mu
+    }
+    return env
+end
+
+function superellipse24(tau,mu)
+    local M4=16/math.sqrt(54)
+    local M2=4
+    local p2=function (x,y)
+        local nx=normE2(x)
+        local ny=normE2(y)
+        if nx<1 and ny<1 then
+            local A=1-nx
+            local B=1+nx
+            local C=A^2/B
+            local D=1-ny
+            local E=1+ny
+            local F=D^2/E
+            local H=blas.dot(x,y)
+            local I=(1-M2*H/(B*E))
+            return C*F/I
+        else
+            return 0
+        end
+    end
+    local p2grad=function (x,y,gradx)
+        local nx=normE2(x)
+        local ny=normE2(y)
+        if nx<1 and ny<1 then     
+            local A=1-nx
+            local B=1+nx
+            local C=A^2/B
+            local D=1-ny
+            local E=1+ny
+            local F=D^2/E
+            local H=blas.dot(x,y)
+            local I=(1-M2*H/(B*E))
+            blas.copy(y,gradx)
+            blas.scal(F*C*M2/(E*B*I^2),gradx)
+            blas.axpy( 2*F*(1-4/(B^2))/I-F*C*H*M2/(E*B^2*I^2) ,x,gradx)
+            return
+        else
+            for i=0,gradx:size()-1 do
+                gradx:set(i,0)                
+            end
+        end
+    end
+    local env={
+        kernel_func=function(x,y,work)
+            local nx=normE4(x)
+            local ny=normE4(y)
+            local A=1-nx
+            local B=1+nx
+            local C=A^2/B
+            local D=1-ny
+            local E=1+ny
+            local F=D^2/E
+            local H=blas.dot(x,y)
+            local I=(1-M4*H/(B*E))
+            return p2(x,y)+tau*C*F/I
+        end,
+        grad_kernel_func=function(vk,x,y,gradx,work)
+            for i=0,gradx:size()-1 do
+                work:set(i,4*x:get(i)^3)                
+            end
+            local nx=normE4(x)
+            local ny=normE4(y)
+            local A=1-nx
+            local B=1+nx
+            local C=A^2/B
+            local D=1-ny
+            local E=1+ny
+            local F=D^2/E
+            local H=blas.dot(x,y)
+            local I=(1-M4*H/(B*E))
+            blas.copy(y,gradx)
+            blas.scal(F*C*M4/(E*B*I^2),gradx)
+            blas.axpy( F*(1-4/(B^2))/I-F*C*H*M4/(E*B^2*I^2) ,work,gradx)
+            blas.copy(gradx,work)
+            p2grad(x,y,gradx)
+            blas.axpy( tau,work,gradx)
+            return 
+        end,
+        in_domain=function(x) return normE4(x)<1 end,
+        radial=false,
+        mu=mu
+    }
+    return env
+end
+
+
+function superellipse6(mu)
+    local M=36/(5*(100^(1/3)))
+    local env={
+        kernel_func=function(x,y,work)
+            local nx=normE6(x)
+            local ny=normE6(y)
+            local A=1-nx
+            local B=1+nx
+            local C=A^2/B
+            local D=1-ny
+            local E=1+ny
+            local F=D^2/E
+            local H=blas.dot(x,y)
+            local I=(1-M*H/(B*E))
+            return C*F/I
+        end,
+        grad_kernel_func=function(vk,x,y,gradx,work)
+            for i=0,gradx:size()-1 do
+                work:set(i,6*x:get(i)^5)                
+            end
+            local nx=normE6(x)
+            local ny=normE6(y)
+            local A=1-nx
+            local B=1+nx
+            local C=A^2/B
+            local D=1-ny
+            local E=1+ny
+            local F=D^2/E
+            local H=blas.dot(x,y)
+            local I=(1-M*H/(B*E))
+            blas.copy(y,gradx)
+            blas.scal(F*C*M/(E*B*I^2),gradx)
+            blas.axpy( F*(1-4/B^2)/I-F*C*H*M/(E*B^2*I^2) ,work,gradx)
+            return 
+        end,
+        in_domain=function(x) return normE6(x)<1 end,
+        radial=false,
+        mu=mu
+    }
+    return env
+end
+
+function bk(mu)
+    local env={
+        kernel_func=function(x,y,work)
+            local nx=normE2(x)
+            local ny=normE2(y)
+            local A=1-nx
+            local B=blas.dot(x,y)
+            local C=1-ny
+            return math.sqrt(A)*math.sqrt(C)/(1-B)
+        end,
+        grad_kernel_func=function(vk,x,y,gradx,work)
+            local nx=normE2(x)
+            local ny=normE2(y)
+            local A=1-nx
+            local B=blas.dot(x,y)
+            local C=1-ny
+            blas.copy(x,gradx)
+            blas.scal(-math.sqrt(C)/math.sqrt(A)/(1-B),gradx)
+            blas.axpy(math.sqrt(A)*math.sqrt(C)/(1-B)^2 ,y,gradx)
+            return 
+        end,
+        in_domain=function(x) return normE2(x)<1 end,
+        radial=false,
+        mu=mu
+    }
+    return env
+end
+
+function smooth_bk(mu)
+    local env={
+        kernel_func=function(x,y,work)
+            local nx=normE2(x)
+            local ny=normE2(y)
+            local A=1-nx
+            local B=blas.dot(x,y)
+            local C=1-ny
+            return A^2*C^2/(1-B)
+        end,
+        grad_kernel_func=function(vk,x,y,gradx,work)
+            local nx=normE2(x)
+            local ny=normE2(y)
+            local A=1-nx
+            local B=blas.dot(x,y)
+            local C=1-ny
+            blas.copy(x,gradx)
+            blas.scal(-4*C^2*A/(1-B),gradx)
+            blas.axpy(A^2*C^2/(1-B)^2 ,y,gradx)
+            return 
+        end,
+        in_domain=function(x) return normE2(x)<1 end,
+        radial=false,
+        mu=mu
+    }
+    return env
+end
+
+function superellipse4_bk(mu)
+    local M=math.sqrt(2)/2
+    local env={
+        kernel_func=function(x,y,work)
+            local nx=normE4(x)
+            local ny=normE4(y)
+            local A=1-nx
+            local B=blas.dot(x,y)
+            local C=1-ny
+            return A^2*C^2/(1-M*B)
+        end,
+        grad_kernel_func=function(vk,x,y,gradx,work)
+            local nx=normE4(x)
+            local ny=normE4(y)
+            local A=1-nx
+            local B=blas.dot(x,y)
+            local C=1-ny
+            for i=0,gradx:size()-1 do
+                work:set(i,4*x:get(i)^3)                
+            end
+            blas.copy(y,gradx)
+            blas.scal( A^2*C^2/(1-M*B)^2*M ,gradx)
+            blas.axpy( -2*A*C^2/(1-M*B)  ,work,gradx)
+            return 
+        end,
+        in_domain=function(x) return normE4(x)<1 end,
+        radial=false,
+        mu=mu
+    }
+    return env
+end
+
+
 
 function euclidean_heat_kernel(tau,mu,n)
     local env={

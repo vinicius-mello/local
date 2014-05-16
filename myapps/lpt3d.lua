@@ -9,9 +9,13 @@ require("vec")
 require("lpt")
 
 vert=array.double(12)
-pnt=array.double(3);
-pnt2=array.double(3);
-temp=array.double(3);
+pnt=array.double(3)
+pnt2=array.double(3)
+temp=array.double(3)
+ori=array.double(3)
+ori:set(0,0.5)
+ori:set(1,0.5)
+ori:set(2,0.5)
 selected=nil
 visible={true,true,true,true,true,true}
 
@@ -238,6 +242,7 @@ function cnv:Display()
     if tree:node_is_leaf() then
 	    local cur=tree:node_code()
 			local id=tree:node_id()
+      print(id)
 			if visible[id]==nil then
 			  visible[id]=true
 			end
@@ -246,6 +251,12 @@ function cnv:Display()
 			end
   	end
   until not tree:node_next()
+
+  print(ori:get(0),ori:get(1),ori:get(2))
+  tree:search_all(ori:data())
+  repeat
+    print(tree:recent_id())
+  until not tree:recent_next()
 
 end
 

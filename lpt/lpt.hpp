@@ -8,11 +8,22 @@
 #endif
 #include <set>
 #include <list>
+#include <queue>
 #include <utility>
 #include <cassert>
 #include <cstdio>
 #define LPT_ABS(x) (((x)<0) ? -(x) : (x))
 #define LPT_SGN(x) (((x)<0) ? -1 : 1)
+
+inline int delete_bit(int byte, int i) {
+    int mask=(~0)<<i;
+    return ((byte>>1)&mask)|((~mask)&byte);
+}
+
+inline int insert_bit(int byte, int i) {
+    int mask=(~0)<<i;
+    return ((mask&byte)<<1)|((~mask)&byte);
+}
 
 //! Template for permutation tables.
 template <int n>
@@ -540,11 +551,65 @@ inline void morton3_10(unsigned int& x) {
     x = (x | (x <<  2)) & 0x09249249;
 }
 
+inline double morton3_10(double x, double y, double z) {
+    double r=0.0;
+    unsigned int xi;
+    if(x==1.0) {
+        xi=0;
+        r+=1.0;
+    } else {
+        xi=(unsigned int)((x+1.0)/2.0*(1<<10));
+        morton3_10(xi);
+    }
+    unsigned int yi;
+    if(y==1.0) {
+        yi=0;
+        r+=2.0;
+    } else {
+        yi=(unsigned int)((y+1.0)/2.0*(1<<10));
+        morton3_10(yi);
+    }
+    unsigned int zi;
+    if(z==1.0) {
+        zi=0;
+        r+=4.0;
+    } else {
+        zi=(unsigned int)((z+1.0)/2.0*(1<<10));
+        morton3_10(zi);
+    }
+    xi=xi | (yi << 1) | (zi << 2);
+    r+=((double)xi)/(1<<30);
+    return r;
+}
+
 inline void morton2_16(unsigned int& x) {
     x = (x | (x << 8)) & 0x00FF00FF;
     x = (x | (x << 4)) & 0x0F0F0F0F;
     x = (x | (x << 2)) & 0x33333333;
     x = (x | (x << 1)) & 0x55555555;
+}
+
+inline double morton2_16(double x, double y) {
+    double r=0.0;
+    unsigned int xi;
+    if(x==1.0) {
+        xi=0;
+        r+=1.0;
+    } else {
+        xi=(unsigned int)((x+1.0)/2.0*(1<<16));
+        morton2_16(xi);
+    }
+    unsigned int yi;
+    if(y==1.0) {
+        yi=0;
+        r+=2.0;
+    } else {
+        yi=(unsigned int)((y+1.0)/2.0*(1<<16));
+        morton2_16(yi);
+    }      
+    xi=xi | (yi << 1);
+    r+=((double)xi)/(1UL<<32);
+    return r;
 }
 
 inline void morton4_8(unsigned int& x) {
@@ -725,6 +790,15 @@ class lpt_tree {
         }
         return p;
     }
+    int neighbor_index(const lpt& r, const lpt& n) const {
+        for(int j=0;j<=dim;++j) {
+            lpt rr;
+            if(neighbor(n,j,rr)) {
+                if(rr==r) return j;
+            }
+        }
+        return -1;
+    }
     //! Performs a compatible bisection
     /** \param r simplex to be bisected */
     void compat_bisect(const lpt& r) {
@@ -793,6 +867,37 @@ class lpt_tree {
     lpt search(double * p, double * w) const {
         lpt r=find_root(p,w);
         return search_rec(p,r,w);
+    }
+    void search_all(double * p) {
+        double w[dim+1];
+        lpt r=search(p,w);
+        int faces=0;
+        for(int i=0;i<=dim;++i) if(w[i]!=0.0) faces+= (1<<i);
+        std::queue<std::pair<lpt,int> > q;
+        q.push(std::make_pair(r,faces));
+        pending.clear();
+        while(!q.empty()) {
+            std::pair<lpt,int> rf=q.front();
+            q.pop();
+            r=rf.first;
+            faces=rf.second;
+            pending.insert(r); 
+            for(int i=0;i<=dim;++i) {
+                if(((1<<i)&faces)==0) {
+                    lpt n;
+                    if(neighbor(r,i,n)) {
+                        rf.first=n;
+                        rf.second=insert_bit(delete_bit(faces,i),neighbor_index(r,n));
+                        if(pending.count(n)==0) q.push(rf);
+                    }
+                }
+            }
+        }
+        recent.clear();
+        for(typename std::set<lpt>::iterator it=pending.begin();it!=pending.end();++it) {
+            recent.push_back(std::make_pair(*it,id(*it)+1));
+        }
+        rec=recent.begin();
     }
     private:
     lpt search_rec(double * p, const lpt& r, double * w) const {

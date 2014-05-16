@@ -7,12 +7,17 @@ typedef lpt_tree<lpt2d> lpt2d_tree;
 typedef lpt_tree<lpt3d> lpt3d_tree;
 %}
 
+double morton2_16(double x, double y);
+double morton3_10(double x, double y, double z);
+
 class lpt2d {
     public:
         lpt2d();
         lpt2d(int sigperm);
         bool is_root() const;
         int level() const;
+        int orthant_level() const;
+        int simplex_level() const;
         int orientation() const;
         lpt2d child(int zo) const;
         bool is_child0() const;
@@ -32,6 +37,7 @@ class lpt2d_tree {
         void compat_bisect(const lpt2d& r);
         lpt2d find_root(double * p, double * w) const;
         lpt2d search(double * p) const;
+        void search_all(double * p);
         lpt2d search(double * p, double * w) const;
         void node_reset();
         bool node_next();
@@ -53,6 +59,8 @@ class lpt3d {
         lpt3d(int sigperm);
         bool is_root() const;
         int level() const;
+        int orthant_level() const;
+        int simplex_level() const;
         int orientation() const;
         lpt3d child(int zo) const;
         bool is_child0() const;
@@ -72,6 +80,7 @@ class lpt3d_tree {
         void compat_bisect(const lpt3d& r);
         lpt3d find_root(double * p, double * w) const;
         lpt3d search(double * p) const;
+        void search_all(double * p);
         lpt3d search(double * p, double * w) const;
         void node_reset();
         bool node_next();

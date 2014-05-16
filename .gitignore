@@ -43,3 +43,5 @@ Thumbs.db
 *_wrap.cxx
 # EPS
 *.eps
+*.stl
+*.xyz

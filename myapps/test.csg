@@ -1,0 +1,6 @@
+obj= --csg.sphere { }
+
+	csg.difference {
+		csg.box { length=2, height=2, depth=2},
+		csg.cylinder { from={0,0,-1}, to={0,0,1}, radius=0.5 }
+	}

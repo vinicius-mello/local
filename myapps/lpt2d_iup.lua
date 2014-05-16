@@ -1,6 +1,8 @@
 dofile("modules.lua")
-require("win")
-require("gl2")
+require("iuplua")
+require("iupluagl")
+require("luagl")
+require("luaglu")
 require("array")
 require("lpt")
 
@@ -10,7 +12,8 @@ pnt=array.double(2);
 tree=lpt.lpt2d_tree()
 selected=nil
 
-cnv = win.New("lpt2d")
+cnv = iup.glcanvas { buffer="DOUBLE", rastersize = "480x480" }
+dlg = iup.dialog {cnv; title="gl2"}
 
 function draw_triangle(c)
 	c:simplex(vert:data())
@@ -33,7 +36,8 @@ function draw_triangle(c)
 end
 
 -- chamada quando a janela OpenGL é redimensionada
-function cnv:Reshape(width, height)
+function cnv:resize_cb(width, height)
+  iup.GLMakeCurrent(self)
   gl.Viewport(0, 0, width, height) -- coloca o viewport ocupando toda a janela
 	self.width=width
 	self.height=height
@@ -44,7 +48,8 @@ function cnv:Reshape(width, height)
 end
 
 -- chamada quando a janela OpenGL necessita ser desenhada
-function cnv:Display()
+function cnv:action(x, y)
+  iup.GLMakeCurrent(self)
   -- limpa a tela e o z-buffer
   gl.Clear('COLOR_BUFFER_BIT,DEPTH_BUFFER_BIT')
   gl.MatrixMode('MODELVIEW')       -- seleciona matriz de modelagem
@@ -69,11 +74,13 @@ function cnv:Display()
 			draw_triangle(selected)
 		end
 	end
-
+  -- troca buffers
+  iup.GLSwapBuffers(self)
 end
 
 -- chamada quando a janela OpenGL é criada
-function cnv:Init()
+function cnv:map_cb()
+  iup.GLMakeCurrent(self)
   gl.ClearColor(0.0,0.0,0.0,0.5)                  -- cor de fundo preta
   gl.ClearDepth(1.0)                              -- valor do z-buffer
   gl.Disable('DEPTH_TEST')                         -- habilita teste z-buffer
@@ -82,21 +89,22 @@ function cnv:Init()
 end
 
 -- chamada quando uma tecla é pressionada
-function cnv:Keyboard(c,x,y)
-  if c == 27 then
+function cnv:k_any(c)
+  if c == iup.K_ESC then
   -- sai da aplicação
-    os.exit()
-	elseif c == 115 then 
+    iup.ExitLoop()
+	elseif c == iup.K_s then 
 	  if selected~=nil then 
 		  tree:compat_bisect(selected)
 			selected=nil
+      cnv:action(0,0)
 		end
   end
 end
 
-function cnv:Mouse(button,state,x,y)
-  if button==glut.LEFT_BUTTON and
-        state==glut.DOWN then 
+function cnv:button_cb(but,pressed,x,y,status)
+  iup.GLMakeCurrent(self)
+  if pressed==1 then 
 	  pnt:set(0,x/self.width*2-1)
 	  pnt:set(1,1-y/self.height*2)
     selected=tree:search(pnt:data())
@@ -104,6 +112,10 @@ function cnv:Mouse(button,state,x,y)
 		print(" - ",tree:id(selected))
 	else 
 	end
+  cnv:action(0,0)
 end
 
-win.Loop()
+-- exibe a janela
+dlg:show()
+-- entra no loop de eventos
+iup.MainLoop()

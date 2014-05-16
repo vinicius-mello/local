@@ -116,6 +116,33 @@
 #define FRAMEBUFFER_INCOMPLETE_MULTISAMPLE 0x8D56
 #define MAX_SAMPLES 0x8D57
 
+#define RG                             0x8227
+#define RG_INTEGER                     0x8228
+#define R8                             0x8229
+#define R16                            0x822A
+#define RG8                            0x822B
+#define RG16                           0x822C
+#define R16F                           0x822D
+#define R32F                           0x822E
+#define RG16F                          0x822F
+#define RG32F                          0x8230
+#define R8I                            0x8231
+#define R8UI                           0x8232
+#define R16I                           0x8233
+#define R16UI                          0x8234
+#define R32I                           0x8235
+#define R32UI                          0x8236
+#define RG8I                           0x8237
+#define RG8UI                          0x8238
+#define RG16I                          0x8239
+#define RG16UI                         0x823A
+#define RG32I                          0x823B
+#define RG32UI                         0x823C
+#define DEPTH_COMPONENT32F             0x8CAC
+#define DEPTH_COMPONENT16              0x81A5
+#define DEPTH_COMPONENT24              0x81A6
+#define DEPTH_COMPONENT32              0x81A7
+
 typedef unsigned int uint;
 typedef unsigned char byte;
 
@@ -315,6 +342,22 @@ class color_texture2d
         void bind(void);
         void unbind(void);
         bool set(int level, int internalFormat, size_t width, size_t height, int border, unsigned format, unsigned type, const void * pixels);
+};
+
+class color_texture3d 
+{
+    public:
+        color_texture3d(void);
+        unsigned object_id(void) const;
+        size_t width(void) const;
+        size_t height(void) const;
+        size_t depth(void) const;
+        int dimensions(void) const;
+        size_t size(const unsigned i) const;
+        unsigned target(void) const;
+        void bind(void);
+        void unbind(void);
+        bool set(int level, int internalFormat, size_t width, size_t height, size_t depth, int border, unsigned format, unsigned type, const void * pixels);
 };
 
 class buffer_object

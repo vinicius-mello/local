@@ -561,27 +561,42 @@ function test_win:solve()
         self.env=euclidean_heat_kernel(tau,mu,n)
     elseif env=="euclidean_heat_kernel_lut" then
         self.env=euclidean_heat_kernel_lut(tau,mu,n,0.001,16536)
-    elseif env=="shifted_laplacian" then
-        self.env=shifted_laplacian(tau,mu)
-    elseif env=="hyperbolic_gaussian" then
-        self.env=hyperbolic_gaussian(tau,mu,n)
+--    elseif env=="shifted_laplacian" then
+--        self.env=shifted_laplacian(tau,mu)
+--    elseif env=="hyperbolic_gaussian" then
+--        self.env=hyperbolic_gaussian(tau,mu,n)
     elseif env=="hyperbolic_heat_kernel" then
         self.env=hyperbolic_heat_kernel(tau,mu,0.001,16536)
     elseif env=="hyperbolicBK_heat_kernel" then
         self.env=hyperbolicBK_heat_kernel(tau,mu,0.001,16536)
-    elseif env=="hyperbolic_shifted_laplacian" then
-        self.env=hyperbolic_shifted_laplacian(tau,mu)
-    elseif env=="hyperbolic_inverse_multiquadrics" then
-        self.env=hyperbolic_inverse_multiquadrics(tau,mu)
+--    elseif env=="hyperbolic_shifted_laplacian" then
+--        self.env=hyperbolic_shifted_laplacian(tau,mu)
+--    elseif env=="hyperbolic_inverse_multiquadrics" then
+--        self.env=hyperbolic_inverse_multiquadrics(tau,mu)
     elseif env=="euclidean_inverse_multiquadrics" then
         self.env=euclidean_inverse_multiquadrics(tau,mu)
-    elseif env=="hyperbolic_radial_characteristics" then
-        self.env=hyperbolic_radial_characteristics(tau,beta,mu)
+--    elseif env=="hyperbolic_radial_characteristics" then
+ --       self.env=hyperbolic_radial_characteristics(tau,beta,mu)
     elseif env=="euclidean_radial_characteristics" then
         self.env=euclidean_radial_characteristics(tau,beta,mu)
     elseif env=="clamped_thin_plate_spline" then
         self.env=clamped_thin_plate_spline(mu)
+    elseif env=="superellipse2" then
+        self.env=superellipse2(mu)
+    elseif env=="superellipse4" then
+        self.env=superellipse4(mu)
+    elseif env=="superellipse24" then
+        self.env=superellipse24(tau,mu)
+    elseif env=="superellipse6" then
+        self.env=superellipse6(mu)
+    elseif env=="bk" then
+        self.env=bk(mu)
+    elseif env=="smooth_bk" then
+        self.env=smooth_bk(mu)
+    elseif env=="superellipse4_bk" then
+        self.env=superellipse4_bk(mu)    
     end
+
 
     self.ws=alloc_workspace(n,N,m)
     self.solver=alloc_solver(self.data,self.env,self.ws)
@@ -726,7 +741,7 @@ function test_win:Init()
     gl.ShadeModel('FLAT')
 
     self.gnuplot = io.popen("gnuplot -persist", "w")
-    self.gnuplot:write("set terminal aqua enhanced font ',40'\n")
+    self.gnuplot:write("set terminal x11 enhanced font ',40'\n")
     self.gnuplot:write("set key left top \n")
 
     self.solved=false
@@ -748,12 +763,19 @@ function test_win:Init()
                 "hyperbolic_heat_kernel",
                 "hyperbolicBK_heat_kernel",
                 "clamped_thin_plate_spline",
+                "superellipse2",
+                "superellipse4",
+                "superellipse24",
+                "superellipse6",
+                "bk",
+                "smooth_bk",
+                "superellipse4_bk",
                 "euclidean_inverse_multiquadrics",
                 "euclidean_radial_characteristics",
-                "hyperbolic_gaussian",
-                "hyperbolic_inverse_multiquadrics",
-                "hyperbolic_radial_characteristics",
-                "hyperbolic_shifted_laplacian"
+--                "hyperbolic_gaussian",
+--                "hyperbolic_inverse_multiquadrics",
+--                "hyperbolic_radial_characteristics",
+--                "hyperbolic_shifted_laplacian"
             }
     self.pars:NewVar {name="environment",
         type={name="Environments",

@@ -79,7 +79,8 @@ function win.New(title)
 
     function t.glutwin:Keyboard(key,x,y)
         tw.SetCurrentWindow(t.glutwin.id)
-        if tw.EventKeyboardGLUT(key,x,y)==0 then
+        t.handled=(tw.EventKeyboardGLUT(key,x,y)==1)
+        if not t.handled then
             if t.Keyboard then
                 t:Keyboard(key,x,y)
             end
@@ -89,7 +90,8 @@ function win.New(title)
 
     function t.glutwin:Special(key,x,y)
         tw.SetCurrentWindow(t.glutwin.id)
-        if tw.EventSpecialGLUT(key,x,y)==0 then
+        t.handled=(tw.EventSpecialGLUT(key,x,y)==1)
+        if not t.handled then
             if t.Special then
                 t:Special(key,x,y)
             end
@@ -99,7 +101,8 @@ function win.New(title)
 
     function t.glutwin:Mouse(button,state,x,y)
         tw.SetCurrentWindow(t.glutwin.id)
-        if tw.EventMouseButtonGLUT(button,state,x,y)==0 then
+        t.handled=(tw.EventMouseButtonGLUT(button,state,x,y)==1)
+        if not t.handled then
             if t.Mouse then
                 t:Mouse(button,state,x,y)
             end
@@ -109,7 +112,8 @@ function win.New(title)
 
     function t.glutwin:Motion(x,y)
         tw.SetCurrentWindow(t.glutwin.id)
-        if tw.EventMouseMotionGLUT(x,y)==0 then
+        t.handled=(tw.EventMouseMotionGLUT(x,y)==1)
+        if not t.handled then
             if t.Motion then
                 t:Motion(x,y)
             end
@@ -119,7 +123,8 @@ function win.New(title)
 
     function t.glutwin:PassiveMotion(x,y)
         tw.SetCurrentWindow(t.glutwin.id)
-        if tw.EventMouseMotionGLUT(x,y)==0 then
+        t.handled=(tw.EventMouseMotionGLUT(x,y)==1)
+        if not t.handled then
             if t.PassiveMotion then
                 t:PassiveMotion(x,y)
             end

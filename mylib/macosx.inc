@@ -53,6 +53,8 @@ CL_INC =
 LPT_LIB = ~/local/lpt/lpt.o
 LPT_INC = -I ~/local/
 
+BOOST_INC = -I /usr/local/include/
+
 IL_LIB = -lIL -lILU -lILUT
 IL_INC = 
 

@@ -1,23 +1,10 @@
-//
-// Bui Tuong Phong shading model (per-pixel)
-//
-// by
-// Massimiliano Corsini
-// Visual Computing Lab (2006)
-//
 
-varying vec3 normal;
-varying vec3 vpos;
+varying vec2 tcoord;
 
 void main()
 {
-    // vertex normal
-    normal = normalize(gl_NormalMatrix * gl_Normal);
+	tcoord=0.5*(gl_Vertex.xy+1.0);
 
     // vertex position
-    vpos = vec3(gl_ModelViewMatrix * gl_Vertex);
-
-
-    // vertex position
-    gl_Position = ftransform();
+    gl_Position = gl_Vertex;
 }

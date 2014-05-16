@@ -165,6 +165,9 @@ lpt$(EXT): lpt_wrap.cxx
 lpt_wrap.cxx: $(MYLIB)/swig/lpt.i 
 	swig -o $@ -c++ -lua $<
 
+interval$(EXT): linterval.cpp 
+	g++ -o $@ $(SHARED) $< $(LUA_INC) $(BOOST_INC) $(LUA_LIB) -I $(MYLIB)
+
 pack$(EXT): lpack.c 
 	gcc -o $@ $(SHARED) $< $(LUA_INC) $(LUA_LIB) -I $(MYLIB)
 

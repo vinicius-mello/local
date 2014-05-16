@@ -37,19 +37,11 @@ function mt.__unm(a)
 end
 
 function mt.__mod(a,b)
-    local r=0
-    for i=1,#a do
-        r=r+a[i]*b[i]
-    end
-    return r
+    return vec.dot(a,b)
 end
 
 function mt.__pow(a,b)
-    local r={}
-    r[1]=a[2]*b[3]-a[3]*b[2]
-    r[2]=a[3]*b[1]-a[1]*b[3]
-    r[3]=a[1]*b[2]-a[2]*b[1]
-    return vec.new(r)
+   return vec.cross(a,b)
 end
 
 function mt.__tostring(a)
@@ -59,6 +51,39 @@ end
 function vec.new(t)
     setmetatable(t,mt)
     return t
+end
+
+function vec.dot(a,b)
+    local r=0
+    for i=1,#a do
+        r=r+a[i]*b[i]
+    end
+    return r
+end
+
+function vec.cross(a,b)
+    local r={}
+    r[1]=a[2]*b[3]-a[3]*b[2]
+    r[2]=a[3]*b[1]-a[1]*b[3]
+    r[3]=a[1]*b[2]-a[2]*b[1]
+    return vec.new(r)
+end
+
+function vec.norm2(a)
+    local r=0
+    for i=1,#a do
+        r=r+a[i]*a[i]
+    end
+    return r
+end
+
+function vec.norm(a)
+    return math.sqrt(vec.norm2(a))
+end
+
+function vec.normalize(a)
+    local l=vec.norm(a)
+    return (1.0/l)*a
 end
 
 return vec
